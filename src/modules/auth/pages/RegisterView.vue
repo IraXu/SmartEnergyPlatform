@@ -2,6 +2,8 @@
   <div class="auth-page">
     <AuthBrand />
 
+    <ProtoAnnouncement />
+
     <div class="auth-panel">
       <div class="auth-card auth-card--wide">
         <h2 class="auth-card__title">注册账号</h2>
@@ -222,6 +224,7 @@ import { BankOutlined, SafetyOutlined } from '@antdv-next/icons'
 import AccountField from '@/modules/auth/components/AccountField.vue'
 import AuthBrand from '@/modules/auth/components/AuthBrand.vue'
 import PasswordStrength from '@/modules/auth/components/PasswordStrength.vue'
+import ProtoAnnouncement from '@/shared/components/ProtoAnnouncement.vue'
 import ProtoTip from '@/shared/components/ProtoTip.vue'
 import { INDUSTRY_OPTIONS, REGION_OPTIONS } from '@/shared/mock/dict'
 import { splitPhoneIdentifier } from '@/shared/mock/countryCode'

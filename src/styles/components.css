@@ -34,6 +34,331 @@
   border-radius: 3px;
 }
 
+/* ---------- 原型公告（登录 / 注册页首次进入时展示一次） ---------- */
+/* 定位层：贴顶通栏 + 水平居中，仅负责定位与入场动画的分工，不拦截页面点击 */
+.proto-announce {
+  position: fixed;
+  top: 20px;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.proto-announce__pop {
+  pointer-events: auto;
+  /* 宽度按最长一条公告单行所需的自然宽度设定，保证内部文案不换行 */
+  width: 462px;
+  max-width: 100%;
+}
+
+/* 流光层以绝对定位贴合容器边缘，宿主需提供定位上下文；此处不裁剪，避免遮住流光 */
+.proto-announce__card {
+  position: relative;
+  padding: 16px 18px 13px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow:
+    0 20px 48px rgba(7, 63, 56, 0.15),
+    0 6px 16px rgba(7, 63, 56, 0.08);
+  animation: proto-announce-card 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes proto-announce-card {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 底色微渐变 + 两处光斑，用独立图层承载以便裁剪，同时不影响外圈流光 */
+.proto-announce__glow {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(158deg, #ffffff 0%, #f5faf9 100%);
+}
+
+.proto-announce__glow::before {
+  content: '';
+  position: absolute;
+  top: -78px;
+  right: -54px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(95, 212, 196, 0.26) 0%, rgba(95, 212, 196, 0) 70%);
+}
+
+.proto-announce__glow::after {
+  content: '';
+  position: absolute;
+  left: -56px;
+  bottom: -84px;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(15, 123, 108, 0.12) 0%, rgba(15, 123, 108, 0) 72%);
+}
+
+/* 内容统一抬到光斑之上 */
+.proto-announce__head,
+.proto-announce__list,
+.proto-announce__footer {
+  position: relative;
+  z-index: 1;
+}
+
+.proto-announce__head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+/* 图标徽标：品牌青绿渐变方块，作为标题区的视觉锚点 */
+.proto-announce__badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  font-size: 16px;
+  color: #fff;
+  border-radius: 10px;
+  background: linear-gradient(140deg, #14907f 0%, #0f7b6c 52%, #0b5f54 100%);
+  box-shadow: 0 6px 14px rgba(15, 123, 108, 0.28);
+}
+
+.proto-announce__titles {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.proto-announce__title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.proto-announce__subtitle {
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 1.6px;
+  color: rgba(15, 123, 108, 0.5);
+}
+
+/* 关闭按钮：默认低调，悬停才浮现底色，避免抢标题注意力 */
+.proto-announce__close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.proto-announce__close:hover {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.proto-announce__close:focus-visible {
+  outline: 2px solid rgba(15, 123, 108, 0.45);
+  outline-offset: 1px;
+}
+
+.proto-announce__list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 13px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 每条公告独立成块，图标与文案左右分栏；文案单行展示，避免折行打断阅读 */
+.proto-announce__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  background: rgba(15, 123, 108, 0.05);
+  transition: background-color 0.2s, transform 0.2s;
+  animation: proto-announce-item 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.proto-announce__item:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.proto-announce__item:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.proto-announce__item:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.proto-announce__item:hover {
+  background: rgba(15, 123, 108, 0.095);
+  transform: translateX(2px);
+}
+
+@keyframes proto-announce-item {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.proto-announce__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  color: #0f7b6c;
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: 0 1px 3px rgba(15, 123, 108, 0.16);
+}
+
+.proto-announce__text {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.72);
+}
+
+/* 底部：倒计时进度条 + 倒计时文案，进度条与秒数共同反映自动关闭剩余时间 */
+.proto-announce__footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(15, 123, 108, 0.2);
+}
+
+.proto-announce__track {
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  background: rgba(15, 123, 108, 0.14);
+  border-radius: 2px;
+}
+
+.proto-announce__bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #0f7b6c 0%, #5fd4c4 100%);
+}
+
+/* 暂停时进度条转为低饱和，配合文案共同表达「已暂停」 */
+.proto-announce__pop.is-paused .proto-announce__bar {
+  background: linear-gradient(90deg, #9db8b3 0%, #cfe0dc 100%);
+}
+
+.proto-announce__hint {
+  flex: none;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.proto-announce__hint.is-paused {
+  color: rgba(15, 123, 108, 0.75);
+}
+
+/* 秒数用主色加粗并定宽居中，避免数字逐秒跳动造成整行抖动 */
+.proto-announce__seconds {
+  display: inline-block;
+  min-width: 1em;
+  font-weight: 600;
+  text-align: center;
+  color: #0f7b6c;
+}
+
+/* 自顶部下滑入场 / 上收退场 */
+.proto-announce-enter-active,
+.proto-announce-leave-active {
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.proto-announce-enter-from,
+.proto-announce-leave-to {
+  opacity: 0;
+  transform: translateY(-14px);
+}
+
+/* 关闭时不叠加卡片自身的入场动画，避免两段动画互相干扰 */
+.proto-announce-leave-active .proto-announce__card {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proto-announce-enter-active,
+  .proto-announce-leave-active {
+    transition: none;
+  }
+
+  .proto-announce__card,
+  .proto-announce__item {
+    animation: none;
+  }
+
+  .proto-announce__item:hover {
+    transform: none;
+  }
+}
+
+/* 窄屏（如移动端）无法容纳单行文案时，放开换行，避免文字溢出卡片 */
+@media (max-width: 560px) {
+  .proto-announce__pop {
+    width: 100%;
+  }
+
+  .proto-announce__text {
+    white-space: normal;
+  }
+}
+
 /* ---------- 企业 Logo 徽标（三处共用：企业中心 / 选择登录企业 / 顶栏企业切换） ---------- */
 .ent-badge {
   display: inline-flex;

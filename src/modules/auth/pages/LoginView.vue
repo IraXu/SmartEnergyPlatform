@@ -2,6 +2,8 @@
   <div class="auth-page">
     <AuthBrand />
 
+    <ProtoAnnouncement />
+
     <div class="auth-panel">
       <div class="auth-card">
         <h2 class="auth-card__title">登录</h2>
@@ -133,6 +135,7 @@ import { LockOutlined, SafetyOutlined } from '@antdv-next/icons'
 import AccountField from '@/modules/auth/components/AccountField.vue'
 import AuthBrand from '@/modules/auth/components/AuthBrand.vue'
 import CaptchaImage from '@/modules/auth/components/CaptchaImage.vue'
+import ProtoAnnouncement from '@/shared/components/ProtoAnnouncement.vue'
 import ProtoTip from '@/shared/components/ProtoTip.vue'
 import {
   CAPTCHA_AFTER_FAILS,

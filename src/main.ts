@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import {
   Alert,
   App as AntdApp,
+  BorderBeam,
   Breadcrumb,
   Button,
   Card,
@@ -69,6 +70,7 @@ import './styles/load-strategy.css'
 const components = [
   AntdApp,
   Alert,
+  BorderBeam,
   Breadcrumb,
   Button,
   Card,

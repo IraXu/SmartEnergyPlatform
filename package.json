@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@antdv-next/icons": "^1.1.2",
-    "antdv-next": "^1.5.6",
+    "antdv-next": "^1.6.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
