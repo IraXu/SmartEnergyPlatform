@@ -1,0 +1,637 @@
+/* 平台后台样式：AdminLayout 顶栏、一级导航栏、二级浮层与业务页面通用容器 */
+
+.admin-layout {
+  min-height: 100vh;
+  background: #f0f2f5;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 24px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-header__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* 平台标识：使用项目统一 logo（图标自带圆角与透明底），与认证页品牌区同一视觉来源 */
+.admin-header__mark {
+  flex: none;
+  width: 28px;
+  height: 28px;
+}
+
+/* 顶栏右侧：企业切换与账号区依次排列 */
+.admin-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------- 顶栏企业切换 ---------- */
+/* 当前企业为可点击控件（而非静态标签）：常驻浅边框使其在静止态即可被识别为可切换控件，
+   悬停边框转向主题绿，展开态再叠加主题色浅底与外发光聚焦环 */
+/* 宽度随企业名称自适应（不设固定宽度与省略号），避免企业名称被截断 */
+.admin-org {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #e6eaef;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-org:hover {
+  background: #f7faf9;
+  border-color: rgba(15, 123, 108, 0.35);
+}
+
+.admin-org--open {
+  background: rgba(15, 123, 108, 0.06);
+  border-color: rgba(15, 123, 108, 0.5);
+  box-shadow: 0 0 0 3px rgba(15, 123, 108, 0.1);
+}
+
+/* 宽度随企业名称自适应：不设最大宽与省略号，保证企业名称完整展示 */
+.admin-org__name {
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.admin-org__caret {
+  flex: none;
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s;
+}
+
+.admin-org--open .admin-org__caret {
+  transform: rotate(180deg);
+}
+
+/* 企业切换浮层内的选项：企业徽标 + 企业名称 + 该企业下的角色标签（COMP-ENT-02 24×24） */
+/* 选项宽度随内容而定，但设上限，避免超长企业名把浮层撑得过宽 */
+.admin-org-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 200px;
+  max-width: 320px;
+  padding: 2px 0;
+}
+
+.admin-org-menu__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-org-menu__name {
+  max-width: 100%;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 角色标签统一样式：企业切换浮层与账号弹层共用，保证同一概念的配色一致 */
+.admin-role-tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0 6px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border: 1px solid rgba(15, 123, 108, 0.2);
+  border-radius: 4px;
+}
+
+/* 企业切换浮层内容承载两行文字，需覆盖菜单项默认的定高与单行省略 */
+.admin-org-dropdown .ant-dropdown-menu-item {
+  position: relative;
+  height: auto;
+  line-height: 1.4;
+  white-space: normal;
+  border-radius: 6px;
+}
+
+.admin-org-dropdown .ant-dropdown-menu-title-content {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+/* 当前企业选中态：左侧绿色色条 + 主色文字作为「当前」标识，不再叠加行尾勾选图标，
+   避免同一状态被重复强调；选中态下角色标签改为不透明白底，与浅绿行底拉开对比 */
+.admin-org-dropdown .ant-dropdown-menu-item-selected {
+  background: rgba(15, 123, 108, 0.08);
+}
+
+.admin-org-dropdown .ant-dropdown-menu-item-selected::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: 3px;
+  background: #0f7b6c;
+  border-radius: 0 2px 2px 0;
+}
+
+.admin-org-dropdown .ant-dropdown-menu-item-selected .admin-org-menu__name {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.admin-org-dropdown .ant-dropdown-menu-item-selected .admin-role-tag {
+  background: #fff;
+}
+
+/* ---------- 顶栏右侧账号区 ---------- */
+/* 单行触发区：悬停与展开时给浅底 + 细边框，明确「可点击」而非静态信息 */
+.admin-account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px 0 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.admin-account:hover,
+.admin-account--open {
+  background: #f5f7fa;
+  border-color: #e8ecf0;
+}
+
+.admin-account--open {
+  background: rgba(15, 123, 108, 0.06);
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+.admin-account__avatar {
+  flex: 0 0 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: #fff;
+  background: linear-gradient(135deg, #0f7b6c 0%, #0b5f54 100%);
+  border-radius: 6px;
+  user-select: none;
+}
+
+.admin-account__name {
+  max-width: 132px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-account__caret {
+  flex: none;
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s;
+}
+
+/* 展开时箭头翻转，给出明确的展开反馈 */
+.admin-account--open .admin-account__caret {
+  transform: rotate(180deg);
+}
+
+/* ---------- 账号下拉弹层 ---------- */
+/* 外层容器承担卡片外观，内层菜单去掉自带阴影与圆角，避免双层描边 */
+.admin-account-popup {
+  min-width: 232px;
+  padding: 18px 16px 4px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 头部身份区：头像、姓名、账号、角色、企业自上而下居中 */
+.admin-account-popup__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-account-popup__avatar {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1;
+  color: #fff;
+  background: linear-gradient(135deg, #0f7b6c 0%, #0b5f54 100%);
+  border-radius: 10px;
+}
+
+.admin-account-popup__name {
+  margin-top: 10px;
+  max-width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-account-popup__identifier {
+  margin-top: 2px;
+  max-width: 100%;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 账号弹层内的角色标签：在身份区各元素间保持间距（样式本体复用 .admin-role-tag） */
+.admin-account-popup__head .admin-role-tag {
+  margin-top: 10px;
+}
+
+.admin-account-popup__org {
+  margin-top: 8px;
+  max-width: 100%;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 菜单在外层卡片内不再自带背景与阴影 */
+.admin-account-popup .ant-dropdown-menu {
+  padding: 4px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* 与身份区一致，操作项文字与图标居中 */
+.admin-account-popup .ant-dropdown-menu-item {
+  justify-content: center;
+  border-radius: 6px;
+}
+
+/* title-content 默认 flex:auto 会撑满剩余宽度，导致图标被挤到最左、只有文字看着居中；
+   此处需与 antd 自带规则同特异性（3 个类）并靠加载顺序覆盖，收为按内容宽度后整组才居中 */
+.admin-account-popup .ant-dropdown-menu .ant-dropdown-menu-title-content {
+  flex: none;
+  text-align: center;
+}
+
+/* ---------- 主体区：一级导航栏 + 二级导航列 + 内容区 ---------- */
+.admin-body {
+  display: flex;
+  align-items: stretch;
+  height: calc(100vh - 56px);
+}
+
+/* ---------- 一级导航栏 ---------- */
+/* 底色与顶栏统一为白色，构成连续的白底框架。
+   层级改由「选中态」表达：未选中项透明（即白底），选中项与二级栏共用同一浅底。
+   --nav-fillet 控制「选中项 → 二级栏」接缝处的内凹圆角半径，值越大弧越明显。
+   一级项数量固定且少，导航栏不承担滚动：不设 overflow，
+   指针位于导航栏上时滚轮不产生任何滚动效果（不出现内部滚动条）。 */
+.admin-nav {
+  --nav-fillet: 14px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100px;
+  padding: 8px 6px;
+  background: #fff;
+}
+
+/* 业务域组与系统组之间的弹性留白，把系统组推到栏底；不画分割线 */
+.admin-nav__spacer {
+  flex: 1 1 auto;
+  min-height: 12px;
+  margin: 8px 0;
+}
+
+.admin-nav__item {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 88px;
+  height: 72px;
+  padding: 16px 0;
+  font: inherit;
+  color: rgba(0, 0, 0, 0.65);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  /* 统一缓动：标准进出曲线，避免默认 ease 的「顿一下」手感 */
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 未选中项悬停：中性浅底，与选中态的品牌浅底区分开 */
+.admin-nav__item:hover {
+  background: #f5f7fa;
+}
+
+/* 按下瞬间轻微内收，给出明确的点击反馈 */
+.admin-nav__item:active {
+  transform: scale(0.97);
+}
+
+/* 当前模块与展开项：与二级栏共用同一浅底（不透明色，避免半透明叠加导致色差），
+   悬停时保持该底色不变，保证与二级栏的一体性 */
+.admin-nav__item--current,
+.admin-nav__item--expanded {
+  color: #0f7b6c;
+  background: #ecf4f3;
+}
+
+.admin-nav__item--current:hover,
+.admin-nav__item--expanded:hover {
+  background: #ecf4f3;
+}
+
+/* 未展开时（二级列未打开）保留轻微投影，浮起为独立卡片 */
+.admin-nav__item--current:not(.admin-nav__item--expanded) {
+  box-shadow: 0 1px 3px rgba(15, 42, 70, 0.08);
+}
+
+/* 浮层展开时，选中项向右补齐到导航栏边缘、右侧收平，与白色二级列连成一块；
+   再用两个内凹圆角把直角接缝抹圆，使一级与二级的白色自然过渡 */
+.admin-nav__item--expanded {
+  width: calc(100% + 6px);
+  margin-right: -6px;
+  border-radius: 8px 0 0 8px;
+  box-shadow: none;
+}
+
+/* 内凹圆角：在方块内以「远离接点的一角」为圆心画弧，
+   弧内透明露出白底、弧外为选中浅底，形成从选中项边缘弯向二级列的内凹弧。
+   半径由 --nav-fillet 统一控制，方块的尺寸、偏移与渐变半径均随其联动。 */
+.admin-nav__item--expanded::before,
+.admin-nav__item--expanded::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: var(--nav-fillet);
+  height: var(--nav-fillet);
+}
+
+/* 上接缝：圆心在方块左上角，浅底补在右下侧 */
+.admin-nav__item--expanded::before {
+  top: calc(var(--nav-fillet) * -1);
+  background: radial-gradient(circle at 0 0, transparent var(--nav-fillet), #ecf4f3 var(--nav-fillet));
+}
+
+/* 下接缝：圆心在方块左下角，浅底补在右上侧 */
+.admin-nav__item--expanded::after {
+  bottom: calc(var(--nav-fillet) * -1);
+  background: radial-gradient(circle at 0 100%, transparent var(--nav-fillet), #ecf4f3 var(--nav-fillet));
+}
+
+.admin-nav__item:focus-visible {
+  outline: 2px solid #0f7b6c;
+  outline-offset: -2px;
+}
+
+.admin-nav__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.admin-nav__label {
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* ---------- 二级导航列 ---------- */
+/* 通高整列：与一级栏并排、从顶到底占满主体区；
+   底色与「选中的一级项」取同一浅底，两者相连处由内凹圆角过渡，
+   视觉上构成一整块从一级项延伸出的面板，不出现分割线或色差。 */
+.admin-nav-panel {
+  flex: none;
+  width: 200px;
+  padding: 16px 12px;
+  overflow-y: auto;
+  background: #ecf4f3;
+  border-right: 1px solid #e6ecea;
+}
+
+/* 一级项之间切换时，二级列表逐项错开滑入：
+   每项按自身索引延迟 --nav-item-index × 18ms，形成自上而下的瀑布式出现 */
+.admin-nav-panel__item {
+  display: block;
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 44px;
+  text-align: left;
+  color: rgba(0, 0, 0, 0.65);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+  /* backwards：延迟期间保持首帧（透明 + 左移），避免替换瞬间先闪一下 */
+  animation: navPanelItemIn 0.26s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+  animation-delay: calc(var(--nav-item-index, 0) * 18ms);
+}
+
+@keyframes navPanelItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.admin-nav-panel__item + .admin-nav-panel__item {
+  margin-top: 4px;
+}
+
+/* 悬停：面板本身已是品牌浅底，此处以白色提亮，保证在浅底上仍可辨识 */
+.admin-nav-panel__item:hover {
+  color: #0f7b6c;
+  background: #fff;
+}
+
+/* 按下瞬间轻微内收，与一级项保持一致的点击手感 */
+.admin-nav-panel__item:active {
+  transform: scale(0.985);
+}
+
+/* 当前功能：在浅底面板上以白色块浮起，配主色文字与加重字重，形成最强层级 */
+.admin-nav-panel__item--current {
+  font-weight: 500;
+  color: #0f7b6c;
+  background: #fff;
+}
+
+.admin-nav-panel__item:focus-visible {
+  outline: 2px solid #0f7b6c;
+  outline-offset: -2px;
+}
+
+/* ---------- 二级列内的三级菜单 ---------- */
+/* 含三级菜单的二级分组：行内承载展开箭头，箭头随展开态旋转 */
+.admin-nav-panel__item--group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-nav-panel__item-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.admin-nav-panel__caret {
+  flex: none;
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-nav-panel__item--expanded .admin-nav-panel__caret {
+  transform: rotate(90deg);
+}
+
+/* 分组自身包含当前功能时，以主色提示所在位置，不强占白色块以免与三级当前项混淆 */
+.admin-nav-panel__item--group.admin-nav-panel__item--current {
+  color: #0f7b6c;
+  background: transparent;
+}
+
+/* 三级菜单：在二级列内缩进展示，仅以缩进表达从属关系，不画竖线 */
+.admin-nav-panel__sublist {
+  margin-top: 4px;
+  padding-left: 12px;
+}
+
+/* 三级项比二级项矮一档、字号小一档，形成层级差 */
+.admin-nav-panel__item--leaf {
+  height: 36px;
+  padding-left: 12px;
+  font-size: 13px;
+  line-height: 36px;
+}
+
+/* 分组容器打断了「相邻项」间距规则，单独补上分组与相邻二级项之间的间距 */
+.admin-nav-panel__group + .admin-nav-panel__item,
+.admin-nav-panel__item + .admin-nav-panel__group {
+  margin-top: 4px;
+}
+
+/* 二级功能未定稿时的占位说明，不可点击 */
+.admin-nav-panel__placeholder {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 二级列整体展开与收起：轻微淡入，不做位移，避免与一级栏产生割裂感 */
+.nav-panel-enter-active,
+.nav-panel-leave-active {
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-panel-enter-from,
+.nav-panel-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-nav__item,
+  .admin-nav-panel__item,
+  .nav-panel-enter-active,
+  .nav-panel-leave-active {
+    transition: none;
+  }
+
+  /* 关闭逐项滑入与按下缩放，避免对动效敏感的用户产生不适 */
+  .admin-nav-panel__item {
+    animation: none;
+  }
+
+  .admin-nav__item:active,
+  .admin-nav-panel__item:active {
+    transform: none;
+  }
+}
+
+/* ---------- 内容区 ---------- */
+.admin-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* 页面内容居中容器，业务页面统一复用 */
+.page-container {
+  max-width: 960px;
+  margin: 0 auto;
+}

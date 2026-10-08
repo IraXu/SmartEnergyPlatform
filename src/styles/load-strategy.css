@@ -1,0 +1,1470 @@
+/* 设备管理 › 设备用电管控 › 负荷策略 样式：对齐《产品交互设计文档-负荷策略》v0.1 第 3 章视觉 token
+   与 4.1.2 页面布局、第 5 章浮层规格。仅用于原型交互验证，不作为生产代码。 */
+
+/* 页面头样式已移除：页面标题与说明不再展示，新建策略与执行记录入口移入列表工具行 */
+
+/* ---------- 触发方式标签：时控主色系 / 负控警告色系 ---------- */
+.lst-tag {
+  display: inline-block;
+  flex: none;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.lst-tag--time {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border: 1px solid rgba(15, 123, 108, 0.2);
+}
+
+.lst-tag--event {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border: 1px solid rgba(250, 173, 20, 0.3);
+}
+
+/* ---------- 动作词：拉闸警告色 / 合闸主色，全站一致 ---------- */
+.lst-action {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lst-action--close {
+  color: #d48806;
+}
+
+.lst-action--open {
+  color: #0f7b6c;
+}
+
+/* ---------- 列表：周期摘要与作用范围 ---------- */
+.lst-summary {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+.lst-summary strong {
+  font-weight: 600;
+}
+
+/* 作用对象：计数以链接呈现，点击打开作用对象抽屉（OVERLAY-05） */
+.lst-scope-link {
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 备注列：最多两行，超出省略 */
+.lst-remark {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+/* 操作人列：账号展示名 */
+.lst-operator {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 生效期：等宽数字，便于逐位核对 */
+.lst-range {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 状态列：开关 + 生效状态文字（不只依赖颜色） */
+.lst-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lst-status__text {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.lst-status__effective {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.lst-status__effective.is-active {
+  color: #0f7b6c;
+}
+
+.lst-status__effective.is-pending {
+  color: #d48806;
+}
+
+.lst-status__effective.is-idle {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 固定列需自带底色，横向滚动时内容不会从下方透出；悬停与选中同步行底色 */
+.lst-table .ant-table-cell-fix-start,
+.lst-table .ant-table-cell-fix-end {
+  background: #fff;
+}
+
+.lst-table .ant-table-tbody > tr:hover > td.ant-table-cell-fix-start,
+.lst-table .ant-table-tbody > tr:hover > td.ant-table-cell-fix-end {
+  background: #f8fbfa;
+}
+
+/* ---------- OVERLAY-01 新建 / 编辑策略 ---------- */
+/* 表单较长：正文区独立滚动，标题与底部按钮始终可见（矮屏下也能直接点保存） */
+.lst-form-modal .ant-modal-body {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+
+.lst-form__meta {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 分组区块：以浅底卡片分隔，避免长表单里字段串行看不出层次 */
+.lst-form__section {
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.lst-form__section:last-child {
+  margin-bottom: 0;
+}
+
+.lst-form__section-title {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* 区块内最后一个字段不留下边距，避免卡片底部出现多余空隙 */
+.lst-form__section .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 两列等宽栅格：字段较多时避免单列过长；窄屏退回单列 */
+.lst-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.lst-form__control {
+  width: 100%;
+}
+
+.lst-form__hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 时间点条目 ---------- */
+.lst-points {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.lst-points__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.lst-points__index {
+  flex: none;
+  width: 20px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+/* 时间选择器与动作切换固定宽度，避免整行被拉宽后控件间距失衡 */
+.lst-points__time {
+  flex: none;
+  width: 140px;
+}
+
+.lst-points__action {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+/* 占位撑开：删除按钮始终贴行尾，与其余条目对齐 */
+.lst-points__spacer {
+  flex: 1 1 auto;
+}
+
+.lst-points__del {
+  flex: none;
+}
+
+.lst-points__empty {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-points__foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lst-points__count {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.lst-points__note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 切换触发方式 / 周期类型的就地确认提示：贴在触发控件下方，不打断表单填写 */
+.lst-switch {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 0 0 12px;
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+}
+
+.lst-switch__icon {
+  flex: none;
+  margin-top: 2px;
+  font-size: 14px;
+  color: #d48806;
+}
+
+.lst-switch__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lst-switch__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.lst-switch__desc {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.lst-switch__actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 星期选择：7 个按钮块平铺，一次看全；选中态实心主色，再点取消 */
+.lst-weekdays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lst-weekdays__item {
+  min-width: 56px;
+  padding: 5px 12px;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #d9e2e0;
+  border-radius: 6px;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+}
+
+.lst-weekdays__item:hover {
+  color: #0f7b6c;
+  border-color: #8fd0c4;
+}
+
+.lst-weekdays__item.is-on {
+  font-weight: 600;
+  color: #fff;
+  background: #0f7b6c;
+  border-color: #0f7b6c;
+}
+
+/* 负控触发规则：每行「序号 + 事件 + → + 动作选择 + 删除」 */
+.lst-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lst-rules__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.lst-rules__index {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 50%;
+}
+
+.lst-rules__event {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lst-rules__label {
+  flex: none;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 拉闸 / 合闸二选一：两个按钮块并排，选中态由 --close / --open 决定 */
+.lst-rules__action {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+.lst-rules__del {
+  flex: none;
+}
+
+.lst-rules__empty {
+  margin: 0;
+  font-size: 12px;
+  line-height: 40px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+  background: #fafbfb;
+  border: 1px dashed #e0e6e5;
+  border-radius: 8px;
+}
+
+.lst-rules__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.lst-rules__count {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.lst-rules__note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 动作选择按钮：形状为胶囊，选中态取列表标签的同一套配色 */
+.lst-action-btn {
+  flex: none;
+  min-width: 60px;
+  padding: 3px 12px;
+  font-size: 13px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.65);
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #d9e2e0;
+  border-radius: 999px;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+}
+
+.lst-action-btn:hover {
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+/* 拉闸：与列表「负控」标签同一套配色（警示橙） */
+.lst-action-btn--close.is-on {
+  font-weight: 600;
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border-color: rgba(250, 173, 20, 0.3);
+}
+
+/* 合闸：与列表「时控」标签同一套配色（主色绿） */
+.lst-action-btn--open.is-on {
+  font-weight: 600;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+/* 作用设备下拉：按所属用能单元分组，分组标题只出现一次，候选项只留设备名 */
+.lst-opt {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.lst-opt__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 待接入 / 离线：仅在不可正常执行时提示，与列表标签同一套配色 */
+.lst-opt__warn {
+  flex: none;
+  padding: 0 6px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #d48806;
+  white-space: nowrap;
+  background: rgba(250, 173, 20, 0.12);
+  border-radius: 4px;
+}
+
+/* 分组标题：以细微底色与候选项区分，形成清晰的归属层次 */
+.lst-device-pop .ant-select-item-group {
+  padding-block: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.45);
+  background: #fafbfb;
+}
+
+/* 作用对象回显：让用户在保存前看到「几个单元 · 几台设备」 */
+.lst-form__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.lst-form__summary-label {
+  flex: none;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-form__summary-value {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+.lst-form__summary-value strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+/* 范围类型：动态 / 静态，与回显计数同行标注 */
+.lst-form__summary-kind {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+}
+
+.lst-form__summary-warn {
+  font-size: 12px;
+  color: #d48806;
+}
+
+.lst-form__warn {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #d48806;
+}
+
+/* ---------- 作用用电单元：策略详情与作用对象抽屉共用同一套清单 ---------- */
+/* 按所属组织节点分组，上级路径只出现一次；单元数可达数十个，
+   折叠态按「整组」收口（不会切半个分组），其余由「展开全部」查看 */
+.lst-units-wrap {
+  position: relative;
+}
+
+.lst-units-body.is-clipped .lst-units {
+  overflow: hidden;
+}
+
+.lst-units {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lst-units__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 分组标题：所属组织节点的层级路径（省略企业名）+ 单元数 */
+.lst-units__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.lst-units__path {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lst-units__count {
+  flex: none;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.lst-units__warn {
+  flex: none;
+  font-size: 12px;
+  line-height: 18px;
+  color: #cf1322;
+}
+
+.lst-units__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lst-unit-chip {
+  padding: 1px 10px;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.75);
+  background: #fff;
+  border: 1px solid #e3eae8;
+  border-radius: 4px;
+}
+
+.lst-unit-chip.is-invalid {
+  color: #cf1322;
+  background: #fff1f0;
+  border-color: #ffccc7;
+}
+
+/* 折叠收口时的展开入口：与正文同一行宽，视觉上从属于清单而非独立操作 */
+.lst-units__toggle {
+  display: block;
+  width: 100%;
+  padding: 4px 0;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #0f7b6c;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-top: 1px dashed #e3eae8;
+}
+
+.lst-units__toggle:hover {
+  color: #0b5f53;
+}
+
+/* ---------- OVERLAY-05 作用对象抽屉 ---------- */
+.lst-scoped__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid #eef2f1;
+}
+
+.lst-scoped__head-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lst-scoped__eyebrow {
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-scoped__title {
+  overflow: hidden;
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lst-scoped__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px 0;
+}
+
+.lst-scoped__count {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+.lst-scoped__count strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.lst-scoped__kind {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+}
+
+.lst-scoped__hint {
+  margin: 8px 0 0;
+  padding: 0 20px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-scoped__block {
+  padding: 16px 20px 0;
+}
+
+.lst-scoped__block--table {
+  padding-bottom: 20px;
+}
+
+.lst-scoped__block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.lst-scoped__block-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.lst-scoped__block-count {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 作用设备筛选行：设备可达数百台，按用能单元收窄后再翻页 */
+.lst-scoped__filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.lst-scoped__filter {
+  width: 260px;
+}
+
+.lst-scoped__filter-hint {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-scoped__table .ant-table {
+  background: transparent;
+}
+
+.lst-scoped__name {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lst-scoped__type {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(15, 123, 108, 0.9);
+  background: rgba(15, 123, 108, 0.08);
+  border-radius: 4px;
+}
+
+.lst-scoped__path {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-all;
+}
+
+.lst-scoped__tag {
+  display: inline-block;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.lst-scoped__tag.is-accessed {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.lst-scoped__tag.is-pending {
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.lst-scoped__online {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.lst-scoped__dot-icon {
+  width: 6px;
+  height: 6px;
+  background: currentcolor;
+  border-radius: 50%;
+}
+
+.lst-scoped__online.is-on {
+  color: #0f7b6c;
+}
+
+.lst-scoped__online.is-off {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-scoped__empty {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-scoped__empty-cell {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.lst-scoped__fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- OVERLAY-02 保存确认 ---------- */
+.lst-confirm__block {
+  padding: 12px 14px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.lst-confirm__row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 4px 0;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.lst-confirm__label {
+  flex: none;
+  width: 84px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-confirm__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-word;
+}
+
+.lst-confirm__num {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.lst-confirm__value strong {
+  font-weight: 600;
+}
+
+/* 拉闸风险提示：红底，不可省略 */
+.lst-confirm__danger {
+  padding: 10px 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #cf1322;
+  background: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+}
+
+/* 同刻矛盾 / 停用影响提示：黄底 */
+.lst-confirm__warn {
+  padding: 10px 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+}
+
+/* ---------- 二次确认弹窗（停用 / 删除，同一套版式） ---------- */
+/* 被操作对象摘要：浅底卡片，先让用户确认操作的是哪一条 */
+.lst-remove__target {
+  padding: 12px 14px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.lst-remove__name {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-word;
+}
+
+.lst-remove__meta {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 不可恢复提示与影响说明：分区表达，避免一长段文字堆在一起 */
+.lst-remove__warn {
+  padding: 10px 12px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+}
+
+.lst-remove__danger {
+  margin: 0;
+  font-weight: 600;
+  color: #cf1322;
+}
+
+.lst-remove__warn p + p {
+  margin: 4px 0 0;
+}
+
+/* 已拉闸设备提示：单独一行，说明停用 / 删除后不会自动合闸 */
+.lst-remove__latch {
+  padding: 10px 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #d48806;
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+}
+
+/* ---------- OVERLAY-03 策略详情 ---------- */
+/* 详情内容较长：正文区独立滚动，标题始终可见 */
+.lst-detail-modal .ant-modal-body {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+
+.lst-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 概览：名称独立成行，状态标签另起一行，避免挤在一起读不出层级 */
+.lst-detail__hero {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f5f4;
+}
+
+.lst-detail__name {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-word;
+}
+
+.lst-detail__hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* 状态标签：与触发方式标签区分视觉重量，用描边 + 文字色表达语义 */
+.lst-detail__chip {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.lst-detail__chip.is-on,
+.lst-detail__chip.is-active {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+.lst-detail__chip.is-pending,
+.lst-detail__chip.is-static {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border-color: rgba(250, 173, 20, 0.3);
+}
+
+.lst-detail__chip.is-off,
+.lst-detail__chip.is-idle,
+.lst-detail__chip.is-dynamic {
+  color: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* 生效期条：列表里最常被核对的信息，详情里同样给一条独立可见的行 */
+.lst-detail__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  padding: 10px 12px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.lst-detail__bar-label {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-detail__bar-value {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 分区：标题 + 键值行，标签统一左对齐便于纵向扫读 */
+.lst-detail__section {
+  padding: 12px 14px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.lst-detail__section-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.lst-detail__row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 4px 0;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.lst-detail__key {
+  flex: none;
+  width: 96px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-detail__val {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-word;
+}
+
+/* 时间点：完整逐条展示（不摘要），等宽数字便于逐条核对 */
+.lst-detail__points {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lst-detail__point {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 6px;
+}
+
+.lst-detail__clock {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* 负控触发规则：逐条列「序号 · 事件 → 动作」，完整不摘要 */
+.lst-detail__rules {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lst-detail__rule {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.lst-detail__rule-index {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 50%;
+}
+
+.lst-detail__rule-arrow {
+  flex: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.lst-detail__event {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 4px;
+}
+
+/* 备注：整段可换行，保留原始换行 */
+.lst-detail__remark {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 作用设备：台数与范围类型同行，指定设备时再补名称清单 */
+.lst-detail__scope {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.lst-detail__scope-count {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 次要说明文字：计数旁的补充信息与「等 N 个单元」收口 */
+.lst-detail__muted {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 详情内的单元清单：与上方计数留出间距 */
+.lst-detail__units {
+  margin-top: 8px;
+}
+
+.lst-detail__devices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.lst-detail__device {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 4px;
+}
+
+.lst-detail__more {
+  align-self: center;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-detail__hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-detail__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+/* ---------- OVERLAY-04 执行记录 ---------- */
+/* 记录条数可能超出视口：正文区独立滚动，标题始终可见 */
+.lst-record-modal .ant-modal-body {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* 引导文案：把「一条记录 = 一次触发」讲成可扫读的两句，而非一段说明 */
+.lst-record__lead {
+  padding: 0;
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.45);
+  list-style: none;
+}
+
+.lst-record__lead li {
+  position: relative;
+  padding-left: 12px;
+}
+
+.lst-record__lead li::before {
+  position: absolute;
+  top: 9px;
+  left: 2px;
+  width: 3px;
+  height: 3px;
+  content: '';
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 50%;
+}
+
+.lst-record__lead strong {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.lst-record__table .ant-table-thead > tr > th,
+.lst-record__devices .ant-table-thead > tr > th {
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+  background: #f7faf9;
+}
+
+.lst-record__table .ant-table-tbody > tr > td,
+.lst-record__devices .ant-table-tbody > tr > td {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.lst-record__time {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 策略名称行：名称可压缩，右侧「已删除」标注不换行 */
+.lst-record__strategy {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.lst-record__name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lst-record__gone {
+  flex: none;
+  padding: 0 6px;
+  margin-left: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+}
+
+/* 触发来源：方式标签 + 命中的时间点 / 事件，回答「这次为什么触发」 */
+.lst-record__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.lst-record__trigger-detail {
+  overflow: hidden;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lst-record__count {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 执行结果：结论标签与计数同排，避免换行后读成两段互不相干的信息 */
+.lst-record__result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.lst-record__summary {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+.lst-record__summary strong {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.lst-record__summary strong.is-failed {
+  color: #ff4d4f;
+}
+
+/* 批次与设备级结果标签 */
+.lst-record__tag {
+  display: inline-block;
+  flex: none;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.lst-record__tag.is-success {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.lst-record__tag.is-warn {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.16);
+}
+
+.lst-record__tag.is-failed {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+}
+
+.lst-record__tag.is-skip {
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* 展开的设备清单：浅底自成一区并加标题行，明确「属于上面哪一次触发」 */
+.lst-record__detail {
+  padding: 4px 0 4px 8px;
+}
+
+.lst-record__detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 6px 12px;
+  background: #f7faf9;
+  border-radius: 6px;
+}
+
+.lst-record__detail-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.lst-record__detail-meta {
+  overflow: hidden;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lst-record__devices {
+  margin-top: 8px;
+}
+
+.lst-record__devices .ant-table {
+  background: #fbfcfc;
+}
+
+.lst-record__path {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+/* 失败原因：失败为红色告警，跳过（未接入 / 离线）为次要色，避免把「未接入」读成故障 */
+.lst-record__reason {
+  display: block;
+  overflow: hidden;
+  font-size: 12px;
+  color: #ff4d4f;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lst-record__reason.is-skip {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-record__empty {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lst-record__empty-block {
+  padding: 24px 0;
+}
+
+/* ---------- 响应式：弹窗宽度收窄时表单两列退回单列 ----------
+   弹窗宽度固定 760px，视口小于该宽度后才会被压缩，因此断点取 860px */
+@media (max-width: 860px) {
+  .lst-form__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lst-points__row {
+    flex-wrap: wrap;
+  }
+}

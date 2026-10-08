@@ -1,0 +1,675 @@
+/* 系统日志页面样式：仅用于原型交互验证，不作为生产代码。
+   视觉方向：列表型审计视图——标题区的留存周期说明常显；页签以主色下划线标识当前类型；
+   筛选区「标签在上、控件在下」按日志类型整块替换；列表固定按操作时间倒序、末列固定操作入口。
+   两类日志均只读，故不出现行选择框与批量操作。 */
+
+/* 信息密度较高的列表页，占满内容区宽度，不使用业务页通用的 960px 居中 */
+.log-page {
+  max-width: none;
+}
+
+/* 整页无权限态：与成员页、角色页保持同一套呈现 */
+.log-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- AREA-LOG-01 留存周期提示（warning Alert） ---------- */
+.log-retention {
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+.log-retention .ant-alert-message {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+/* ---------- AREA-LOG-02 日志类型页签 ---------- */
+.log-tabs {
+  display: flex;
+  gap: 24px;
+  height: 40px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.log-tabs__item {
+  position: relative;
+  padding: 0 2px 10px;
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.65);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.log-tabs__item:hover {
+  color: #0f7b6c;
+}
+
+/* 当前页签：文字字重 + 主色 + 2px 下划线，不只依赖颜色（可访问性要求） */
+.log-tabs__item--active {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.log-tabs__item--active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  content: '';
+  background: #0f7b6c;
+  border-radius: 2px;
+}
+
+.log-tabs__item:focus-visible {
+  outline: 2px solid rgba(15, 123, 108, 0.4);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- AREA-LOG-03 筛选区 ---------- */
+.log-filter {
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+/* 条件项与按钮组同一行：条件项等宽等分撑满，按钮组紧跟其后右对齐 */
+.log-filter__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 8px;
+}
+
+/* 所有筛选控件等宽：flex-basis 0 + 均分保证长度完全一致；
+   min-width 决定按钮组换行时机，同时保证日期区间能容下两个完整日期 */
+.log-field {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 150px;
+}
+
+/* 日期区间控件内置图标占用宽度，隐藏右侧图标并压缩内间距，使其与其他控件等宽 */
+.log-field .ant-picker {
+  padding-inline: 2px;
+}
+
+.log-field .ant-picker-suffix {
+  display: none;
+}
+
+/* 区间控件内两个完整日期需在等宽下完整展示：收窄字号与字距，并用紧凑的 ~ 作分隔符 */
+.log-field .ant-picker-input > input {
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+  letter-spacing: -0.2px;
+  text-align: center;
+}
+
+.log-field .ant-picker-range-separator {
+  flex: none;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.log-field .ant-picker-range-separator .ant-picker-separator {
+  display: none;
+}
+
+.log-field .ant-picker-range-separator::after {
+  font-size: 12px;
+  line-height: 1;
+  content: '~';
+}
+
+.log-field__label {
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.log-field__control {
+  width: 100%;
+}
+
+.log-field__prefix {
+  color: rgba(0, 0, 0, 0.28);
+}
+
+/* 按钮组（查询 / 重置 / 导出）：贴在条件项行尾，与控件底部对齐 */
+.log-filter__actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* ---------- AREA-LOG-04 列表容器 ---------- */
+.log-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  padding: 0 16px 16px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+/* 工具行：仅承载「导出」，右对齐；无工具行时不占高度 */
+.log-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 48px;
+  margin: 0 -16px;
+  padding: 0 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.log-list__skeleton {
+  padding: 16px 0 8px;
+}
+
+/* ---------- 表格 ---------- */
+.log-table {
+  margin-top: 8px;
+}
+
+.log-table .ant-table {
+  font-size: 13px;
+}
+
+/* 表头：浅底、无竖直分隔线，弱化装饰、突出内容 */
+.log-table .ant-table-thead > tr > th {
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+  background: #f7faf9;
+  border-bottom: 1px solid #eaf0ef;
+}
+
+.log-table .ant-table-thead > tr > th::before {
+  display: none;
+}
+
+/* 行：所有列统一左右内边距，保证列与列之间的间隔完全均匀 */
+.log-table .ant-table-tbody > tr > td {
+  padding: 12px 14px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f4f7f6;
+  /* 单元格内文本一律单行显示，超长以省略号截断（悬浮 title 看全文）：
+     避免时间在空格处、IP 在点号处、终端在斜杠处被意外折成两行 */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.log-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+/* 可点击行（仅操作行为日志）：悬停高亮，提示可点击打开详情 */
+.log-table--clickable .ant-table-tbody > tr:hover > td {
+  background: #f8fbfa;
+  cursor: pointer;
+}
+
+.log-table .ant-table-pagination.ant-pagination {
+  margin: 16px 0 0;
+}
+
+/* 「操作」列：查看详情为链接按钮，去掉多余内边距使列宽更紧凑 */
+.log-cell__op.ant-btn {
+  height: auto;
+  padding: 0;
+  font-size: 13px;
+}
+
+/* ---------- 单元格内容 ---------- */
+.log-cell__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.78);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 操作账号：账号在上、姓名在下（两行堆叠为刻意设计，不视为意外换行） */
+.log-cell__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.log-cell__sub {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.log-cell__ellipsis {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 变更类型：浅底标签，与摘要文字形成视觉区分 */
+.log-cell__type {
+  display: inline-block;
+  max-width: 100%;
+  padding: 1px 8px;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 20px;
+  color: #0f7b6c;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(15, 123, 108, 0.08);
+  border: 1px solid rgba(15, 123, 108, 0.16);
+  border-radius: 4px;
+}
+
+/* ---------- 标签（登录结果 / 对象清单结果 / 已删除） ---------- */
+.log-tag.ant-tag,
+.logd .logd__tag.ant-tag {
+  margin-inline-end: 0;
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 4px;
+}
+
+.log-tag--ok,
+.logd__tag--ok {
+  color: #389e0d;
+  background: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+.log-tag--fail,
+.logd__tag--fail {
+  color: #cf1322;
+  background: #fff1f0;
+  border-color: #ffa39e;
+}
+
+.log-tag--warn,
+.logd__tag--warn {
+  color: #d48806;
+  background: #fffbe6;
+  border-color: #ffe58f;
+}
+
+.log-tag--muted,
+.logd__tag--muted {
+  color: rgba(0, 0, 0, 0.45);
+  background: #fafafa;
+  border-color: #f0f0f0;
+}
+
+/* ---------- 状态块（加载失败 / 空态） ---------- */
+.log-state {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 260px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.log-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  font-size: 22px;
+  color: rgba(0, 0, 0, 0.4);
+  background: #f5f7fa;
+  border-radius: 50%;
+}
+
+.log-state__icon--error {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.log-state__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.log-state__desc {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- OVERLAY-01 日志详情抽屉 ---------- */
+.logd {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.logd__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 56px;
+  padding: 0 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.logd__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.logd__body {
+  flex: 1 1 auto;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.logd__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 48px 0;
+  text-align: center;
+}
+
+.logd__state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  font-size: 22px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 50%;
+}
+
+.logd__state-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.logd__state-desc {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.logd__section + .logd__section {
+  margin-top: 20px;
+}
+
+/* 分区标题：左侧主色标识条 + 字重，形成分区感 */
+.logd__section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.logd__section-title::before {
+  width: 3px;
+  height: 14px;
+  content: '';
+  background: #0f7b6c;
+  border-radius: 2px;
+}
+
+.logd__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin: 0;
+}
+
+.logd__field {
+  min-width: 0;
+}
+
+.logd__field dt {
+  margin-bottom: 2px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.logd__field dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-all;
+}
+
+.logd__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.logd__note {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 明细表：字段级前后值 / 对象清单共用 */
+.logd__table {
+  width: 100%;
+  overflow: hidden;
+  font-size: 13px;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.logd__table th,
+.logd__table td {
+  padding: 9px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #f4f7f6;
+}
+
+.logd__table th {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+  background: #f7faf9;
+}
+
+.logd__table tr:last-child td {
+  border-bottom: none;
+}
+
+/* 权限点增删清单 */
+.logd__perm + .logd__perm {
+  margin-top: 12px;
+}
+
+.logd__perm-head {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.logd__perm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.logd__perm-list li {
+  display: flex;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.78);
+  word-break: break-all;
+}
+
+.logd__perm-add {
+  color: #389e0d;
+}
+
+.logd__perm-remove {
+  color: #cf1322;
+}
+
+/* 状态变更条 / 归属变更条 */
+.logd__strip,
+.logd__owner-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  background: #fafbfb;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.logd__owner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logd__strip-label {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.logd__strip-value {
+  padding: 1px 8px;
+  color: rgba(0, 0, 0, 0.78);
+  background: #f4f7f6;
+  border-radius: 4px;
+}
+
+.logd__strip-value--after {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+}
+
+.logd__strip-arrow {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.logd__hint {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #faad14;
+}
+
+.logd__text {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.78);
+  word-break: break-all;
+  background: #fafbfb;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.logd__empty {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 同步影响说明：企业名称变更类记录 */
+.logd__sync {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-radius: 8px;
+}
+
+.logd__foot {
+  display: flex;
+  justify-content: flex-end;
+  height: 56px;
+  padding: 0 24px;
+  align-items: center;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ---------- 窄屏适应 ---------- */
+@media (max-width: 767px) {
+  .log-filter {
+    padding: 14px 12px;
+  }
+
+  .log-field,
+  .log-field--narrow {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .log-filter__actions {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  .logd__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log-tabs__item {
+    transition: none;
+  }
+}

@@ -1,0 +1,2507 @@
+/* 设备台账 / 设备详情页样式：对齐《产品交互设计文档-设备台账》v1.0 第 3 章视觉 token
+   与 4.1.2 / 4.2.2 页面布局。仅用于原型交互验证，不作为生产代码。 */
+
+/* 高信息密度列表页：取消业务页通用的 960px 居中限制，把宽度让给表格 */
+.device-page {
+  max-width: none;
+}
+
+/* 整页无权限态：与成员页、角色页、告警页保持同一套呈现 */
+.device-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- 页面头样式已移除：标题区不再使用，建档入口移到列表工具行 ---------- */
+
+/* ---------- 查询条件区 AREA-DEV-02 ---------- */
+.device-filter {
+  padding: 18px 20px 14px;
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+/* 五项条件等宽均分；按钮组贴行尾并与控件底部对齐 */
+.device-filter__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 8px;
+}
+
+.device-field {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 6px;
+  /* 决定按钮组换行时机：五项触底时按钮组整体换到下一行 */
+  min-width: 176px;
+}
+
+.device-field__label {
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.device-field__control {
+  width: 100%;
+}
+
+.device-field__prefix {
+  color: rgba(0, 0, 0, 0.28);
+}
+
+.device-filter__actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* ---------- 列表容器 AREA-DEV-03 ---------- */
+.device-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+/* 工具行：建档入口位于查询控件下方、设备列表左上方 */
+.device-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.device-toolbar__actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 列设置入口对齐列表容器右上角，与左上的建档入口分列工具行两端 */
+.device-toolbar__setting {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* ---------- 卡片视图 ---------- */
+.device-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+/* 卡片整体可点击：键盘可达，点击进入设备详情 */
+.devcard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.devcard:hover {
+  border-color: rgba(15, 123, 108, 0.32);
+  box-shadow: 0 6px 16px rgba(15, 123, 108, 0.1);
+  transform: translateY(-2px);
+}
+
+.devcard:focus-visible {
+  outline: 2px solid #0f7b6c;
+  outline-offset: 2px;
+}
+
+/* 顶部信息行：左侧缩略图，中间设备名称与类型，右侧在线状态 */
+.devcard__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* 设备图片区：小尺寸缩略图，平台图片为透明底产品图，不加边框与底色 */
+.devcard__thumb {
+  flex: none;
+  width: 56px;
+  height: 56px;
+}
+
+.devcard__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 设备名称：位于缩略图与右侧信息之间，超长省略 */
+.devcard__head {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.devcard__name {
+  display: block;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 所属用能单元：完整层级路径较长，独占一整行、最多两行折行展示 */
+.devcard__unit {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+/* 右侧信息列：在线状态在上、设备类型（tag）在下 */
+.devcard__aside {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  margin-top: 2px;
+}
+
+.devcard__online {
+  flex: none;
+}
+
+/* 设备类型沿用列表的类型 tag 样式，仅限制最大宽度避免撑破卡片 */
+.devcard__type {
+  flex: none;
+  max-width: 110px;
+}
+
+/* 卡片内的键值对：标签定宽，保证同一行卡片的信息竖向对齐 */
+.devcard__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+  margin: 0;
+  border-top: 1px solid #f4f7f6;
+}
+
+.devcard__row {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.devcard__row dt {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devcard__row dd {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* 标识值：占满剩余宽度，超长省略，复制按钮始终贴右可见 */
+.devcard__row dd > .device-cell__mono {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 复制按钮：常态弱化提示可复制，悬停转主色 */
+.devcard__copy {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  padding: 2px;
+  font-size: 12px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.devcard__copy:hover {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+}
+
+.devcard__copy:focus-visible {
+  outline: 2px solid #0f7b6c;
+  outline-offset: 1px;
+}
+
+/* 卡片视图分页：贴右与列表分页保持同一视觉位置 */
+.device-cards__pager {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* ---------- 列设置浮层 ---------- */
+.devcols {
+  width: 248px;
+}
+
+.devcols__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eef2f1;
+}
+
+.devcols__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.devcols__list {
+  max-height: 320px;
+  padding: 0;
+  margin: 6px 0 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.devcols__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  transition: background-color 0.15s;
+}
+
+.devcols__item:hover {
+  background: #f7faf9;
+}
+
+/* 拖动时：拖起项降透明度，目标位置给出主色提示线 */
+.devcols__item.is-dragging {
+  opacity: 0.5;
+}
+
+.devcols__item.is-target {
+  box-shadow: inset 0 2px 0 #0f7b6c;
+}
+
+.devcols__handle {
+  display: inline-flex;
+  flex: none;
+  color: rgba(0, 0, 0, 0.35);
+  cursor: grab;
+}
+
+.devcols__handle.is-locked {
+  cursor: not-allowed;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.devcols__check {
+  flex: 1;
+  overflow: hidden;
+}
+
+.devcols__tag {
+  flex: none;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+  border: 1px solid rgba(15, 123, 108, 0.16);
+  border-radius: 4px;
+}
+
+.devcols__note {
+  padding-top: 8px;
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+  border-top: 1px solid #eef2f1;
+}
+
+.device-list__skeleton {
+  padding: 8px 0;
+}
+
+/* ---------- 选择态操作条 ---------- */
+.device-selbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  background: #ecf4f3;
+  border: 1px solid rgba(15, 123, 108, 0.2);
+  border-radius: 8px;
+}
+
+.device-selbar__text {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.device-selbar__text strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.device-selbar-enter-active,
+.device-selbar-leave-active {
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.device-selbar-enter-from,
+.device-selbar-leave-to {
+  opacity: 0;
+}
+
+/* ---------- 表格 ---------- */
+.device-table .ant-table {
+  font-size: 14px;
+}
+
+.device-table .ant-table-thead > tr > th {
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+  background: #f7faf9;
+  border-bottom: 1px solid #eaf0ef;
+}
+
+.device-table .ant-table-thead > tr > th::before {
+  display: none;
+}
+
+/* 排序图标紧贴列名，避免与标题之间出现过大的空白 */
+.device-table .ant-table-column-sorters {
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.device-table .ant-table-column-title {
+  flex: none;
+}
+
+.device-table .ant-table-column-sorter {
+  margin-inline-start: 0;
+}
+
+.device-table .ant-table-thead th.ant-table-column-sort {
+  background: #f1f6f5;
+}
+
+.device-table .ant-table-tbody > tr > td {
+  padding: 13px 14px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f4f7f6;
+}
+
+.device-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+.device-table .ant-table-tbody > tr:hover > td {
+  background: #f8fbfa;
+}
+
+.device-table .ant-table-tbody > tr.ant-table-row-selected > td {
+  background: #f2f8f7;
+}
+
+/* 勾选列收窄左右留白，避免首列过空 */
+.device-table .ant-table-selection-column {
+  padding-inline: 12px 4px !important;
+}
+
+/* 操作列：文字按钮贴左；链接型按钮去掉水平内边距 */
+.device-table .ant-table-tbody > tr > td .ant-btn-variant-link {
+  padding-inline: 0;
+}
+
+/* 固定右侧的操作列：与内容列之间加轻描边分隔，横向滚动时仍可见 */
+.device-table .ant-table-cell-fix-right {
+  background: #fff;
+}
+
+.device-table .ant-table-tbody > tr:hover > td.ant-table-cell-fix-right {
+  background: #f8fbfa;
+}
+
+.device-table .ant-table-tbody > tr.ant-table-row-selected > td.ant-table-cell-fix-right {
+  background: #f2f8f7;
+}
+
+.device-table .ant-table-cell-fix-right-first::after {
+  box-shadow: inset 8px 0 8px -8px rgba(0, 0, 0, 0.12);
+}
+
+.device-table .ant-table-pagination.ant-pagination {
+  margin: 16px 0 0;
+}
+
+/* 详情页内的只读表格：去掉行悬停与内边距的强调，弱化为纯展示 */
+.device-table--plain .ant-table-tbody > tr:hover > td {
+  background: transparent;
+}
+
+/* ---------- 单元格内容 ---------- */
+.device-cell__link {
+  max-width: 100%;
+  padding-inline: 0;
+  font-size: 14px;
+}
+
+.device-cell__link span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 添加时间：日期为主、时刻为次，两行展示便于在窄列中扫读 */
+.device-cell__time {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.device-cell__time-date {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.device-cell__time-clock {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 机器可读值（License / 设备识别码 / 卡号 / GPS 坐标 / 上级网关）统一等宽字体，便于逐位核对 */
+.device-cell__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+  word-break: break-all;
+}
+
+/* 设备类型：浅底主色标签 */
+.device-cell__type {
+  display: inline-block;
+  max-width: 100%;
+  padding: 1px 8px;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 20px;
+  color: #0f7b6c;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(15, 123, 108, 0.08);
+  border: 1px solid rgba(15, 123, 108, 0.16);
+  border-radius: 4px;
+}
+
+/* 接入状态标签：待接入为警告色系、已接入为主色系；不只依赖颜色 */
+.device-cell__tag {
+  display: inline-block;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.device-cell__tag.is-pending {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border: 1px solid rgba(250, 173, 20, 0.3);
+}
+
+.device-cell__tag.is-accessed {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border: 1px solid rgba(15, 123, 108, 0.2);
+}
+
+/* 在线状态：圆点 + 文字，灰度下仍可区分 */
+.device-cell__online {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.device-cell__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.device-cell__online.is-on {
+  color: #52c41a;
+}
+
+.device-cell__online.is-off {
+  color: #ff4d4f;
+}
+
+/* 规格型号与用能单元路径：单行 / 双行省略 */
+.device-cell__model {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.device-cell__path {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+}
+
+/* 归属单元已失效：原路径保留展示并附警告色说明 */
+.device-cell__invalid {
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  word-break: break-all;
+}
+
+.device-cell__invalid em {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-style: normal;
+  color: #d48806;
+}
+
+.device-cell__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.device-cell__empty {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.device-cell__time {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 状态块（空态 / 错误态） ---------- */
+.device-state {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 260px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.device-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  font-size: 22px;
+  color: rgba(0, 0, 0, 0.4);
+  background: #f5f7fa;
+  border-radius: 50%;
+}
+
+.device-state__icon--error {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.device-state__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.device-state__desc {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 确认弹窗内容 ---------- */
+.device-confirm {
+  padding: 14px 16px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.device-confirm__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.device-confirm__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.device-confirm__meta {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+  word-break: break-all;
+}
+
+.device-confirm__lead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.78);
+}
+
+.device-confirm__lead strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.device-confirm__warn {
+  margin-top: 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.device-confirm__warn p {
+  margin: 0;
+}
+
+/* 不可恢复提示：用错误色强调，与下方的历史告警说明区分层级 */
+.device-confirm__danger {
+  font-weight: 600;
+  color: #ff4d4f;
+}
+
+/* ---------- 迁移弹窗 ---------- */
+.devmove__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.devmove__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devmove__meta {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  word-break: break-all;
+}
+
+.devmove__lead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.78);
+}
+
+.devmove__lead strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.devmove__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.devmove__label {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.devmove__label em {
+  font-style: normal;
+  color: #ff4d4f;
+}
+
+.devmove__current {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-all;
+}
+
+.devmove__error {
+  margin: 0;
+  font-size: 12px;
+  color: #ff4d4f;
+}
+
+/* 影响说明提示条：迁移不追溯历史数据 */
+.devmove__notice {
+  padding: 10px 12px;
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+}
+
+.devmove__notice p {
+  margin: 0;
+}
+
+.devmove__notice-sub {
+  margin-top: 4px !important;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 批量添加弹窗 ---------- */
+.devimport__step {
+  margin-bottom: 16px;
+}
+
+.devimport__step:last-child {
+  margin-bottom: 0;
+}
+
+.devimport__step-title {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devimport__step-desc {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devimport__step-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devimport__upload-icon {
+  margin: 0 0 8px;
+  font-size: 32px;
+  color: #0f7b6c;
+}
+
+.devimport__upload-text {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devimport__upload-hint {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devimport__file {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.devimport__result {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.devimport__ok {
+  color: #52c41a;
+}
+
+.devimport__fail {
+  color: #ff4d4f;
+}
+
+/* 失败原因列表：超过 5 条时区块内滚动，避免弹窗被撑高 */
+.devimport__errors {
+  max-height: 160px;
+  padding: 10px 12px;
+  overflow: auto;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+}
+
+.devimport__error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.75);
+  word-break: break-all;
+}
+
+.devimport__report {
+  margin-top: 12px;
+}
+
+.devimport__progress {
+  padding: 12px 0;
+  text-align: center;
+}
+
+.devimport__progress-tip {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* ---------- 批量导入删除弹窗（OVERLAY-12） ---------- */
+.devimpdel__alert {
+  margin-bottom: 16px;
+}
+
+.devimpdel__step {
+  margin-bottom: 16px;
+}
+
+.devimpdel__step:last-child {
+  margin-bottom: 0;
+}
+
+.devimpdel__step-title {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devimpdel__step-desc {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devimpdel__upload-icon {
+  margin: 0 0 8px;
+  font-size: 32px;
+  color: #0f7b6c;
+}
+
+.devimpdel__upload-text {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devimpdel__upload-hint {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devimpdel__file {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.devimpdel__result {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.devimpdel__ok {
+  color: #ff4d4f;
+}
+
+.devimpdel__skip {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 未命中行列表：超过 5 条时区块内滚动，避免弹窗被撑高 */
+.devimpdel__errors {
+  max-height: 160px;
+  padding: 10px 12px;
+  overflow: auto;
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+}
+
+.devimpdel__error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.75);
+  word-break: break-all;
+}
+
+.devimpdel__report {
+  margin-top: 12px;
+}
+
+/* ---------- 设备表单（OVERLAY-01 / OVERLAY-07） ---------- */
+/* 新增设备弹窗顶部的添加方式切换：三等分整行，作为弹窗内的首要选择 */
+.devcreate__modes {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* 分组标题：与成员表单同一套分组呈现 */
+.devform__group {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devform__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.devform__item--full {
+  grid-column: 1 / -1;
+}
+
+/* 表单内提示文案：字段说明与「不支持修改」等口径 */
+.devform__hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 设备 GPS 选点（与组织架构 CMP-ORG-14 统一交互） ---------- */
+.devgps {
+  width: 100%;
+}
+
+/* 表单内入口：与 antd 输入框等高的一条信息行，坐标用等宽字体，操作按钮贴右 */
+.devgps__field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 8px 0 11px;
+  background: #fafcfc;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+}
+
+/* 坐标读数与来源标签同组，剩余空间由它占满，按钮靠最右 */
+.devgps__readout {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.devgps__value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.devgps__value--empty {
+  font-family: inherit;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* 坐标来源标注：自定义为警示色，跟随用能单元为中性主色 */
+.devgps__tag {
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border-radius: 4px;
+}
+
+.devgps__tag.is-follow {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+}
+
+.devgps__open {
+  margin-left: auto;
+}
+
+/* 弹窗内：查询定位区与结果列表 */
+.devgps__locate {
+  margin-bottom: 8px;
+}
+
+.devgps__results {
+  max-height: 132px;
+  margin: 8px 0 0;
+  padding: 4px;
+  overflow: auto;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.devgps__results-empty {
+  padding: 6px 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devgps__result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+}
+
+.devgps__result:hover {
+  background: #f5f7fa;
+}
+
+.devgps__result-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.devgps__result-coord {
+  flex: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devgps__located {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #0f7b6c;
+}
+
+/* 操作指引行：文字说明与「取用能单元坐标」同一行 */
+.devgps__hint-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 4px;
+  align-items: center;
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devgps__hint-strong {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 模拟地图：浅色底 + 网格与道路示意，避免空白导致「不可点」的误解 */
+.devgps__map {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+  cursor: crosshair;
+  background: #f2f5f4;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+}
+
+.devgps__map:focus-visible {
+  outline: 2px solid #0f7b6c;
+  outline-offset: -2px;
+}
+
+.devgps__grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(15, 123, 108, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 123, 108, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* 道路示意：不接入真实地图服务，用白色带状表达路网，帮助用户建立方位感 */
+.devgps__roads {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 44%, #fff 44%, #fff 52%, transparent 52%),
+    linear-gradient(90deg, transparent 28%, #fff 28%, #fff 34%, transparent 34%),
+    linear-gradient(transparent 72%, #fff 72%, #fff 78%, transparent 78%);
+}
+
+/* 所属用能单元参考点：空心主色圆点，说明「默认值来自哪里」 */
+.devgps__unit {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  background: rgba(15, 123, 108, 0.16);
+  border: 2px solid #0f7b6c;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 十字准星：单击产生的预览点 */
+.devgps__crosshair {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.devgps__crosshair-h,
+.devgps__crosshair-v {
+  position: absolute;
+  background: #0f7b6c;
+}
+
+.devgps__crosshair-h {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.devgps__crosshair-v {
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+}
+
+/* 确定点：实心主色圆点 + 坐标气泡，让「双击落点」的读数直接可见 */
+.devgps__pin {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  background: #0f7b6c;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(15, 123, 108, 0.35);
+  transform: translate(-50%, -50%);
+}
+
+.devgps__pin-label {
+  position: absolute;
+  padding: 1px 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 18px;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(15, 123, 108, 0.9);
+  border-radius: 4px;
+  transform: translate(10px, -50%);
+}
+
+.devgps__corner {
+  position: absolute;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.devgps__corner--tl {
+  top: 6px;
+  left: 8px;
+}
+
+.devgps__corner--br {
+  right: 8px;
+  bottom: 6px;
+}
+
+/* 经纬度读数：左右等宽各占一半，保证 6 位小数能完整显示 */
+.devgps__coord {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.devgps__coord-item {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.devgps__coord-label {
+  flex: none;
+  font-size: 13px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.devgps__input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.devgps__note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devform__alert {
+  margin-top: 8px;
+}
+
+/* ---------- 设备详情页 PAGE-02 ---------- */
+.device-detail__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.device-detail__head-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.device-detail__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.device-detail__title {
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.device-detail__path {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  word-break: break-all;
+}
+
+.device-detail__invalid {
+  margin-left: 6px;
+  font-size: 12px;
+  font-style: normal;
+  color: #d48806;
+}
+
+.device-detail__head-actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* 信息区块卡片 */
+.device-detail__card {
+  padding: 20px;
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.device-detail__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.device-detail__card-title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.device-detail__card-head .device-detail__card-title {
+  margin-bottom: 12px;
+}
+
+/* 标题后缀说明：弱化展示「默认 5 条」等口径，不抢占标题层级 */
+.device-detail__card-note {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 可折叠区块的标题行：整行可点击，右侧给出展开 / 收起指示 */
+.device-detail__card-head--toggle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.device-detail__card-head--toggle .device-detail__card-title {
+  margin-bottom: 0;
+}
+
+.device-detail__card-head--toggle + .device-detail__archive {
+  margin-top: 12px;
+}
+
+.device-detail__toggle {
+  display: inline-flex;
+  flex: none;
+  gap: 4px;
+  align-items: center;
+  font-size: 12px;
+  color: #0f7b6c;
+}
+
+.device-detail__toggle-icon {
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+
+.device-detail__toggle-icon.is-open {
+  transform: rotate(180deg);
+}
+
+.device-detail__copy {
+  padding-inline: 4px;
+  color: #0f7b6c;
+}
+
+/* 专属数据区：置顶主区块，用白底 + 主色提示条与档案区拉开层级 */
+.device-detail__card--primary {
+  padding: 20px;
+  border-color: rgba(15, 123, 108, 0.24);
+  box-shadow: 0 1px 3px rgba(15, 123, 108, 0.06);
+}
+
+/* 返回入口贴左置于标题上方，符合「先返回、后阅读」的浏览顺序 */
+.device-detail__back {
+  align-self: flex-start;
+  margin-bottom: 4px;
+}
+
+.device-detail__stamp {
+  flex: none;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 专属数据分组标题：主色竖条 + 标题，快速区分相别与电量 */
+.device-detail__metric-bar {
+  display: inline-block;
+  width: 3px;
+  height: 13px;
+  margin-right: 7px;
+  background: #0f7b6c;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+/* 专属数据数值卡片：自适应多列，数值大字号在前、单位小字在后 */
+.device-detail__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 10px;
+}
+
+.device-detail__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: #f7faf9;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.device-detail__metric-label {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.device-detail__metric-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+}
+
+.device-detail__metric-value em {
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.3;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-all;
+}
+
+.device-detail__metric-value small {
+  flex: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 设备档案：按「设备标识 / 安装与位置 / 通信与接入 / 备注」分组铺排。
+   每组内部为「固定宽度标签 + 取值」两列栅格，标签竖向对齐，避免字段名长短不一时错位。 */
+.device-detail__archive {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 32px;
+  margin-top: 12px;
+}
+
+.device-detail__archive-group {
+  min-width: 0;
+}
+
+/* 跨整行的分组：备注等整段文本 */
+.device-detail__archive-group--full {
+  grid-column: 1 / -1;
+}
+
+.device-detail__archive-title {
+  padding-left: 9px;
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  border-left: 3px solid #0f7b6c;
+  border-radius: 2px;
+}
+
+.device-detail__archive-list {
+  margin: 0;
+}
+
+.device-detail__archive-item {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 0 12px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid #f5f7f6;
+}
+
+.device-detail__archive-list > .device-detail__archive-item:last-child {
+  border-bottom: none;
+}
+
+.device-detail__archive dt {
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.device-detail__archive dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-word;
+}
+
+/* 备注：整段文本直排，不参与键值对齐 */
+.device-detail__archive-remark {
+  padding: 8px 12px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.88);
+  background: #f7faf9;
+  border-radius: 8px;
+  word-break: break-word;
+}
+
+/* GPS 来源标注：自定义为警示色、跟随用能单元为中性主色 */
+.device-detail__badge {
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border-radius: 4px;
+}
+
+.device-detail__badge.is-follow {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+}
+
+/* 专属数据区：按类型分组，组内两列网格 */
+.device-detail__metric-group + .device-detail__metric-group {
+  margin-top: 16px;
+}
+
+.device-detail__metric-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.device-detail__empty {
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- OVERLAY-09 MQTT 通讯日志抽屉 ---------- */
+.mqttlog {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 20px 20px;
+}
+
+/* 头部：设备标识与保留期说明，说明文字弱化 */
+.mqttlog__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 0 14px;
+}
+
+.mqttlog__head-text {
+  min-width: 0;
+}
+
+.mqttlog__eyebrow {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.mqttlog__title {
+  margin: 2px 0 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 设备标识：License 优先于设备识别码（IMEI），标签定宽保证两行对齐 */
+.mqttlog__ident {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 6px 0 0;
+}
+
+.mqttlog__ident-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.mqttlog__ident-row dt {
+  flex: none;
+  width: 52px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.mqttlog__ident-row dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  line-height: 1.7;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mqttlog__sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 概览：三项统计等宽均分 */
+.mqttlog__overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px 16px;
+  background: #f7faf9;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.mqttlog__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mqttlog__stat-label {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.mqttlog__stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.mqttlog__stat-value small {
+  margin-left: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.mqttlog__stat-value.is-danger {
+  color: #ff4d4f;
+}
+
+.mqttlog__stat-value--time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* 筛选行：两个下拉定宽，关键字输入占满剩余空间 */
+.mqttlog__filter {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 14px 0 12px;
+}
+
+.mqttlog__filter-item {
+  width: 160px;
+}
+
+.mqttlog__filter-item--grow {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+.mqttlog__table {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* 通讯方向：上行为读取（主色），下行为下发（蓝），语义上区分开 */
+.mqttlog__direction {
+  display: inline-block;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 4px;
+}
+
+.mqttlog__direction.is-up {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+}
+
+.mqttlog__direction.is-down {
+  color: #1d6fb8;
+  background: rgba(29, 111, 184, 0.08);
+}
+
+.mqttlog__topic {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mqttlog__result.is-ok {
+  color: #52c41a;
+}
+
+.mqttlog__result.is-fail {
+  color: #ff4d4f;
+}
+
+.mqttlog__cost {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 展开行：失败原因（红色）与报文内容（等宽代码块） */
+.mqttlog__detail {
+  padding: 4px 0;
+}
+
+.mqttlog__detail-error {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #ff4d4f;
+}
+
+.mqttlog__detail-label {
+  margin: 0 0 4px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.mqttlog__payload {
+  padding: 10px 12px;
+  margin: 0;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.85);
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: #f7faf9;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+/* ---------- OVERLAY-10 设备控制 ---------- */
+.devctl__target {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #f0f4f3;
+}
+
+.devctl__target-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.devctl__target-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* 设备标识：License 优先于设备识别码（IMEI），标签定宽保证两行对齐 */
+.devctl__ident {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+
+.devctl__ident-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.devctl__ident-row dt {
+  flex: none;
+  width: 52px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devctl__ident-row dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  line-height: 1.7;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.devctl__alert {
+  margin-bottom: 14px;
+}
+
+/* 指令清单：单列铺排，每项为可点击的整行按钮 */
+.devctl__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.devctl__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #e7edec;
+  border-radius: 8px;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.devctl__item:hover:not(:disabled) {
+  background: #f8fbfa;
+  border-color: rgba(15, 123, 108, 0.32);
+  box-shadow: 0 2px 8px rgba(15, 123, 108, 0.08);
+}
+
+.devctl__item:focus-visible {
+  outline: 2px solid #0f7b6c;
+  outline-offset: 1px;
+}
+
+.devctl__item:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* 影响供电的指令：警示色描边与图标，与常态操作区分 */
+.devctl__item.is-danger {
+  border-color: rgba(255, 77, 79, 0.28);
+}
+
+.devctl__item.is-danger:hover:not(:disabled) {
+  background: #fff8f8;
+  border-color: rgba(255, 77, 79, 0.5);
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.1);
+}
+
+.devctl__item-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+  border-radius: 8px;
+}
+
+.devctl__item.is-danger .devctl__item-icon {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.08);
+}
+
+.devctl__item-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.devctl__item-name {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devctl__item-desc {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devctl__item-risk {
+  flex: none;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+  border-radius: 4px;
+}
+
+/* 无该指令权限：以中性标签呈现，与「影响供电」的风险标签区分 */
+.devctl__item-lock {
+  flex: none;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+}
+
+.devctl__note {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devctl__confirm-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.devctl__confirm-text.is-danger {
+  color: #cf1322;
+}
+
+.devctl__confirm-target {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- OVERLAY-11 设备参数配置抽屉 ---------- */
+.devparam {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* 头部：设备标识与关闭按钮，说明文字弱化 */
+.devparam__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid #f0f4f3;
+}
+
+.devparam__head-text {
+  min-width: 0;
+}
+
+.devparam__eyebrow {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devparam__title {
+  margin: 2px 0 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 设备标识：License 优先于设备识别码（IMEI），标签定宽保证两行对齐 */
+.devparam__ident {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 6px 0 0;
+}
+
+.devparam__ident-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.devparam__ident-row dt {
+  flex: none;
+  width: 52px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devparam__ident-row dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  line-height: 1.7;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 主体：参数项较多时内部滚动，头部与操作区保持可见 */
+.devparam__body {
+  flex: 1 1 auto;
+  padding: 16px 20px 24px;
+  overflow-y: auto;
+}
+
+.devparam__alert {
+  margin-bottom: 14px;
+}
+
+/* 操作区：左侧抄读、右侧下发，中间留白避免误点 */
+.devparam__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  background: #f7faf9;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.devparam__toolbar-tip {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devparam__toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.devparam__changed {
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+  border-radius: 4px;
+}
+
+/* 参数分组：分组标题 + 组内参数项列表 */
+.devparam__group {
+  margin-bottom: 18px;
+}
+
+.devparam__group-head {
+  padding-left: 9px;
+  margin-bottom: 8px;
+  border-left: 3px solid #0f7b6c;
+}
+
+.devparam__group-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devparam__group-desc {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 参数项：左侧说明固定宽度，右侧「当前值 / 待下发值」两列对齐 */
+.devparam__item {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+  gap: 8px 20px;
+  padding: 12px;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.devparam__item + .devparam__item {
+  margin-top: 8px;
+}
+
+.devparam__item.is-changed {
+  background: rgba(15, 123, 108, 0.04);
+  border-color: rgba(15, 123, 108, 0.24);
+}
+
+.devparam__item-info {
+  min-width: 0;
+}
+
+.devparam__item-name {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.devparam__item-unit {
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devparam__item-desc {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devparam__item-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+}
+
+.devparam__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.devparam__field-label {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 设备当前值：只读展示，未抄读时弱化 */
+.devparam__current {
+  display: block;
+  padding: 4px 11px;
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 24px;
+  color: rgba(0, 0, 0, 0.75);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: #f7faf9;
+  border: 1px solid #eef2f1;
+  border-radius: 6px;
+}
+
+.devparam__current.is-empty {
+  font-family: inherit;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.devparam__control {
+  width: 100%;
+}
+
+.devparam__error {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #ff4d4f;
+}
+
+.devparam__empty {
+  padding: 32px 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+/* ---------- CARD-06 上下线记录 ---------- */
+/* 概览：单行内联呈现，只占一行高度，把纵向空间留给记录列表。
+   上边距用于与折叠标题行拉开距离（折叠标题的下边距为 0） */
+.devsess__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 8px 0 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 收起态下概览是卡片内最后一个元素，去掉下外边距避免多出空白 */
+.devsess__summary.is-collapsed {
+  margin-bottom: 0;
+}
+
+.devsess__summary-item em {
+  font-style: normal;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+.devsess__summary-sep {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* 展开内容区：无概览时（保留期内无记录）与标题行留出间距 */
+.device-detail__card-head--toggle + .devsess__body {
+  margin-top: 12px;
+}
+
+/* 查询条件：事件类型 + 时间范围，与列表同宽左对齐 */
+.devsess__filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.devsess__filter-item {
+  width: 180px;
+}
+
+/* 时间范围精确到时分秒，故宽度大于普通日期区间控件 */
+.devsess__filter-item--date {
+  width: 380px;
+}
+
+/* 时间读数：等宽数字，便于纵向逐行比对 */
+.devsess__time {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 事件标签：上线绿、离线红，与顶部在线状态的色彩口径一致 */
+.devsess__type {
+  display: inline-block;
+  min-width: 48px;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.devsess__type.is-on {
+  color: #389e0d;
+  background: rgba(82, 196, 26, 0.12);
+  border: 1px solid rgba(82, 196, 26, 0.24);
+}
+
+.devsess__type.is-off {
+  color: #cf1322;
+  background: rgba(255, 77, 79, 0.1);
+  border: 1px solid rgba(255, 77, 79, 0.24);
+}
+
+/* 说明：单行省略，完整内容由 title 提示 */
+.devsess__reason {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 窄屏适应 ---------- */
+@media (max-width: 1279px) {
+  /* 中等宽度：按钮组换行后仍贴右 */
+  .device-filter__body {
+    row-gap: 12px;
+  }
+}
+
+@media (max-width: 991px) {
+  /* 设备档案收为单列，分组依次纵向排列 */
+  .device-detail__archive {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .device-detail__archive-group--full {
+    grid-column: auto;
+  }
+
+  /* 上下线查询条件收为整行，避免控件被压窄 */
+  .devsess__filter-item,
+  .devsess__filter-item--date {
+    flex: 1 1 100%;
+    width: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .device-filter {
+    padding: 14px 12px 12px;
+  }
+
+  /* 窄屏下每个条件项独占一行，避免控件被压得读不清 */
+  .device-field {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .device-filter__actions {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  .device-filter__actions .ant-btn {
+    flex: 1 1 auto;
+  }
+
+  /* 表单两列栅格收为单列 */
+  .devform__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .device-detail__head {
+    flex-direction: column;
+  }
+
+  .device-detail__head-actions {
+    align-self: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .device-selbar-enter-active,
+  .device-selbar-leave-active {
+    transition: none;
+  }
+}

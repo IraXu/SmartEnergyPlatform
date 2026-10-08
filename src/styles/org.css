@@ -1,0 +1,940 @@
+/* 组织架构页面样式：对齐《产品交互设计文档-组织架构》v1.0 第 3 章视觉 token 与 4.1.2 页面布局。
+   仅用于原型交互验证，不作为生产代码。 */
+
+/* 结构维护页信息密度高，取消业务页通用的 960px 居中限制，占满内容区可用宽度 */
+.org-page {
+  max-width: none;
+}
+
+/* ---------- 页面级无权限空态（无 `system:org` 权限点） ---------- */
+.org-page__denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- 页面标题区 AREA-ORG-01 ---------- */
+/* 结构维护入口收在树节点操作区，标题区不再放置「新增下级」按钮，因此改为纵向排列 */
+.org-page__head {
+  margin-bottom: 16px;
+}
+
+.org-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.org-page__desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 主体分栏 AREA-ORG-02 ---------- */
+.org-page__main {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  min-height: 480px;
+  height: calc(100vh - 200px);
+}
+
+/* ---------- 树面板 AREA-ORG-03 ---------- */
+.org-tree {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  padding: 16px;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 10px;
+  border-right: 1px solid #e6ecea;
+}
+
+.org-tree__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.org-tree__search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.org-tree__search-icon {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.org-tree__alert {
+  margin-bottom: 12px;
+}
+
+.org-tree__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.org-tree__body--center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* ---------- 树区状态块（加载失败 / 搜索无结果） ----------
+   树面板宽仅 360px，不套用 a-result / a-empty 的大号默认尺寸，
+   统一用「图标 + 标题 + 说明 + 可选操作」的紧凑竖排结构。 */
+.org-tree__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.org-tree__state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  font-size: 22px;
+  color: rgba(0, 0, 0, 0.3);
+  background: #f5f7fa;
+  border-radius: 50%;
+}
+
+/* 加载失败为「需用户处理」的异常，用品牌主色承载，与中性灰的搜索无结果区分 */
+.org-tree__state-icon--error {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.org-tree__state-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.org-tree__state-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.org-tree__state-action {
+  margin-top: 10px;
+}
+
+/* 空结构：树下方给出搭建引导 */
+.org-tree__empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0 0 24px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 搜索命中项：名称 + 上级路径 */
+.org-tree__hit {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.org-tree__hit:hover {
+  background: #f5f7fa;
+}
+
+.org-tree__hit--current {
+  background: #ecf4f3;
+}
+
+.org-tree__hit-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.org-tree__hit-name {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.org-tree__hit--current .org-tree__hit-name {
+  font-weight: 500;
+  color: #0f7b6c;
+}
+
+.org-tree__hit-tag {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+/* 命中关键字高亮（STATE-ORG-04） */
+.org-tree__hit-mark {
+  font-style: normal;
+  font-weight: 500;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.12);
+  border-radius: 3px;
+}
+
+.org-tree__hit-path {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 节点行的宽度约束：长节点名（如企业全称）会按 min-content 把树节点撑宽，
+   导致行右侧的操作区被 .org-tree__body 的横向滚动裁掉、看起来「操作不见了」。
+   这里逐层放开 min-width，让名称自己省略，操作区始终贴在树内容区右缘。 */
+.org-tree .ant-tree-treenode,
+.org-tree .ant-tree-node-content-wrapper,
+.org-tree .ant-tree-title {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.org-tree .ant-tree-title {
+  display: block;
+}
+
+/* ---------- 树节点行 CMP-ORG-06~CMP-ORG-10 ---------- */
+.org-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  padding-right: 4px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  border-radius: 8px;
+}
+
+.org-node--current {
+  font-weight: 500;
+  color: #0f7b6c;
+}
+
+.org-node__icon {
+  flex: none;
+  font-size: 16px;
+}
+
+.org-node__icon--root {
+  color: #0f7b6c;
+}
+
+.org-node__icon--org {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.org-node__icon--unit {
+  color: #faad14;
+}
+
+.org-node__icon--current {
+  color: #0f7b6c;
+}
+
+.org-node__name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.org-node__count {
+  flex: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 悬停操作区：常显但默认降低对比度，悬停或键盘聚焦该行时转为高对比。
+   不使用 display:none / opacity:0 隐藏：前者会让下拉浮层的触发元素矩形归零导致浮层错位，
+   后者会让用户以为「操作入口不存在」，结构维护页的操作入口需要始终可发现。 */
+.org-node__actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.org-node .org-node__action {
+  color: rgba(0, 0, 0, 0.45);
+  background: transparent;
+}
+
+.org-node:hover .org-node__action,
+.org-node:focus-within .org-node__action,
+.org-node--current .org-node__action,
+.org-node--menu-open .org-node__action {
+  color: #0f7b6c;
+}
+
+.org-node__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.org-node__action:hover {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+}
+
+/* 选中节点在树上给定底色，与导航当前态保持同一视觉语言 */
+.org-node--current {
+  padding-left: 2px;
+}
+
+/* ---------- 属性面板 AREA-ORG-04 ---------- */
+/* 面板为纵向弹性容器：属性网格按内容高度，用能单元卡片吸收剩余高度，
+   避免「上重下轻 + 底部大片留白」的失衡感 */
+.org-attr {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 480px;
+  padding: 20px 24px 24px;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 10px;
+}
+
+.org-attr__empty {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
+.org-attr__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.org-attr__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* 头部图标：与树节点图标同款，形成「树 → 面板」的视觉对应 */
+.org-attr__title-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  border-radius: 8px;
+  background: #f5f7fa;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.org-attr__title-icon--root {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.org-attr__title-icon--unit {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.14);
+}
+
+.org-attr__name {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.org-attr__kind {
+  flex: none;
+  margin: 0;
+}
+
+.org-attr__kind--unit {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+.org-attr__head-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 只读态属性区：短字段两列并排、长字段跨两列，信息密度更紧凑 */
+.org-attr__grid {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 12px;
+  overflow: hidden;
+  background: #f0f0f0;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.org-attr__field {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 12px;
+  background: #fff;
+}
+
+.org-attr__field--full {
+  grid-column: 1 / -1;
+}
+
+.org-attr__label {
+  flex: none;
+  width: 84px;
+  font-size: 13px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.org-attr__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.85);
+  word-break: break-all;
+}
+
+/* 空值以更弱的颜色呈现，与实际填写值区分开 */
+.org-attr__value--empty {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.org-attr__value--muted {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 用能单元编码等机器可读值使用等宽字体，便于逐位核对 */
+.org-attr__value--code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: #0f7b6c;
+}
+
+/* 层级路径整行展示，路径过长时在格内换行 */
+.org-attr__field .org-attr__path {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.org-attr__path-link {
+  color: #0f7b6c;
+}
+
+.org-attr__form {
+  flex: none;
+  margin-top: 16px;
+}
+
+/* ---------- 用能单元列表（属性面板下方） ---------- */
+/* 卡片化并吸收剩余高度：与上方属性区形成两个视觉分区，解决「头重脚轻」 */
+.org-attr__units {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+  margin-top: 20px;
+  padding: 16px 18px 18px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.org-units__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.org-units__title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.org-units__heading {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.org-units__count {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.org-units__search {
+  flex: none;
+  width: 200px;
+}
+
+.org-units__search-icon {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.org-units__empty {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+}
+
+/* 表格吸收卡片剩余高度，行数少时也不会缩成一条窄表；
+   分页锚定在卡片底部，剩余高度落在表格画布内，避免卡片下缘悬空留白 */
+.org-units__table {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* 单元名称：可点击定位到左侧树 */
+.org-units__name {
+  color: #0f7b6c;
+}
+
+/* 长文本（GPS 坐标、所属组织节点）需完整可读：允许折行，不做省略 */
+.org-units__wrap {
+  display: block;
+  line-height: 20px;
+  word-break: break-word;
+}
+
+/* 列头内的说明图标：紧贴标题文字，悬浮展示该列的用途说明 */
+.org-units__head-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.org-units__head-tip {
+  color: rgba(0, 0, 0, 0.45);
+  cursor: help;
+}
+
+.org-units .ant-table {
+  flex: 1 1 auto;
+  font-size: 13px;
+  background: transparent;
+}
+
+/* 表格主体撑满卡片剩余高度，末行与分页之间的空隙由画布承担 */
+.org-units .ant-table-container {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.org-units .ant-table-content {
+  flex: 1 1 auto;
+}
+
+.org-units .ant-table-thead > tr > th {
+  padding: 10px 16px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  background: #f4f7f6;
+}
+
+.org-units .ant-table-tbody > tr > td {
+  padding: 12px 16px;
+  vertical-align: top;
+  background: #fff;
+}
+
+/* 表头列分割线弱化，减少视觉噪声 */
+.org-units .ant-table-thead > tr > th::before {
+  display: none;
+}
+
+/* 分页常显：入口固定在列表下方右侧 */
+.org-units .ant-table-pagination.ant-pagination {
+  margin: 14px 0 0;
+}
+
+/* ---------- GPS 选点（CMP-ORG-14） ---------- */
+.gps-picker {
+  width: 100%;
+}
+
+/* 表单内入口：坐标文字 + 「地图选点」按钮，地图交互收进弹窗 */
+.gps-picker__field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.gps-picker__value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.gps-picker__value--empty {
+  font-family: inherit;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* 弹窗内：查询定位区 */
+.gps-picker__locate {
+  margin-bottom: 8px;
+}
+
+.gps-picker__results {
+  max-height: 132px;
+  margin: 8px 0 0;
+  padding: 4px;
+  overflow: auto;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.gps-picker__results-empty {
+  padding: 6px 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.gps-picker__result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+}
+
+.gps-picker__result:hover {
+  background: #f5f7fa;
+}
+
+.gps-picker__result-coord {
+  flex: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.gps-picker__located {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #0f7b6c;
+}
+
+.gps-picker__hint-bar {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.gps-picker__hint-strong {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 模拟地图：浅色底 + 网格与道路示意，避免空白导致「不可点」的误解；双击确定位置 */
+.gps-picker__map {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+  cursor: crosshair;
+  background: #f2f5f4;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+}
+
+.gps-picker__map:focus-visible {
+  outline: 2px solid #0f7b6c;
+  outline-offset: -2px;
+}
+
+.gps-picker__grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(15, 123, 108, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 123, 108, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.gps-picker__roads {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 44%, #fff 44%, #fff 52%, transparent 52%),
+    linear-gradient(90deg, transparent 28%, #fff 28%, #fff 34%, transparent 34%),
+    linear-gradient(transparent 72%, #fff 72%, #fff 78%, transparent 78%);
+}
+
+/* 十字准星：单击产生的预览点，纵横两条准线，定位点居中 */
+.gps-picker__crosshair {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.gps-picker__crosshair-h,
+.gps-picker__crosshair-v {
+  position: absolute;
+  background: #0f7b6c;
+}
+
+.gps-picker__crosshair-h {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
+.gps-picker__crosshair-v {
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+}
+
+.gps-picker__pin {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  background: #0f7b6c;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(15, 123, 108, 0.35);
+  transform: translate(-50%, -50%);
+}
+
+/* 确定点旁的坐标气泡：让「双击落点」的读数直接可见 */
+.gps-picker__pin-label {
+  position: absolute;
+  padding: 1px 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 18px;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(15, 123, 108, 0.9);
+  border-radius: 4px;
+  transform: translate(10px, -50%);
+}
+
+.gps-picker__corner {
+  position: absolute;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.gps-picker__corner--tl {
+  top: 6px;
+  left: 8px;
+}
+
+.gps-picker__corner--br {
+  right: 8px;
+  bottom: 6px;
+}
+
+/* 经纬度读数：左右等宽各占一半，保证 6 位小数能完整显示。
+   不用 a-input-number 的 addon-before：其外层会包一层 ant-space-compact，
+   在 flex 容器里吃不到 flex:1，导致输入框被压到 90px 并裁切读数。 */
+.gps-picker__coord {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.gps-picker__coord-item {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gps-picker__coord-label {
+  flex: none;
+  font-size: 13px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.gps-picker__input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gps-picker__note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.org-attr__hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 未保存提示与操作按钮同一行，左对齐提示、右侧按钮 */
+.org-attr__form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+/* 未保存提示：左侧提示条自适应宽度，右侧按钮不换行 */
+.org-attr__unsaved {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 4px 10px;
+}
+
+.org-attr__form-actions {
+  flex: none;
+}
+
+/* ---------- 弹窗内共用 ---------- */
+.org-modal__path {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  word-break: break-all;
+}
+
+.org-modal__tree {
+  max-height: 360px;
+  padding: 8px;
+  overflow: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.org-modal__hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 窄屏适应（1081~1365px） ---------- */
+@media (max-width: 1365px) {
+  .org-tree {
+    width: 280px;
+  }
+
+  .org-attr {
+    min-width: 400px;
+  }
+
+  .org-units__search {
+    width: 160px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .org-tree__hit,
+  .org-node__action {
+    transition: none;
+  }
+}

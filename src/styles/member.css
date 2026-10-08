@@ -1,0 +1,891 @@
+/* 企业成员页面样式：对齐《产品交互设计文档-企业成员》v1.0 第 3 章视觉 token 与 4.1.2 页面布局。
+   仅用于原型交互验证，不作为生产代码。 */
+
+/* 成员列表有 8 列信息，取消业务页通用的 960px 居中限制，把宽度让给表格 */
+.member-page {
+  max-width: none;
+}
+
+/* ---------- 页面标题区 AREA-MEM-01 ---------- */
+.member-page__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.member-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.member-page__desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.member-page__denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- 筛选区卡片 AREA-MEM-02 ---------- */
+.member-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+/* 统一控件高度、宽度与圆角：四个查询控件等宽同高排列，视觉整齐 */
+.member-filter__control {
+  width: 220px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.member-filter__control.ant-select .ant-select-selector {
+  height: 32px;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.member-filter__control.ant-select .ant-select-selection-item,
+.member-filter__control.ant-select .ant-select-selection-placeholder {
+  line-height: 30px;
+}
+
+.member-filter__icon {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* 组织节点筛选的下拉浮层：宽度按内容自适应（关闭与选择框同宽），
+   节点标题单行不换行；超长路径由浮层自身横向留白承载，而不是折行 */
+.member-scope-filter-popup .ant-select-tree-title {
+  white-space: nowrap;
+}
+
+.member-scope-filter-popup .ant-select-tree-node-content-wrapper,
+.member-scope-filter-popup .ant-select-tree-node-content-wrapper:hover {
+  white-space: nowrap;
+}
+
+/* treeData 的 title 已含缩进层级，浮层最宽不超过视口 60%，避免超长节点名把浮层推出屏 */
+.member-scope-filter-popup {
+  max-width: 60vw;
+  width: max-content;
+}
+
+/* 查询 / 重置推到右端：与左侧筛选条件区分开，形成「条件区 + 动作区」的清晰分区 */
+.member-filter__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ---------- 列表卡片 AREA-MEM-03 ---------- */
+.member-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  padding: 16px 0;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.member-list__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 16px;
+  overflow: auto;
+}
+
+.member-list__body--center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+/* 列表区状态块：紧凑型，不用 a-result 的大图标与大标题 */
+.member-list__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.member-list__state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  font-size: 22px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 50%;
+}
+
+.member-list__state-icon--error {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.member-list__state-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.member-list__state-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.member-list__state-action {
+  margin-top: 10px;
+}
+
+/* ---------- 表格（CMP-MEM-11~CMP-MEM-20） ---------- */
+.member-list .ant-table {
+  font-size: 14px;
+}
+
+/* 表格左右留出与卡片一致的内边距，避免表头色块顶到圆角边缘 */
+.member-list > .ant-table-wrapper {
+  padding: 0 16px;
+}
+
+.member-list .ant-table-thead > tr > th {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.65);
+  background: #f4f7f6;
+}
+
+.member-list .ant-table-thead > tr > th::before {
+  display: none;
+}
+
+.member-list .ant-table-tbody > tr > td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+/* 第一列左侧留出更大内边距，避免姓名紧贴表格左边缘 */
+.member-list .ant-table-thead > tr > th:first-child,
+.member-list .ant-table-tbody > tr > td:first-child {
+  padding-left: 16px;
+}
+
+.member-list .ant-table-tbody > tr:hover > td {
+  background: #f5f7fa;
+}
+
+/* 从角色管理「查看成员」跳转过来的成员行：以浅底 + 左侧主色标记定位 */
+.member-list .ant-table-tbody > tr.member-row--highlight > td {
+  background: #ecf4f3;
+}
+
+.member-list .ant-table-tbody > tr.member-row--highlight > td:first-child {
+  box-shadow: inset 3px 0 0 #0f7b6c;
+}
+
+/* 分页常显：即使只有一页也展示入口 */
+.member-list .ant-table-pagination.ant-pagination {
+  margin: 14px 0 0;
+}
+
+.member-cell__name {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-cell__account {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.member-cell__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.member-cell__type {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.member-cell__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.member-cell__tags .ant-tag {
+  margin: 0;
+}
+
+/* 超级管理员标签用主色浅底，与其他角色区分 */
+.member-cell__tag--admin {
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+.member-cell__warn {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #faad14;
+}
+
+.member-cell__warn--hint {
+  margin: 2px 0 0;
+}
+
+/* 数据范围可点击查看详情（成员可能管理超多组织节点） */
+.member-cell__scope-link {
+  font-size: 14px;
+  color: #0f7b6c;
+  word-break: break-all;
+}
+
+.member-cell__scope-link:hover {
+  color: #0a5f53;
+  text-decoration: underline;
+}
+
+/* 状态开关：开关与文案同行，文案随状态变化 */
+.member-cell__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.member-cell__status-text {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.member-cell__note {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.member-cell__note--warn {
+  color: #faad14;
+}
+
+.member-cell__time {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 行操作区：三个动作默认即为各自的语义色（重置=主色 / 编辑=中性 / 删除=危险色）；
+   悬停时各自在同一色系内加深，不使用跨色系的第三色，避免「颜色不搭」 */
+.member-cell__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.member-cell__actions .ant-btn {
+  padding-inline: 6px;
+}
+
+/* antdv 的 link 型按钮用自有 CSS 变量驱动默认色与悬停色
+   （--ant-btn-text-color / --ant-btn-text-color-hover / --ant-btn-text-color-active），
+   直接写 color 会被组件样式的变量取值覆盖，导致「重置密码」与「编辑」悬停后都变成链接蓝。
+   因此这里改为覆盖变量本身；选择器写到三个类以保证优先级高于组件的 .ant-btn.ant-btn-variant-link。 */
+.member-cell__actions .ant-btn.member-cell__action--reset {
+  --ant-btn-text-color: #0f7b6c;
+  --ant-btn-text-color-hover: #0a5f53;
+  --ant-btn-text-color-active: #0a5f53;
+}
+
+/* 编辑：中性色系（默认正文色 → 悬停加深），不与主色/危险色抢注意力 */
+.member-cell__actions .ant-btn.member-cell__action--edit {
+  --ant-btn-text-color: rgba(0, 0, 0, 0.65);
+  --ant-btn-text-color-hover: rgba(0, 0, 0, 0.88);
+  --ant-btn-text-color-active: rgba(0, 0, 0, 0.88);
+}
+
+/* 删除：危险色系（危险色 → 悬停加深） */
+.member-cell__actions .ant-btn.member-cell__action--danger {
+  --ant-btn-text-color: #ff4d4f;
+  --ant-btn-text-color-hover: #ff7875;
+  --ant-btn-text-color-active: #d9363e;
+}
+
+/* ---------- 弹窗内共用 ---------- */
+/* 待操作对象信息卡：标签列定宽 + 内容列自适应，长账号自动省略而不折行 */
+.member-modal__card {
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  background: #f9fbfa;
+  border-radius: 10px;
+}
+
+.member-modal__card-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.member-modal__card-row + .member-modal__card-row {
+  margin-top: 10px;
+}
+
+.member-modal__card-label {
+  flex: none;
+  width: 60px;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.member-modal__card-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.member-modal__card-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-modal__card-mono {
+  margin: 2px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-modal__card-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.member-modal__tags {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.member-modal__tags .ant-tag {
+  margin: 0;
+}
+
+.member-modal__empty {
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.member-modal__lead {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.member-modal__hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.member-modal__warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #faad14;
+}
+
+.member-modal__warn svg {
+  flex: none;
+  margin-top: 3px;
+}
+
+/* 删除风险说明：逐条列出，两行以内不换行展示 */
+.member-modal__risks {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  list-style: none;
+  background: #fffbf5;
+  border: 1px solid #ffe7ba;
+  border-radius: 10px;
+}
+
+.member-modal__risks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.member-modal__risks li + li {
+  margin-top: 6px;
+}
+
+.member-modal__risks svg {
+  flex: none;
+  margin-top: 3px;
+  color: #faad14;
+}
+
+.member-modal__confirm {
+  display: block;
+  margin-top: 16px;
+}
+
+/* ---------- 成员表单（OVERLAY-01 / OVERLAY-02） ---------- */
+.member-form__group {
+  margin: 4px 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.member-form__group:not(:first-child) {
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.member-form__hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.member-form__warn {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #faad14;
+}
+
+.member-form__alert {
+  margin-top: 8px;
+}
+
+/* 账号已存在时的一行式提示：紧凑、贴合主题主色，替代占位过大的 Alert 块 */
+.member-form__note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+  border-radius: 6px;
+}
+
+.member-form__note-icon {
+  flex: none;
+  font-size: 13px;
+  color: #0f7b6c;
+}
+
+.member-form__result {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 一次性凭据区：等宽字体展示，便于逐位核对 */
+.member-form__credential {
+  padding: 12px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.member-form__credential-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 22px;
+}
+
+.member-form__credential-row + .member-form__credential-row {
+  margin-top: 8px;
+}
+
+.member-form__credential-label {
+  flex: none;
+  width: 72px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.member-form__mono {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-all;
+}
+
+/* ---------- 数据范围选择（COMP-MEM-01） ---------- */
+.member-scope__field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+}
+
+/* 已选节点标签：内部文字用 flex 收缩省略。
+   不用「inline-block + vertical-align」做省略——那会把关闭图标（x）挤出基线导致错位。 */
+.member-scope__tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  margin: 0;
+}
+
+.member-scope__tag > span:first-child,
+.member-scope__tag > .member-scope__tag-text {
+  min-width: 0;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-scope__tag .ant-tag-close-icon {
+  flex: none;
+  margin-inline-start: 4px;
+}
+
+.member-scope__empty {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.member-scope__readonly {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.member-scope__hint {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.member-scope__warn {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #faad14;
+}
+
+.member-scope__modal-desc {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.member-scope__search {
+  margin-bottom: 8px;
+}
+
+.member-scope__search-icon {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.member-scope__tree {
+  max-height: 360px;
+  padding: 8px;
+  overflow: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.member-scope__no-hit {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.member-scope__selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.member-scope__selected .ant-tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  margin: 0;
+}
+
+.member-scope__selected .ant-tag > span {
+  min-width: 0;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-scope__selected .ant-tag .ant-tag-close-icon {
+  flex: none;
+  margin-inline-start: 4px;
+}
+
+.member-scope__count {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 数据范围详情 OVERLAY-06 ---------- */
+.member-scope-detail-modal .ant-modal-body {
+  padding-top: 4px;
+}
+
+/* 成员信息条：浅底卡片，姓名与账号分两行，右侧用标签给出范围规模 */
+.scope-detail__summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: #f9fbfa;
+  border-radius: 10px;
+}
+
+.scope-detail__avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-size: 17px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 50%;
+}
+
+.scope-detail__summary-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.scope-detail__summary-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scope-detail__summary-sub {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scope-detail__summary-tag {
+  flex: none;
+  margin: 0;
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+.scope-detail__search {
+  margin-bottom: 12px;
+}
+
+/* 列表容器：不额外加边框，用行分隔线与悬停底色表达层级，避免「框中框」 */
+.scope-detail__body {
+  min-height: 200px;
+  max-height: 340px;
+  overflow: auto;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.scope-detail__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scope-detail__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  transition: background-color 0.2s;
+}
+
+.scope-detail__item + .scope-detail__item {
+  border-top: 1px solid #f5f7fa;
+}
+
+.scope-detail__item:hover {
+  background: #f9fbfa;
+}
+
+.scope-detail__item-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+  background: #f5f7fa;
+  border-radius: 7px;
+}
+
+.scope-detail__item:hover .scope-detail__item-icon {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.scope-detail__item-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.scope-detail__item-name {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scope-detail__item-path {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scope-detail__item-tag {
+  flex: none;
+  margin: 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  background: #f5f7fa;
+  border-color: #eef2f1;
+}
+
+.scope-detail__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.scope-detail__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 窄屏适应（1081~1365px） ---------- */
+@media (max-width: 1365px) {
+  .member-filter__control {
+    width: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .member-list .ant-table-tbody > tr {
+    transition: none;
+  }
+}

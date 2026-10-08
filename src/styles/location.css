@@ -1,0 +1,1049 @@
+/* 点位地图页面样式：对齐《产品交互设计文档-点位地图》v1.0 第 3 章视觉 token 与 4.2 页面布局。
+   仅用于原型交互验证，不作为生产代码。
+
+   布局要点：地图占满整个内容区（全屏地图），全部控件以悬浮层形式绝对定位在地图之上，
+   不挤占地图空间。地图支持鼠标拖拽平移、滚轮缩放、方向键平移与加减号缩放。 */
+
+/* ---------- 页面容器：地图铺满内容区 ---------- */
+.loc-page {
+  position: relative;
+  width: 100%;
+  /* 顶栏 56px + 内容区上下内边距 24px×2；地图高度占满，不产生页面级滚动 */
+  height: calc(100vh - 56px - 48px);
+  min-height: 520px;
+}
+
+/* 整页无权限态：与设备页、成员页、角色页、告警页保持同一套呈现 */
+.loc-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- 地图容器：整块铺满，作为悬浮控件的定位基准 ---------- */
+.loc-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #eaf1ef;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+}
+
+/* ---------- 地图画布 ---------- */
+.loc-canvas {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
+  outline: none;
+}
+
+.loc-canvas--dragging {
+  cursor: grabbing;
+}
+
+.loc-canvas:focus-visible {
+  box-shadow: inset 0 0 0 2px #0f7b6c;
+}
+
+/* ---------- 轻量刷新进度条（维度切换 / 查询 / 重置） ---------- */
+/* 贴地图顶边的一条细进度条：不遮挡内容、不阻断拖拽与缩放，替代整屏遮罩 */
+.loc-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  width: 100%;
+  height: 3px;
+  overflow: hidden;
+  background: rgba(15, 123, 108, 0.12);
+  pointer-events: none;
+}
+
+.loc-progress__bar {
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(15, 123, 108, 0.2), #0f7b6c);
+  border-radius: 0 2px 2px 0;
+  animation: loc-progress-slide 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes loc-progress-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* 刷新中：条件面板内的轻提示文案 */
+.loc-filter__refreshing {
+  color: #0f7b6c;
+}
+
+/* 屏幕阅读器专用文本：视觉隐藏但可被读屏播报 */
+.loc-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip-path: inset(50%);
+}
+
+/* ---------- 标记层：维度切换时新标记淡入 ---------- */
+.loc-marker-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* 只做「入场淡入」：旧维度标记随维度切换当帧移除，不做淡出，
+   避免视野重置后旧标记在新坐标上残留渐隐产生的错位感 */
+.loc-marker-fade-enter-active {
+  transition: opacity 0.24s ease;
+}
+
+.loc-marker-fade-enter-from {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loc-progress__bar {
+    animation-duration: 2s;
+  }
+
+  .loc-marker-fade-enter-active {
+    transition: none;
+  }
+}
+
+/* 模拟地图：网格与道路示意 */
+.loc-canvas__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(15, 123, 108, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 123, 108, 0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.loc-canvas__roads {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(96deg, transparent 49.6%, rgba(0, 0, 0, 0.06) 49.6%, rgba(0, 0, 0, 0.06) 50.4%, transparent 50.4%),
+    linear-gradient(184deg, transparent 49.6%, rgba(0, 0, 0, 0.06) 49.6%, rgba(0, 0, 0, 0.06) 50.4%, transparent 50.4%),
+    linear-gradient(38deg, transparent 49.75%, rgba(0, 0, 0, 0.04) 49.75%, rgba(0, 0, 0, 0.04) 50.25%, transparent 50.25%);
+}
+
+/* ---------- 地图标记 ---------- */
+.loc-marker {
+  position: absolute;
+  z-index: 2;
+  padding: 0;
+  cursor: pointer;
+  border: 0;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 用能单元维度：聚合标记（方块 + 设备数徽标） */
+.loc-marker--unit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #ffffff;
+  background: #0f7b6c;
+  border: 2px solid #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.loc-marker--unit .loc-marker__icon {
+  font-size: 18px;
+}
+
+/* 设备数为 0：标记弱化 */
+.loc-marker--unit.loc-marker--empty {
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.94);
+  border-color: #d9d9d9;
+}
+
+.loc-marker__badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  color: #ffffff;
+  text-align: center;
+  background: #0f7b6c;
+  border: 1.5px solid #ffffff;
+  border-radius: 9px;
+}
+
+.loc-marker--unit.loc-marker--empty .loc-marker__badge {
+  color: rgba(0, 0, 0, 0.65);
+  background: #f0f0f0;
+}
+
+/* 设备维度：逐台标记，按在线状态区分形态（颜色 + 形状双通道） */
+.loc-marker--device {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+/* 在线：实心圆点 */
+.loc-marker--online {
+  background: #0f7b6c;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 离线：空心圆环 + 警告色描边 */
+.loc-marker--offline {
+  background: transparent;
+  border: 3px solid #faad14;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+}
+
+/* 未接入：实心灰点 */
+.loc-marker--unknown {
+  width: 14px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid #ffffff;
+}
+
+/* 选中态：放大 + 主色光环（两种维度共用） */
+.loc-marker--active {
+  z-index: 4;
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.loc-marker--unit.loc-marker--active,
+.loc-marker--device.loc-marker--active {
+  box-shadow: 0 0 0 4px rgba(15, 123, 108, 0.25);
+}
+
+/* ---------- 悬浮层：绝对定位在地图之上 ---------- */
+.loc-float {
+  position: absolute;
+  z-index: 6;
+}
+
+.loc-float--top-left {
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* 条件面板为竖向堆叠，宽度固定；窄屏收窄见媒体查询 */
+  width: 340px;
+  /* 不遮挡地图拖拽：仅面板本体可交互，空白处透传 */
+  pointer-events: none;
+}
+
+.loc-float--top-left > * {
+  pointer-events: auto;
+}
+
+.loc-float--top-right {
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.loc-float--bottom-left {
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.loc-float--bottom-left > * {
+  pointer-events: auto;
+}
+
+.loc-float--bottom-right {
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.loc-float--bottom-center {
+  bottom: 16px;
+  left: 50%;
+  max-width: 520px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.loc-float--bottom-center > * {
+  pointer-events: auto;
+}
+
+/* ---------- 悬浮面板（统一卡片观感） ---------- */
+.loc-panel {
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.loc-panel--head {
+  padding: 12px 14px;
+}
+
+/* ---------- 维度切换：整体式分段控件（浅底轨道 + 滑动指示块） ---------- */
+.loc-dimension {
+  position: relative;
+  display: flex;
+  gap: 0;
+  padding: 4px;
+  background: #ecf4f3;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(15, 123, 108, 0.14);
+}
+
+/* 选中底色：等宽于一个选项，切换时左右滑动 */
+.loc-dimension__thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 8px) / 2);
+  background: #0f7b6c;
+  border-radius: 9px;
+  box-shadow: 0 3px 10px rgba(15, 123, 108, 0.32);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loc-dimension__item {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f7b6c;
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loc-dimension__item:hover:not(.loc-dimension__item--active) {
+  color: #0a5c50;
+}
+
+.loc-dimension__item:focus-visible {
+  outline: 2px solid #0f7b6c;
+  outline-offset: 2px;
+}
+
+/* 当前维度：白色文字压在滑动指示块上 */
+.loc-dimension__item--active {
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loc-dimension__thumb {
+    transition: none;
+  }
+}
+
+/* 条件面板：竖向堆叠，每项独占一行 */
+.loc-panel--filter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.loc-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.loc-field__label {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.loc-field__control {
+  width: 100%;
+}
+
+.loc-filter__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.loc-filter__count {
+  flex: 1 1 auto;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+/* ---------- 检索命中下拉 ---------- */
+.loc-hits {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  width: 100%;
+  max-height: 260px;
+  margin: 6px 0 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.loc-hits__empty {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.loc-hits__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.loc-hits__item:hover,
+.loc-hits__item:focus-visible {
+  background: #ecf4f3;
+}
+
+.loc-hits__name {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.loc-hits__sub {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 地图工具按钮（缩放 / 重置视野 / 原型说明） ---------- */
+.loc-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.loc-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.loc-tool:hover:not(:disabled) {
+  color: #0f7b6c;
+  border-color: #0f7b6c;
+}
+
+.loc-tool:disabled {
+  color: rgba(0, 0, 0, 0.25);
+  cursor: not-allowed;
+}
+
+/* 缩放组内的按钮：去掉独立圆角与阴影，由容器统一承载 */
+.loc-tools .loc-tool {
+  width: 32px;
+  padding: 0;
+  font-size: 14px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.loc-tool--reset {
+  width: auto;
+}
+
+/* ---------- 图例与坐标读数 ---------- */
+.loc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  max-width: 260px;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.loc-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.loc-legend__unit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  color: #ffffff;
+  background: #0f7b6c;
+  border-radius: 4px;
+}
+
+.loc-legend__unit-icon--empty {
+  color: rgba(0, 0, 0, 0.45);
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+}
+
+.loc-legend__dot {
+  width: 10px;
+  height: 10px;
+  background: #0f7b6c;
+  border: 1.5px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #0f7b6c;
+}
+
+.loc-legend__ring {
+  width: 10px;
+  height: 10px;
+  background: transparent;
+  border: 2px solid #faad14;
+  border-radius: 50%;
+}
+
+.loc-legend__unknown {
+  width: 10px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1.5px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.loc-legend__active {
+  width: 12px;
+  height: 12px;
+  background: #ecf4f3;
+  border: 2px solid #0f7b6c;
+  border-radius: 50%;
+}
+
+.loc-readout {
+  margin: 0;
+  padding: 3px 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.55);
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* ---------- 底部状态提示（超限提示条 / 视野内无标记） ---------- */
+.loc-panel__alert {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.loc-panel__hint {
+  margin: 0;
+  padding: 6px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.55);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- 原型说明面板 ---------- */
+.loc-tool--demo {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.loc-panel--demo {
+  width: 360px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.loc-panel__demo-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.loc-panel__demo-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.loc-panel__demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ---------- 地图内状态层（加载中 / 加载失败 / 空态） ---------- */
+.loc-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.loc-overlay__text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.loc-overlay__text--error {
+  color: #d4380d;
+}
+
+/* ---------- OVERLAY-02 设备信息卡 ---------- */
+.loc-card {
+  position: absolute;
+  z-index: 8;
+  width: 300px;
+  padding: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* 头部：按在线状态给顶部色条，一眼可辨状态 */
+.loc-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px 12px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  border-top: 3px solid #0f7b6c;
+}
+
+.loc-card__head--online {
+  border-top-color: #0f7b6c;
+}
+
+.loc-card__head--offline {
+  border-top-color: #faad14;
+}
+
+.loc-card__head--unknown {
+  border-top-color: rgba(0, 0, 0, 0.25);
+}
+
+.loc-card__avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  font-size: 17px;
+  border-radius: 9px;
+}
+
+.loc-card__avatar--online {
+  color: #0f7b6c;
+  background: #ecf4f3;
+}
+
+.loc-card__avatar--offline {
+  color: #d48806;
+  background: #fff7e6;
+}
+
+.loc-card__avatar--unknown {
+  color: rgba(0, 0, 0, 0.45);
+  background: #f5f5f5;
+}
+
+.loc-card__title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.loc-card__name {
+  margin: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.loc-card__online {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.loc-card__online-dot {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.loc-card__online--online {
+  color: #0f7b6c;
+}
+
+.loc-card__online--offline {
+  color: #d48806;
+}
+
+.loc-card__online--unknown {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.loc-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.loc-card__row {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.loc-card__label {
+  flex: none;
+  width: 76px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.loc-card__value {
+  min-width: 0;
+  margin: 0;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-all;
+}
+
+.loc-card__foot {
+  padding: 10px 14px 12px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ---------- OVERLAY-01 设备明细抽屉（内容样式；抽屉容器由 a-drawer 承载） ---------- */
+.loc-drawer {
+  display: flex;
+  flex-direction: column;
+  /* 抽屉 body 已去掉内边距；撑满通高，让明细区吸收剩余高度（表格自身滚动） */
+  height: 100%;
+}
+
+.loc-drawer__head {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 12px;
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #ecf4f3 0%, #ffffff 62%);
+  border-bottom: 1px solid #e8efee;
+}
+
+.loc-drawer__head-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  font-size: 19px;
+  color: #ffffff;
+  background: #0f7b6c;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(15, 123, 108, 0.28);
+}
+
+.loc-drawer__head-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.loc-drawer__eyebrow {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #0f7b6c;
+}
+
+.loc-drawer__title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 档案摘要：浅底卡片 + 两列栅格（长字段跨列） */
+.loc-drawer__profile {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 20px;
+  margin: 16px 20px 0;
+  padding: 14px 16px;
+  background: #fafbfb;
+  border: 1px solid #eef1f0;
+  border-radius: 10px;
+}
+
+.loc-drawer__field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.loc-drawer__field--wide {
+  grid-column: 1 / -1;
+}
+
+.loc-drawer__label {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.loc-drawer__value {
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-all;
+}
+
+.loc-drawer__value--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.loc-drawer__invalid {
+  margin-left: 6px;
+  color: #d4380d;
+}
+
+.loc-drawer__detail {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  padding: 18px 20px 20px;
+}
+
+.loc-drawer__detail-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+}
+
+/* 区块标题左侧主色竖条，强化分区感 */
+.loc-drawer__detail-title {
+  padding-left: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  border-left: 3px solid #0f7b6c;
+}
+
+.loc-drawer__detail-count {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.loc-drawer__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 0;
+}
+
+.loc-drawer__state-text {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+/* 设备名称：纯文本（详情入口只在操作列，避免重复） */
+.loc-drawer__name {
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* ---------- 复用元素：浅底主色标签与等宽文本 ---------- */
+.loc-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-radius: 4px;
+}
+
+.loc-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* 在线状态：圆点 + 文字（未接入设备展示占位符） */
+.loc-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.loc-online__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.loc-online--online .loc-online__dot {
+  background: #0f7b6c;
+}
+
+.loc-online--offline .loc-online__dot {
+  background: #faad14;
+}
+
+.loc-online--unknown .loc-online__dot {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- 窄屏（1366~1439px）：收窄悬浮面板 ---------- */
+@media (max-width: 1439px) {
+  .loc-float--top-left {
+    width: 300px;
+  }
+
+  .loc-panel--demo {
+    width: 320px;
+  }
+
+  .loc-legend {
+    max-width: 220px;
+  }
+}

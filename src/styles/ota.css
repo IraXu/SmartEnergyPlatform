@@ -1,0 +1,602 @@
+/* 设备管理 › 设备OTA 样式：对齐《产品交互设计文档-设备OTA》v0.3 第 3 章视觉 token
+   与 4.1.2 页面布局、第 5 章浮层规格。仅用于原型交互验证，不作为生产代码。 */
+
+/* ---------- AREA-OTA-01 页面头 ---------- */
+.ota-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ota-head__left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ota-head__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.ota-head__desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ota-head__actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ---------- 列表容器内工具行：排序控件 ---------- */
+.ota-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+/* 进行中任务提示条的「已完成」数字用成功色，与计数区分 */
+.ota-running .device-selbar__text strong.is-done {
+  color: #52c41a;
+}
+
+/* ---------- 固件版本列：当前 → 最新 合并展示 ---------- */
+.ota-firmware {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.ota-firmware__current,
+.ota-firmware__latest {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ota-firmware__current {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 最新版本用信息蓝，与当前版本（中性灰）形成主次区分；
+   刻意避开品牌青绿——青绿在页面上已用于主操作与升级成功，
+   再用它表达「有新固件」会与「已成功/可操作」混淆，蓝色更贴近「有更新需关注」的语义。 */
+.ota-firmware__latest {
+  color: #1677ff;
+}
+
+.ota-firmware__arrow {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- 最新固件版本列：版本号 + 新固件标识 ---------- */
+.ota-version {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 新固件标签：信息蓝浅底描边，与「升级成功」的青绿标签明确区分 */
+.ota-version__tag {
+  display: inline-block;
+  flex: none;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #0958d9;
+  white-space: nowrap;
+  background: rgba(22, 119, 255, 0.1);
+  border: 1px solid rgba(22, 119, 255, 0.28);
+  border-radius: 4px;
+}
+
+/* 无新固件：弱提示，与「有新固件」标签形成可区分的次要表达 */
+.ota-version__hint {
+  flex: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+/* ---------- 升级状态列：标签 + 进度细条 ---------- */
+.ota-status {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ota-status__tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.ota-status__tag.is-idle {
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.ota-status__tag.is-running {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border: 1px solid rgba(250, 173, 20, 0.3);
+}
+
+.ota-status__tag.is-success {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border: 1px solid rgba(15, 123, 108, 0.2);
+}
+
+.ota-status__tag.is-failed {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+  border: 1px solid rgba(255, 77, 79, 0.25);
+}
+
+/* 设备级进度：4px 细条，位于状态文字下方 */
+.ota-status__bar,
+.ota-progress__device-bar {
+  display: block;
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  background: #f0f0f0;
+  border-radius: 2px;
+}
+
+.ota-status__bar i,
+.ota-progress__device-bar i {
+  display: block;
+  height: 100%;
+  background: #faad14;
+  border-radius: 2px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ota-progress__device-bar.is-success i {
+  background: #52c41a;
+}
+
+.ota-progress__device-bar.is-failed i {
+  background: #ff4d4f;
+}
+
+.ota-progress__device-bar.is-skip i {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- 操作列：按动作语义着色 ----------
+   同一行里并列 2~3 个链接按钮，若都用主色会「彼此争抢注意力」，
+   用户需要逐字读才知道哪个是主操作。这里按语义分色，形成可扫读的优先级：
+   - 升级：品牌主色（本页唯一的实质动作，最重要，保持主色以延续主操作语义）
+   - 检测：中性灰（只读性质的版本刷新，弱于升级）
+   - 升级内容：中性灰（只读查看）
+   - 查看进度与记录：信息蓝（跟进态，与「有新固件」的蓝形成呼应，表示「进行中/待关注」）
+   antdv 的 link 型按钮由自有 CSS 变量驱动默认色与悬停色，直接写 color 会被组件样式覆盖，
+   因此这里覆盖变量本身；选择器写到三个类以保证优先级高于组件默认样式。 */
+
+/* 检测：中性灰，悬停加深 */
+.ota-table .ant-btn.ota-action--detect {
+  --ant-btn-text-color: rgba(0, 0, 0, 0.65);
+  --ant-btn-text-color-hover: rgba(0, 0, 0, 0.88);
+  --ant-btn-text-color-active: rgba(0, 0, 0, 0.88);
+}
+
+/* 升级：品牌主色，本页唯一实质动作，保持最强的视觉权重 */
+.ota-table .ant-btn.ota-action--upgrade {
+  --ant-btn-text-color: #0f7b6c;
+  --ant-btn-text-color-hover: #0a5f53;
+  --ant-btn-text-color-active: #0a5f53;
+}
+
+/* 升级内容：中性灰，只读查看，不与升级抢注意力 */
+.ota-table .ant-btn.ota-action--content {
+  --ant-btn-text-color: rgba(0, 0, 0, 0.65);
+  --ant-btn-text-color-hover: rgba(0, 0, 0, 0.88);
+  --ant-btn-text-color-active: rgba(0, 0, 0, 0.88);
+}
+
+/* 查看进度与记录：信息蓝，表达「升级进行中、可持续跟进」 */
+.ota-table .ant-btn.ota-action--record {
+  --ant-btn-text-color: #1677ff;
+  --ant-btn-text-color-hover: #0958d9;
+  --ant-btn-text-color-active: #0958d9;
+}
+
+/* ---------- OVERLAY-01 升级内容 ---------- */
+.ota-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ota-content__loading {
+  padding: 8px 0;
+}
+
+.ota-content__compare {
+  padding: 14px 16px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.ota-content__versions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.ota-content__version {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ota-content__version em {
+  font-size: 12px;
+  font-style: normal;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ota-content__version strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* 目标版本用信息蓝，与列表「最新固件版本」同色系，保持全站一致 */
+.ota-content__version strong.is-target {
+  color: #1677ff;
+}
+
+.ota-content__arrow {
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.ota-content__meta {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ota-content__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ota-content__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.ota-content__value {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.ota-content__notes {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.ota-content__notes li {
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(0, 0, 0, 0.78);
+}
+
+.ota-content__empty,
+.ota-content__blank {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ota-content__blank {
+  padding: 16px 0;
+  text-align: center;
+}
+
+/* 升级提示：固定风险提示条（黄底） */
+.ota-content__warn {
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+}
+
+/* ---------- OVERLAY-02 批量检测确认 ---------- */
+.ota-detect__lead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.78);
+}
+
+.ota-detect__lead strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.ota-detect__scope {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ota-detect__skip {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #d48806;
+}
+
+.ota-detect__progress {
+  margin-top: 16px;
+}
+
+.ota-detect__count {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.ota-detect__summary {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #0f7b6c;
+}
+
+/* ---------- OVERLAY-03 / 04 升级确认 ---------- */
+.ota-upgrade__lead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.78);
+}
+
+.ota-upgrade__lead strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.ota-upgrade__count {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.ota-upgrade__count strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.ota-upgrade__compare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.ota-upgrade__version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.78);
+}
+
+/* 目标版本用信息蓝，与列表「最新固件版本」同色系，保持全站一致 */
+.ota-upgrade__version.is-target {
+  font-weight: 600;
+  color: #1677ff;
+}
+
+.ota-upgrade__arrow {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.ota-upgrade__hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ota-upgrade__notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* 更新说明：浅底描边块，全量展示（超长时块内滚动，不折叠条目） */
+.ota-upgrade__notes-box {
+  max-height: 240px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+}
+
+.ota-upgrade__notes-box .ota-upgrade__hint {
+  margin: 0;
+}
+
+.ota-upgrade__link {
+  align-self: flex-start;
+  padding-inline: 0;
+}
+
+/* 风险提示条：重启离线（黄底）；不可回滚（红底） */
+.ota-upgrade__warn {
+  padding: 10px 12px;
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+}
+
+.ota-upgrade__danger {
+  padding: 10px 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.7;
+  color: #cf1322;
+  background: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+}
+
+/* ---------- OVERLAY-05 升级进度与记录 ---------- */
+.ota-record__lead {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ota-record__table .ant-table-thead > tr > th,
+.ota-record__devices .ant-table-thead > tr > th {
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+  background: #f7faf9;
+}
+
+.ota-record__table .ant-table-tbody > tr > td,
+.ota-record__devices .ant-table-tbody > tr > td {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.ota-record__time {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 展开行内的设备清单：浅底自成一区，与任务行区分层级 */
+.ota-record__devices {
+  margin: 4px 0 4px 8px;
+}
+
+.ota-record__devices .ant-table {
+  background: #fbfcfc;
+}
+
+.ota-record__result {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.ota-record__result strong {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.ota-record__result strong.is-failed {
+  color: #ff4d4f;
+}
+
+.ota-record__tag {
+  display: inline-block;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.ota-record__tag.is-running {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+}
+
+.ota-record__tag.is-warn {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.16);
+}
+
+.ota-record__tag.is-success {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.ota-record__tag.is-failed {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+}
+
+.ota-record__tag.is-skip {
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* 设备级进度：进度条 + 百分比 */
+.ota-progress__device {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ota-progress__device-percent {
+  flex: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.ota-progress__fail {
+  display: block;
+  overflow: hidden;
+  font-size: 12px;
+  color: #ff4d4f;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 响应式：窄屏下页面头操作组换行 ---------- */
+@media (max-width: 1365px) {
+  .ota-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .ota-head__actions {
+    justify-content: flex-start;
+  }
+}

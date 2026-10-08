@@ -1,0 +1,974 @@
+/* 企业中心页面样式：仅用于原型交互验证，不作为生产代码。
+
+   布局要点：内容容器 960px 居中（复用 .page-container）；三张卡片纵向排列、卡片间距 16px；
+   卡片头为「图标 + 标题/说明 + 编辑入口」三段式，正文使用统一的网格与字段单元；
+   企业档案卡片以「标识区」呈现（Logo 与企业身份信息并排），编辑态卡片描边转主色。 */
+
+/* ---------- AREA-ENT-01 页面标题区 ---------- */
+.ent-page__head {
+  margin-bottom: 16px;
+}
+
+.ent-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.ent-page__desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ent-page__denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- 卡片容器 ---------- */
+.ent-card {
+  padding: 20px 24px 24px;
+  margin-bottom: 16px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* 处于编辑态的卡片：描边转主色并加一层极淡外发光，明确「当前正在编辑这一张」 */
+.ent-card--editing {
+  border-color: rgba(15, 123, 108, 0.35);
+  box-shadow: 0 0 0 3px rgba(15, 123, 108, 0.06);
+}
+
+/* 加载失败等整卡片状态：内容居中、不出现空白卡片 */
+.ent-card--state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* ---------- 卡片头（AREA-ENT-05） ---------- */
+.ent-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 卡片图标：浅底圆角方块，统一三张卡片的视觉起点 */
+.ent-card__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-radius: 9px;
+}
+
+.ent-card__titles {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ent-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.ent-card__note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 编辑态标识替换「编辑」入口位置展示 */
+.ent-card__badge {
+  flex: none;
+  padding: 2px 10px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-radius: 20px;
+}
+
+.ent-card__edit {
+  flex: none;
+  height: 32px;
+  padding-inline: 10px;
+  color: #0f7b6c;
+  background: #f5faf9;
+  border: 1px solid rgba(15, 123, 108, 0.2);
+  border-radius: 8px;
+}
+
+.ent-card__edit:hover {
+  color: #0a5f53 !important;
+  background: #ecf4f3 !important;
+  border-color: rgba(15, 123, 108, 0.35) !important;
+}
+
+/* ---------- 企业标识区（企业档案卡片正文） ---------- */
+.ent-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 编辑态信息量更大，标识与字段顶部对齐 */
+.ent-hero--editing {
+  align-items: flex-start;
+}
+
+/* 企业 Logo 容器：固定 96×96，只读与编辑态尺寸一致，切换时不跳动 */
+.ent-logo {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.ent-logo__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+/* 未上传 Logo：虚线占位 + 图标 + 文案（不回退企业名称首字徽标） */
+.ent-logo__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.35);
+  background: #fafafa;
+  border: 1px dashed #d9d9d9;
+  border-radius: 10px;
+}
+
+.ent-logo__empty-icon {
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* 加载骨架中的 Logo 占位 */
+.ent-logo--skeleton {
+  background: #f5f7fa;
+  border-radius: 10px;
+}
+
+/* 编辑态 Logo 列：固定宽度容纳上传区与下方提示行，高度放开 */
+.ent-logo--edit {
+  width: 200px;
+  height: auto;
+  overflow: visible;
+}
+
+.ent-hero__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ent-hero__name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-all;
+}
+
+/* 行业 / 地区以浅底信息条呈现，与主名称拉开层级但不抢注意力 */
+.ent-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.75);
+  background: #f5f7fa;
+  border-radius: 6px;
+}
+
+.ent-chip__label {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 字段网格与字段单元 ---------- */
+.ent-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.ent-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ent-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ent-hero__main .ent-grid {
+  margin-top: 16px;
+}
+
+/* 跨整行的字段（营业执照） */
+.ent-item--full {
+  grid-column: 1 / -1;
+}
+
+.ent-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ent-item__label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ent-item__value {
+  font-size: 14px;
+  line-height: 32px;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-all;
+}
+
+/* 统一社会信用代码等宽展示，便于逐位核对 */
+.ent-item__value--mono,
+.ent-item__input--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.5px;
+}
+
+.ent-item__value--mono {
+  font-size: 13px;
+}
+
+.ent-item__value--muted {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ent-item__value-icon {
+  color: #faad14;
+}
+
+.ent-item__error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: #ff4d4f;
+}
+
+/* 编辑态控件高度统一为 32px，与本页只读文本行高一致 */
+.ent-item .ant-input,
+.ent-item .ant-input-affix-wrapper,
+.ent-item .ant-select .ant-select-selector,
+.ent-item .ant-cascader .ant-select-selector {
+  border-radius: 8px;
+}
+
+.ent-item .ant-select .ant-select-selector,
+.ent-item .ant-cascader .ant-select-selector {
+  height: 32px;
+  align-items: center;
+}
+
+.ent-item .ant-select .ant-select-selection-item,
+.ent-item .ant-select .ant-select-selection-placeholder,
+.ent-item .ant-cascader .ant-select-selection-item,
+.ent-item .ant-cascader .ant-select-selection-placeholder {
+  line-height: 30px;
+}
+
+/* 联系人电话复用账号输入组件，其内部为 large 尺寸，此处收敛到本页统一高度 */
+.ent-item .account-field .ant-input,
+.ent-item .account-field .ant-select .ant-select-selector {
+  height: 32px;
+  border-radius: 8px;
+}
+
+.ent-item .account-field .ant-select .ant-select-selection-item,
+.ent-item .account-field .ant-select .ant-select-selection-placeholder {
+  line-height: 30px;
+}
+
+/* ---------- AREA-ENT-08 编辑态操作区 ---------- */
+.ent-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 16px;
+  margin-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ---------- 页面状态块（加载失败） ---------- */
+.ent-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.ent-state__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  font-size: 22px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 50%;
+}
+
+.ent-state__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.ent-state__desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ent-state__action {
+  margin-top: 10px;
+}
+
+/* ---------- 营业执照：缩略图与操作 ---------- */
+.ent-license {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ent-license--editing {
+  align-items: flex-start;
+}
+
+.ent-license__thumb {
+  position: relative;
+  flex: none;
+  width: 160px;
+  height: 120px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: #fafafa;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+}
+
+.ent-license__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ent-license__thumb-mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ent-license__thumb:hover .ent-license__thumb-mask {
+  opacity: 1;
+}
+
+.ent-license__side {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+  min-width: 0;
+}
+
+.ent-license__name {
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  word-break: break-all;
+}
+
+.ent-license__hint {
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 图片上传（COMP-ENT-01） ---------- */
+.ent-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ent-upload__box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.45);
+  background: #fafafa;
+  border: 1px dashed #d9d9d9;
+  border-radius: 8px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+/* Logo 96×96 圆角 10px（与只读态 Logo 容器一致）；营业执照 160×120 圆角 8px */
+.ent-upload__box--logo {
+  width: 96px;
+  height: 96px;
+  border-radius: 10px;
+}
+
+.ent-upload__box--empty:not(.ent-upload__box--logo) {
+  width: 160px;
+  height: 120px;
+}
+
+.ent-upload__box--empty:not(:disabled) {
+  cursor: pointer;
+}
+
+.ent-upload__box--empty:not(:disabled):hover {
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.35);
+}
+
+.ent-upload__box--filled {
+  padding: 0;
+  border-style: solid;
+  border-color: #eef2f1;
+  background: #fff;
+}
+
+.ent-upload__box--filled.ent-upload__box--logo {
+  border-radius: 10px;
+}
+
+.ent-upload__box--filled:not(.ent-upload__box--logo) {
+  width: 160px;
+  height: 120px;
+}
+
+.ent-upload__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 悬停遮罩与「更换 / 删除」文字操作 */
+.ent-upload__mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.48);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.ent-upload__box--filled:hover .ent-upload__mask {
+  opacity: 1;
+}
+
+.ent-upload__op {
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ent-upload__op:hover {
+  text-decoration: underline;
+}
+
+.ent-upload__op--danger {
+  color: #ff7875;
+}
+
+/* 上传中：覆盖上传区，期间上传区不可点击 */
+.ent-upload__progress {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #0f7b6c;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.ent-upload__progress-icon {
+  font-size: 16px;
+  color: #0f7b6c;
+}
+
+.ent-upload__icon {
+  font-size: 18px;
+}
+
+.ent-upload__text {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.ent-upload__hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ent-upload__error {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #ff4d4f;
+}
+
+/* 文件选择器隐藏，仅由上传区按钮触发 */
+.ent-upload__input {
+  display: none;
+}
+
+/* ---------- OVERLAY-01 企业名称变更确认 ---------- */
+.ent-name-diff {
+  padding: 0 0 4px;
+}
+
+.ent-name-diff__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.ent-name-diff__label {
+  flex: none;
+  width: 52px;
+  font-size: 13px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 等宽排版，便于逐字核对变更前后名称 */
+.ent-name-diff__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.65);
+  word-break: break-all;
+}
+
+/* 新名称为变更结果，用主色强调 */
+.ent-name-diff__value--next {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.ent-name-diff__note {
+  padding: 12px;
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+/* ---------- 删除类确认说明 ---------- */
+.ent-warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.ent-warn__icon {
+  flex: none;
+  margin-top: 3px;
+  color: #faad14;
+}
+
+.ent-warn__text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* ---------- OVERLAY-02 营业执照大图查看（灯箱） ---------- */
+/* 不套弹窗外框：深色遮罩铺满视口，图片本身即主体，工具栏与文件名悬浮其上 */
+.ent-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px 88px;
+  background: rgba(0, 0, 0, 0.86);
+}
+
+.ent-lightbox__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.ent-lightbox__stage:active {
+  cursor: grabbing;
+}
+
+.ent-lightbox__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+  transition: transform 0.16s ease-out;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+.ent-lightbox__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.ent-lightbox__error-icon {
+  font-size: 32px;
+  color: #faad14;
+}
+
+.ent-lightbox__error-text {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* 关闭：右上角浮层内固定，不随图片缩放移动 */
+.ent-lightbox__close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 10px;
+  transition: background-color 0.2s;
+}
+
+.ent-lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* 底部居中工具栏：深浅统一，避免白底在深色遮罩上过亮 */
+.ent-lightbox__toolbar {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  transform: translateX(-50%);
+}
+
+.ent-lightbox__tool {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.88);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.ent-lightbox__tool:not(:disabled):hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.ent-lightbox__tool:disabled {
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+}
+
+.ent-lightbox__scale {
+  min-width: 46px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.ent-lightbox__divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.ent-lightbox__caption {
+  position: absolute;
+  bottom: 78px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  transform: translateX(-50%);
+}
+
+.ent-lightbox__name {
+  max-width: 420px;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ent-lightbox__hint::before {
+  content: '·';
+  margin-right: 10px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* 灯箱淡入 */
+.ent-lightbox-enter-active,
+.ent-lightbox-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.ent-lightbox-enter-from,
+.ent-lightbox-leave-to {
+  opacity: 0;
+}
+
+/* ---------- OVERLAY-05 企业 Logo 裁剪 ---------- */
+.ent-crop__desc {
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 裁剪区：外框 320×320，框外以半透明遮罩压暗，框边与四角用主色描边 */
+.ent-crop__stage {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.ent-crop__frame {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.ent-crop__frame:active {
+  cursor: grabbing;
+}
+
+.ent-crop__img {
+  position: absolute;
+  user-select: none;
+  pointer-events: none;
+}
+
+.ent-crop__hint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #fff;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  transform: translateX(-50%);
+}
+
+/* 四角 L 形主色把手 */
+.ent-crop__corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #0f7b6c;
+}
+
+.ent-crop__corner--tl {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.ent-crop__corner--tr {
+  top: -1px;
+  right: -1px;
+  border-bottom: none;
+  border-left: none;
+}
+
+.ent-crop__corner--bl {
+  bottom: -1px;
+  left: -1px;
+  border-top: none;
+  border-right: none;
+}
+
+.ent-crop__corner--br {
+  right: -1px;
+  bottom: -1px;
+  border-top: none;
+  border-left: none;
+}
+
+.ent-crop__zoom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0 0;
+}
+
+.ent-crop__slider {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+.ent-crop__warn {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #faad14;
+}
+
+.ent-crop__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 16px;
+  margin-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ent-card,
+  .ent-upload__box,
+  .ent-upload__mask,
+  .ent-license__thumb-mask,
+  .ent-lightbox__img,
+  .ent-lightbox-enter-active,
+  .ent-lightbox-leave-active {
+    transition: none;
+  }
+}

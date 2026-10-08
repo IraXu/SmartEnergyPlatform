@@ -1,0 +1,400 @@
+/* 认证模块样式：登录（P-01）、注册（P-02）、忘记密码（P-03）、注册成功（P-04） */
+
+/* ---------- 认证类页面公共布局 ---------- */
+.auth-page {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.auth-panel {
+  flex: 1 1 48%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: #fff;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+}
+
+.auth-card--wide {
+  max-width: 520px;
+}
+
+.auth-card__title {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.auth-card__subtitle {
+  margin: 0 0 22px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.auth-steps {
+  margin-bottom: 24px;
+}
+
+/* ---------- 文字链接与相邻文案对齐 ---------- */
+/* 文字链接统一使用 a-typography-link，与相邻文字保持同一行高与基线，避免按钮链接自带高度造成的错位 */
+.auth-switch,
+.auth-footer,
+.auth-form-actions {
+  line-height: 22px;
+}
+
+.auth-switch {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.auth-switch .ant-typography,
+.auth-footer .ant-typography,
+.auth-form-actions .ant-typography {
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.auth-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.auth-form-actions .ant-checkbox-wrapper {
+  align-items: center;
+}
+
+.auth-footer {
+  margin-top: 26px;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.auth-footer .ant-typography {
+  font-size: 12px;
+  line-height: 20px;
+}
+
+/* ---------- 账号输入（手机号国际区号 + 自动识别邮箱） ---------- */
+.account-field__code {
+  flex: 0 0 132px;
+}
+
+.account-field__input {
+  flex: 1;
+}
+
+.account-field__option-code {
+  float: right;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.account-field__hint {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 选择登录企业（P-06） ---------- */
+/* 选项为整行可点卡片：选中的企业给主色描边与浅底，未选中给浅灰底，靠底色与描边共同表达选中态 */
+.org-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.org-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 20px 18px;
+  text-align: left;
+  cursor: pointer;
+  background: #f5f7fa;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.org-option:hover {
+  background: #eef2f6;
+}
+
+.org-option--active {
+  background: rgba(15, 123, 108, 0.05);
+  border-color: #0f7b6c;
+}
+
+.org-option--active:hover {
+  background: rgba(15, 123, 108, 0.05);
+}
+
+.org-option__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.org-option__line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.org-option__name {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.org-option__tag {
+  flex: none;
+  margin: 0;
+}
+
+.org-option__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 角色用主色强调，与企业标识（次要灰）区分，便于快速识别「我在该企业的身份」 */
+.org-option__role {
+  color: #0f7b6c;
+}
+
+.org-option__divider {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.org-picker__remember {
+  display: flex;
+  margin-top: 24px;
+  font-size: 14px;
+}
+
+.org-picker__submit {
+  margin-top: 28px;
+}
+
+/* ---------- 验证码区域 ---------- */
+.code-field {
+  display: flex;
+  gap: 10px;
+}
+
+.code-field__input {
+  flex: 1;
+}
+
+.code-field__button {
+  flex: 0 0 128px;
+}
+
+/* ---------- 图形验证码 ---------- */
+.captcha-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.captcha-row__input {
+  flex: 1;
+}
+
+.captcha-canvas {
+  flex: 0 0 112px;
+  height: 34px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fafafa;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier New', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 3px;
+  color: #0f7b6c;
+  background-image: repeating-linear-gradient(45deg, rgba(15, 123, 108, 0.12) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-45deg, rgba(15, 123, 108, 0.12) 0 1px, transparent 1px 9px);
+}
+
+/* ---------- 密码强度 ---------- */
+.pwd-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.pwd-strength__text {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.pwd-rules {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.9;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 表单提示区 ---------- */
+.form-alert {
+  margin-bottom: 18px;
+}
+
+/* ---------- 认证页品牌区 ---------- */
+.auth-brand {
+  position: relative;
+  flex: 1 1 52%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 72px;
+  color: #fff;
+  background: linear-gradient(140deg, #0f7b6c 0%, #0b5f54 48%, #073f38 100%);
+  overflow: hidden;
+}
+
+.auth-brand::after {
+  content: '';
+  position: absolute;
+  right: -140px;
+  bottom: -160px;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.auth-brand__logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 平台标识：使用项目统一 logo（图标自带圆角与透明底），尺寸按品牌区视觉层级固定 */
+.auth-brand__mark {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.3));
+}
+
+/* 平台名称：渐变文字 + 流动高光 + 冷光晕，品牌区视觉焦点，字号需大于下方所有正文 */
+.auth-brand__name {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  background: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #ffffff 28%,
+    #8ff5e0 46%,
+    #5fdbc4 54%,
+    #ffffff 72%,
+    #ffffff 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 14px rgba(94, 240, 210, 0.38));
+  animation: brand-name-flow 7s linear infinite;
+}
+
+@keyframes brand-name-flow {
+  0% {
+    background-position: 240% 0;
+  }
+  100% {
+    background-position: -40% 0;
+  }
+}
+
+/* 关闭动效偏好下保留渐变与光晕，仅停止高光流动 */
+@media (prefers-reduced-motion: reduce) {
+  .auth-brand__name {
+    animation: none;
+  }
+}
+
+.auth-brand__title {
+  margin: 32px 0 16px;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 1px;
+}
+
+.auth-brand__desc {
+  max-width: 460px;
+  font-size: 15px;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.auth-brand__points {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.auth-brand__point {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-brand__footer {
+  position: absolute;
+  bottom: 32px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 1080px) {
+  .auth-brand {
+    display: none;
+  }
+
+  .auth-panel {
+    flex: 1 1 100%;
+  }
+}

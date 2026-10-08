@@ -1,0 +1,17 @@
+/* 全局基础样式：仅包含重置与设计令牌，模块样式见 auth.css / admin.css */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #f0f2f5;
+  color: rgba(0, 0, 0, 0.88);
+}

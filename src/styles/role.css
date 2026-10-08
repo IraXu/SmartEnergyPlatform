@@ -1,0 +1,950 @@
+/* 角色管理页面样式：对齐《产品交互设计文档-角色管理》v1.0 第 3 章视觉 token 与 4.1.2 页面布局。
+   仅用于原型交互验证，不作为生产代码。 */
+
+/* 权限树信息密度高，取消业务页通用的 960px 居中限制，占满内容区可用宽度 */
+.role-page {
+  max-width: none;
+}
+
+/* ---------- 页面标题区 AREA-ROL-01 ---------- */
+.role-page__head {
+  margin-bottom: 16px;
+}
+
+.role-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.role-page__desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.role-page__denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- 主体分栏 AREA-ROL-02 ---------- */
+.role-page__main {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  min-height: 520px;
+  height: calc(100vh - 200px);
+}
+
+/* ---------- 角色列表面板 AREA-ROL-03 ---------- */
+.role-list {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  padding: 12px;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 10px;
+  border-right: 1px solid #e6ecea;
+}
+
+.role-list__tools {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.role-list__search-icon {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.role-list__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.role-list__body--center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 8px;
+}
+
+/* 列表区状态块：面板仅 280px 宽，不用 a-result / a-empty 的大号默认尺寸 */
+.role-list__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.role-list__state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  font-size: 22px;
+  color: rgba(0, 0, 0, 0.3);
+  background: #f5f7fa;
+  border-radius: 50%;
+}
+
+.role-list__state-icon--error {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.role-list__state-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.role-list__state-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.role-list__state-action {
+  margin-top: 10px;
+}
+
+.role-list__empty-hint {
+  margin: 16px 4px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.role-list__add {
+  flex: none;
+  margin-top: 12px;
+}
+
+/* ---------- 角色列表项（CMP-ROL-05~CMP-ROL-09） ---------- */
+.role-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.role-item + .role-item {
+  margin-top: 2px;
+}
+
+.role-item:hover {
+  background: #f5f7fa;
+}
+
+.role-item--current {
+  background: #ecf4f3;
+}
+
+.role-item__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-item--current .role-item__name {
+  color: #0f7b6c;
+}
+
+.role-item__tag {
+  flex: none;
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.role-item__tag--preset {
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+/* 成员数：以「人」为单位的小徽标，避免与角色名称混淆 */
+.role-item__count {
+  flex: none;
+  min-width: 22px;
+  padding: 0 6px;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+  background: #f5f7fa;
+  border-radius: 9px;
+}
+
+.role-item--current .role-item__count {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+/* 角色行「更多」下拉：状态与操作常显 + 默认低对比度（不使用 display:none / opacity:0，
+   避免下拉浮层触发元素矩形归零导致浮层错位，与组织架构页一致的约定） */
+.role-item__more {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+  border-radius: 4px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.role-item:hover .role-item__more,
+.role-item:focus-within .role-item__more,
+.role-item--current .role-item__more {
+  color: #0f7b6c;
+}
+
+.role-item__more:hover {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+}
+
+/* 角色操作下拉：菜单项文本居中，配合统一定宽让「重命名 / 查看成员 / 删除」垂直对齐。
+   定宽取「查看成员」的最窄占位（4 字 + 左右内边距），避免按最长项把浮层撑得过宽 */
+.role-item-menu .ant-dropdown-menu-item {
+  min-width: 96px;
+  text-align: center;
+}
+
+/* ---------- 权限配置面板 AREA-ROL-04 ---------- */
+.role-perm {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 560px;
+  padding: 20px 24px 24px;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 10px;
+}
+
+.role-perm__empty {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
+.role-perm__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+}
+
+.role-perm__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.role-perm__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.65);
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+.role-perm__icon--preset {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.role-perm__name {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-perm__tag {
+  flex: none;
+  margin: 0;
+  font-size: 12px;
+}
+
+.role-perm__tag--preset {
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+.role-perm__members {
+  flex: none;
+  font-size: 13px;
+  color: #0f7b6c;
+}
+
+.role-perm__members--empty {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.role-perm__head-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 角色描述：置于右侧面板顶部，选中角色后即可确认其适用岗位（PRD 5.2） */
+.role-perm__desc {
+  display: flex;
+  flex: none;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  background: #f9fbfa;
+  border-radius: 8px;
+}
+
+.role-perm__desc-label {
+  flex: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.role-perm__desc-value--empty {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* 预置角色只读提示条：主色实底 + 两级文案，比通用 info alert 更醒目且与整页同色系（CMP-ROL-12） */
+.role-perm__lock {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, #0f7b6c 0%, #12897a 100%);
+  border-radius: 10px;
+}
+
+.role-perm__lock-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+  font-size: 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+}
+
+.role-perm__lock-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.role-perm__lock-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  color: #fff;
+}
+
+.role-perm__lock-desc {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* 权限工具行（CMP-ROL-13~CMP-ROL-15） */
+.role-perm__tools {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.role-perm__search {
+  width: 280px;
+}
+
+.role-perm__search-icon {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.role-perm__hits,
+.role-perm__count {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 统计与全选 / 清空推到右端，避免工具行左侧过于拥挤 */
+.role-perm__count {
+  margin-left: auto;
+}
+
+.role-perm__update {
+  flex: none;
+  margin-top: 12px;
+}
+
+.role-perm__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-top: 14px;
+  overflow: auto;
+}
+
+.role-perm__body--center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-perm__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.role-perm__state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  font-size: 22px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 50%;
+}
+
+.role-perm__state-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.role-perm__state-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.role-perm__state-action {
+  margin-top: 10px;
+}
+
+.role-perm__no-hit {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+/* ---------- 权限配置区（CMP-ROL-18~CMP-ROL-21） ----------
+   以「目录卡片 → 菜单行（可多级嵌套）→ 按钮勾选项」逐级下钻：
+   1) 免去深层缩进，权限点可在一屏内横向扫读；
+   2) 一个菜单一块区域，同页权限点属同一业务动作，勾选时不易串行；
+   3) 每一级都带勾选框，因此既能只配一个目录、只配一个菜单，也能细化到单个按钮；
+   4) 菜单可嵌套，用缩进 + 左侧色条表达层级，天然支持多级菜单。 */
+.perm-module + .perm-module {
+  margin-top: 16px;
+}
+
+/* 目录标题行：左侧主色条标注「目录」层级，右侧为层级徽标与计数。
+   对齐口径：目录行左边框 3px + padding-left 12px = 15px，与菜单卡片「边框 1px + padding-left 14px」
+   的内容起点（同为 15px）一致，使目录行与菜单行的勾选框落在同一条竖线上。 */
+.perm-module__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 12px;
+  background: #f9fbfa;
+  border-left: 3px solid #0f7b6c;
+  border-radius: 10px;
+}
+
+/* 层级徽标：明确区分「目录 / 菜单」，避免层级混淆 */
+.perm-level__badge {
+  flex: none;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 17px;
+  color: #0b6459;
+  background: rgba(15, 123, 108, 0.12);
+  border-radius: 4px;
+}
+
+.perm-level__badge--menu {
+  color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* 每一级的勾选框与标题对齐 */
+.perm-level__box {
+  flex: none;
+  margin: 0;
+}
+
+.perm-module__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 6px;
+}
+
+.perm-module__name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+/* 目录计数与菜单卡片的计数统一右对齐，避免同一面板里两种对齐方式并存 */
+.perm-module__count {
+  flex: 1 1 auto;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: right;
+}
+
+/* 无下级菜单的目录（如「工作台」）：给出「勾选即获得访问权限」的说明 */
+.perm-module__note {
+  margin: 8px 0 0 15px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 目录自身即页面时，其下按钮级权限直接以勾选项平铺（如「告警中心」）。
+   左内边距与目录行内容起点（15px）一致，保证按钮块与层级标题左对齐。 */
+.perm-module__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-left: 15px;
+}
+
+/* 菜单区：每个菜单一张卡片；含下级菜单的菜单，其下级菜单卡片嵌套在上级卡片内部。
+   align-items: start 让卡片按自身内容高度排布——含嵌套子菜单的卡片会更高，
+   若强制等高会把同级菜单卡片拉伸出一片空白。 */
+.perm-menus {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  align-items: start;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.perm-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.perm-menu:hover {
+  border-color: rgba(15, 123, 108, 0.3);
+  box-shadow: 0 2px 8px rgba(15, 123, 108, 0.06);
+}
+
+/* 嵌套菜单（下级菜单卡片嵌在上级卡片内部）：左侧加一道浅色条 + 逐级缩进，
+   与上级拉开层级差；卡片底色转浅，避免多级嵌套时白底卡片层层叠加显得厚重 */
+.perm-menu--nested {
+  margin-left: 16px;
+  background: #fcfdfd;
+  border-left: 2px solid rgba(15, 123, 108, 0.2);
+}
+
+/* 下级菜单容器：与上级菜单的按钮区留出间距，形成「上级内容 → 下级菜单」的分层 */
+.perm-menu__children {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+/* 搜索未命中时整块淡出，但仍可见（不改变勾选状态） */
+.perm-menu--dim,
+.perm-module--dim {
+  opacity: 0.45;
+}
+
+.perm-menu__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.perm-menu__name {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.perm-menu__count {
+  flex: 1 1 auto;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: right;
+}
+
+.perm-menu__empty {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* 按钮级权限点：横向流式排布，勾选项自带浅底块，点选目标明确 */
+.perm-menu__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.perm-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.75);
+  background: #f7f9f8;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.perm-action:hover {
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.18);
+}
+
+.perm-action--on {
+  color: #0b6459;
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.22);
+}
+
+.perm-action--dim {
+  opacity: 0.4;
+}
+
+/* 勾选框与文字对齐：勾选框不参与文字省略计算 */
+.perm-action .ant-checkbox {
+  top: 0;
+  align-self: center;
+}
+
+.perm-action__text {
+  min-width: 0;
+}
+
+/* 命中关键字高亮（COMP-ROL-02） */
+.role-perm__mark {
+  font-style: normal;
+  font-weight: 500;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.15);
+  border-radius: 3px;
+}
+
+/* ---------- 底部操作区 AREA-ROL-06 ---------- */
+.role-perm__footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.role-perm__summary {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #faad14;
+}
+
+.role-perm__summary--idle {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 弹窗内共用 ---------- */
+.role-modal__path {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  word-break: break-all;
+}
+
+/* 角色信息卡：名称与描述分层，长描述限定两行省略，避免撑高弹窗 */
+.role-modal__card {
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background: #f9fbfa;
+  border-radius: 10px;
+}
+
+.role-modal__card-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.role-modal__card-desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.role-modal__lead {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 风险说明：浅黄底 + 圆角，前置警告图标，与成员模块的删除确认保持同一套语言 */
+.role-modal__risks {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  list-style: none;
+  background: #fffbf5;
+  border: 1px solid #ffe7ba;
+  border-radius: 10px;
+}
+
+.role-modal__risks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.role-modal__risks li + li {
+  margin-top: 6px;
+}
+
+.role-modal__risks svg {
+  flex: none;
+  margin-top: 3px;
+  color: #faad14;
+}
+
+.role-modal__hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.role-modal__warn {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #faad14;
+}
+
+/* 差异清单：逐项列出，超过 10 项时列表内部滚动（COMP-ROL-01） */
+.role-diff {
+  margin-top: 12px;
+}
+
+.role-diff__title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.role-diff__list {
+  max-height: 160px;
+  margin: 0;
+  padding: 8px 12px;
+  overflow: auto;
+  font-size: 13px;
+  line-height: 1.9;
+  color: rgba(0, 0, 0, 0.65);
+  list-style: none;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.role-diff__item--removed {
+  color: #ff4d4f;
+}
+
+/* ---------- 角色成员清单 OVERLAY-05 ---------- */
+.role-members__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.role-members__search {
+  width: 240px;
+}
+
+.role-members__body {
+  min-height: 160px;
+}
+
+.role-members__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.role-members__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #52c41a;
+}
+
+.role-members__status--disabled .role-members__dot {
+  background: #ff4d4f;
+}
+
+/* 成员清单里的数据范围：单行省略，完整节点名由悬停气泡给出 */
+.role-members__scope {
+  display: inline-block;
+  max-width: 100%;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.role-members__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+}
+
+/* ---------- 窄屏适应（1081~1365px） ---------- */
+@media (max-width: 1365px) {
+  .role-list {
+    width: 240px;
+  }
+
+  .role-perm {
+    min-width: 480px;
+  }
+
+  .role-perm__search {
+    width: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .role-item,
+  .role-item__more {
+    transition: none;
+  }
+}

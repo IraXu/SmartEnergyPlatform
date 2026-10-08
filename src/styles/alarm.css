@@ -1,0 +1,451 @@
+/* 告警中心页面样式：仅用于原型交互验证，不作为生产代码。
+   视觉方向：查询条件区用「标签在上、控件在下」的等宽栅格，四列对齐、控件宽度一致；
+   列表以可读性优先，表头浅底、排序图标紧贴列名、行距舒展；
+   选择态用一条主色浅底操作条承接，不与分页总条数重复。 */
+
+/* 信息密度较高的列表页，占满内容区宽度，不使用业务页通用的 960px 居中 */
+.alm-page {
+  max-width: none;
+}
+
+/* 整页无权限态：与成员页、角色页保持同一套呈现 */
+.alm-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 0;
+}
+
+/* ---------- 查询条件区 ---------- */
+.alm-filter {
+  padding: 18px 20px 14px;
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+/* 查询条件与操作按钮同一行：条件项等宽均分剩余空间，按钮组固定在行尾。
+   窗口收窄到四个条件项触底（min-width）时，按钮组整体换到下一行并右对齐。 */
+.alm-filter__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 8px;
+}
+
+/* 标签在上、控件在下；条件项等宽均分剩余空间，四项宽度严格一致。
+   flex-basis 为 0 使宽度完全由可用空间均分；min-width 决定换行时机。 */
+.alm-field {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+/* 告警时间为日期区间控件，固有宽度最大。这里收窄分隔符与内边距、字号降为 13px，
+   并去掉右侧日历图标（标签「告警时间」与可见日期已足够表意），
+   使其最小宽度降到与其他条件项一致，四项严格等宽、日期也不会被截断 */
+.alm-field--date .ant-picker {
+  padding-inline: 10px;
+  font-size: 13px;
+}
+
+.alm-field--date .ant-picker-input > input {
+  width: 100%;
+  min-width: 0;
+}
+
+.alm-field--date .ant-picker-range-separator {
+  padding: 0 2px;
+}
+
+.alm-field--date .ant-picker-suffix {
+  display: none;
+}
+
+.alm-field__label {
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.alm-field__control {
+  width: 100%;
+}
+
+.alm-field__prefix {
+  color: rgba(0, 0, 0, 0.28);
+}
+
+/* 按钮组与查询控件底部对齐、贴在行尾，不随条件项增减而左右跳动 */
+.alm-filter__actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* ---------- 列表容器 ---------- */
+.alm-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.alm-list__skeleton {
+  padding: 8px 0;
+}
+
+/* ---------- 选择态操作条 ---------- */
+/* 仅在勾选后出现；条数只在分页区展示，避免同一页面出现两处总条数 */
+.alm-selbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  background: #ecf4f3;
+  border: 1px solid rgba(15, 123, 108, 0.2);
+  border-radius: 8px;
+}
+
+.alm-selbar__text {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.alm-selbar__text strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.alm-selbar-enter-active,
+.alm-selbar-leave-active {
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.alm-selbar-enter-from,
+.alm-selbar-leave-to {
+  opacity: 0;
+}
+
+/* ---------- 表格 ---------- */
+.alm-table .ant-table {
+  font-size: 14px;
+}
+
+/* 表头：浅底、去掉分隔竖线，弱化装饰、突出内容 */
+.alm-table .ant-table-thead > tr > th {
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+  background: #f7faf9;
+  border-bottom: 1px solid #eaf0ef;
+}
+
+.alm-table .ant-table-thead > tr > th::before {
+  display: none;
+}
+
+/* 排序图标紧贴列名，避免与标题之间出现过大的空白 */
+.alm-table .ant-table-column-sorters {
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.alm-table .ant-table-column-title {
+  flex: none;
+}
+
+.alm-table .ant-table-column-sorter {
+  margin-inline-start: 0;
+}
+
+.alm-table .ant-table-thead th.ant-table-column-sort {
+  background: #f1f6f5;
+}
+
+/* 行：加大纵向留白，长文本行 hover 更清晰 */
+.alm-table .ant-table-tbody > tr > td {
+  padding: 13px 14px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f4f7f6;
+}
+
+.alm-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+.alm-table .ant-table-tbody > tr:hover > td {
+  background: #f8fbfa;
+}
+
+.alm-table .ant-table-tbody > tr.ant-table-row-selected > td {
+  background: #f2f8f7;
+}
+
+/* 勾选列收窄左右留白，避免首列过空 */
+.alm-table .ant-table-selection-column {
+  padding-inline: 12px 4px !important;
+}
+
+/* 操作列：紧随内容列、按钮贴左，不做右对齐，避免视觉上被推出表格 */
+.alm-table .ant-table-tbody > tr > td .ant-btn-variant-link {
+  padding-inline: 0;
+}
+
+.alm-table .ant-table-pagination.ant-pagination {
+  margin: 16px 0 0;
+}
+
+/* ---------- 单元格内容 ---------- */
+
+/* 告警时间：日期为主、时刻为次，两行展示便于在窄列中扫读 */
+.alm-cell__time {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.alm-cell__time-date {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.alm-cell__time-clock {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 事件类型：浅底标签，与告警内容形成视觉区分 */
+.alm-cell__event {
+  display: inline-block;
+  max-width: 100%;
+  padding: 1px 8px;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 20px;
+  color: #0f7b6c;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(15, 123, 108, 0.08);
+  border: 1px solid rgba(15, 123, 108, 0.16);
+  border-radius: 4px;
+}
+
+/* 所属设备：名称在上、License 在下 */
+.alm-cell__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.alm-cell__name {
+  overflow: hidden;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alm-cell__meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.alm-cell__meta-key {
+  flex: none;
+  padding: 0 4px;
+  font-size: 11px;
+  line-height: 16px;
+  color: rgba(0, 0, 0, 0.45);
+  background: #f4f7f6;
+  border-radius: 3px;
+}
+
+.alm-cell__mono {
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 用能单元路径：最多两行，超出省略 */
+.alm-cell__path {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+}
+
+/* 告警内容：重点信息，用主文字色；最多两行 */
+.alm-cell__content {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.78);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+}
+
+.alm-cell__empty {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- 状态块（加载失败 / 空态） ---------- */
+.alm-state {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 260px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.alm-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  font-size: 22px;
+  color: rgba(0, 0, 0, 0.4);
+  background: #f5f7fa;
+  border-radius: 50%;
+}
+
+.alm-state__icon--error {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.alm-state__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.alm-state__desc {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 删除确认弹窗 ---------- */
+.alm-confirm {
+  padding: 14px 16px;
+  background: #fbfcfc;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.alm-confirm__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.alm-confirm__event {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.alm-confirm__time {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.alm-confirm__content,
+.alm-confirm__lead {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.78);
+}
+
+.alm-confirm__lead {
+  margin-top: 0;
+}
+
+.alm-confirm__lead strong {
+  font-weight: 600;
+  color: #0f7b6c;
+}
+
+.alm-confirm__meta {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+  word-break: break-all;
+}
+
+.alm-confirm__warn {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* ---------- 窄屏适应 ---------- */
+@media (max-width: 767px) {
+  .alm-filter {
+    padding: 14px 12px 12px;
+  }
+
+  /* 窄屏下每个条件项独占一行，避免控件被压得读不清 */
+  .alm-field {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  /* 按钮组换到下一行后占满整行宽，不挤压变形 */
+  .alm-filter__actions {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  .alm-filter__actions .ant-btn {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alm-selbar-enter-active,
+  .alm-selbar-leave-active {
+    transition: none;
+  }
+}
