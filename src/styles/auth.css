@@ -274,16 +274,29 @@
 }
 
 /* ---------- 认证页品牌区 ---------- */
+/* 版式：顶部固定标识 → 大面积留白 → 底部左对齐的主标语组 → 分隔线 → 横向价值点条 */
 .auth-brand {
   position: relative;
   flex: 1 1 52%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 0 72px;
+  padding: 56px 72px 56px;
   color: #fff;
   background: linear-gradient(140deg, #0f7b6c 0%, #0b5f54 48%, #073f38 100%);
   overflow: hidden;
+}
+
+/* 装饰光斑：与原有右下角圆形叠加，营造纵深与呼吸感 */
+.auth-brand::before {
+  content: '';
+  position: absolute;
+  top: -180px;
+  left: -160px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(94, 240, 210, 0.22) 0%, rgba(94, 240, 210, 0) 68%);
+  pointer-events: none;
 }
 
 .auth-brand::after {
@@ -297,10 +310,49 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* 内容上浮入场：标识先行，主标语组随后，形成层次感 */
+.auth-brand__logo,
+.auth-brand__hero {
+  position: relative;
+  z-index: 1;
+  animation: brand-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-brand__hero {
+  animation-delay: 0.08s;
+}
+
+@keyframes brand-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-brand__logo,
+  .auth-brand__hero {
+    animation: none;
+  }
+}
+
 .auth-brand__logo {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+/* 主标语组：占据标识以下的全部空间并底对齐，与页脚形成「顶—底」对压的版式张力 */
+.auth-brand__hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 8px;
 }
 
 /* 平台标识：使用项目统一 logo（图标自带圆角与透明底），尺寸按品牌区视觉层级固定 */
@@ -353,40 +405,81 @@
 }
 
 .auth-brand__title {
-  margin: 32px 0 16px;
+  margin: 0 0 20px;
   font-size: 34px;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.3;
   letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* 主标语左侧加一条品牌青强调线，替代居中堆叠的常规排版 */
+.auth-brand__title::before {
+  content: '';
+  display: block;
+  width: 96px;
+  height: 4px;
+  margin-bottom: 24px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #8ff5e0 0%, rgba(143, 245, 224, 0) 100%);
 }
 
 .auth-brand__desc {
-  max-width: 460px;
+  max-width: 480px;
+  margin: 0;
   font-size: 15px;
   line-height: 1.9;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.78);
 }
 
+/* 价值点：横向三栏，每栏「图标 + 文案」；窄屏时允许单栏内文案换行 */
 .auth-brand__points {
-  margin-top: 36px;
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+  margin-top: 36px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .auth-brand__point {
+  flex: 1;
   display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.auth-brand__point:first-child {
+  padding-left: 0;
+}
+
+.auth-brand__point + .auth-brand__point {
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* 图标与文案同字号，仅以品牌青区分；图标跟随首行文字顶部对齐 */
+.auth-brand__point-icon {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  flex: none;
+  height: 21px;
+  font-size: 13px;
+  line-height: 1;
+  color: #8ff5e0;
+}
+
+.auth-brand__point-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .auth-brand__footer {
   position: absolute;
+  left: 72px;
   bottom: 32px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 @media (max-width: 1080px) {
