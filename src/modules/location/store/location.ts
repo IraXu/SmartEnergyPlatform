@@ -53,14 +53,13 @@ const hasCoordinate = (lng: number | null, lat: number | null): boolean => lng !
 const located = <T extends { lng: number | null; lat: number | null }>(item: T): boolean =>
   hasCoordinate(item.lng, item.lat)
 
-/** 设备的在线状态：未接入设备为「未知」 */
+/** 设备的在线状态：与设备台账一致，两态互斥 */
 export function onlineStateOf(device: Device): DeviceOnlineState {
-  if (device.accessStatus === '待接入' || device.onlineStatus === null) return '未知'
   return device.onlineStatus
 }
 
-/** 地图标记叠放优先级：离线优先 → 在线 → 未知（PRD F-LOC-05 业务规则） */
-const STATE_PRIORITY: Record<DeviceOnlineState, number> = { 离线: 0, 在线: 1, 未知: 2 }
+/** 地图标记叠放优先级：离线优先 → 在线（PRD F-LOC-05 业务规则） */
+const STATE_PRIORITY: Record<DeviceOnlineState, number> = { 离线: 0, 在线: 1 }
 
 /* ---------- 用能单元维度 ---------- */
 
@@ -95,7 +94,7 @@ export function unitMarkers(filters: UnitFilters): UnitMarker[] {
       lng: node.lng as number,
       lat: node.lat as number,
       unitCode: node.unitCode || '—',
-      // 徽标口径为该用能单元下的全部设备数（含未接入、离线设备）
+      // 徽标口径为该用能单元下的全部设备数（含离线设备）
       deviceCount: devicesOfUnit(node.id).length,
     }))
 }

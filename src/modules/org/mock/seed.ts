@@ -182,6 +182,20 @@ export function createPresetNodes(rootName: string): OrgNode[] {
       remark: '全园区集中供冷',
     },
     {
+      id: 'NODE-P1-B2-U2',
+      parentId: 'NODE-P1-B2',
+      name: '二次供水泵房',
+      kind: 'unit',
+      order: 1,
+      ownerId: null,
+      address: 'B 栋地下一层水泵房',
+      lng: 113.8818,
+      lat: 22.5643,
+      unitCode: 'UNIT-HN-B-002',
+      // 【演示】该用能单元不在任何负荷策略的作用范围内，用于验证「设备不关联负荷策略」的展示
+      remark: '生活供水加压，暂未纳入负荷策略管控',
+    },
+    {
       id: 'NODE-P2',
       parentId: ROOT_ID,
       name: '华东园区',

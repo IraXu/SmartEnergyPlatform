@@ -26,21 +26,21 @@
   border-radius: 10px;
 }
 
-/* 五项条件等宽均分；按钮组贴行尾并与控件底部对齐 */
+/* 查询条件每行最多 6 项：等宽排布，第 7 项自动换行，按钮组紧随末个条件控件 */
 .device-filter__body {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 14px 8px;
+  gap: 14px 16px;
 }
 
 .device-field {
   display: flex;
-  flex: 1 1 0;
+  /* 每行 6 项等宽：横向 5 个 16px 间距 */
+  flex: 0 0 calc((100% - 80px) / 6);
   flex-direction: column;
   gap: 6px;
-  /* 决定按钮组换行时机：五项触底时按钮组整体换到下一行 */
-  min-width: 176px;
+  min-width: 0;
 }
 
 .device-field__label {
@@ -57,12 +57,12 @@
   color: rgba(0, 0, 0, 0.28);
 }
 
+/* 操作按钮紧随查询条件控件之后，不贴行尾 */
 .device-filter__actions {
   display: flex;
   flex: none;
   gap: 8px;
   align-items: center;
-  margin-left: auto;
 }
 
 /* ---------- 列表容器 AREA-DEV-03 ---------- */
@@ -131,7 +131,7 @@
   outline-offset: 2px;
 }
 
-/* 顶部信息行：左侧缩略图，中间设备名称与类型，右侧在线状态 */
+/* 顶部信息行：左侧缩略图 + 中间名称与信息行 */
 .devcard__top {
   display: flex;
   align-items: flex-start;
@@ -152,55 +152,86 @@
   object-fit: contain;
 }
 
-/* 设备名称：位于缩略图与右侧信息之间，超长省略 */
+/* 设备名称与类型：竖向紧凑排列 */
 .devcard__head {
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: 6px;
   min-width: 0;
-  padding-top: 2px;
+  padding-top: 1px;
 }
 
+/* 设备名称：独占一行，超长省略 */
 .devcard__name {
   display: block;
   overflow: hidden;
   font-size: 15px;
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.4;
   color: rgba(0, 0, 0, 0.88);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* 所属用能单元：完整层级路径较长，独占一整行、最多两行折行展示 */
-.devcard__unit {
-  display: -webkit-box;
-  margin: 0;
+/* 设备类型：内置小标签 */
+.devcard__type {
+  align-self: flex-start;
+  max-width: 100%;
   overflow: hidden;
-  font-size: 12px;
-  line-height: 1.6;
-  color: rgba(0, 0, 0, 0.65);
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  word-break: break-word;
+  padding: 1px 6px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: rgba(15, 123, 108, 0.06);
+  border-radius: 4px;
 }
 
-/* 右侧信息列：在线状态在上、设备类型（tag）在下 */
-.devcard__aside {
+.devcard__type.is-empty {
+  color: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* 右上角状态列：在线状态在上、拉合闸状态在下，右对齐竖排 */
+.devcard__states {
   display: flex;
   flex: none;
   flex-direction: column;
   gap: 6px;
   align-items: flex-end;
-  margin-top: 2px;
 }
 
-.devcard__online {
+.devcard__online,
+.devcard__latch {
   flex: none;
 }
 
-/* 设备类型沿用列表的类型 tag 样式，仅限制最大宽度避免撑破卡片 */
-.devcard__type {
+/* 所属用能单元：完整层级路径较长，独占一整行、最多两行折行展示，前置归属图标 */
+.devcard__unit {
+  display: flex;
+  gap: 5px;
+  align-items: flex-start;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.devcard__unit-icon {
   flex: none;
-  max-width: 110px;
+  margin-top: 3px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.devcard__unit-text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
 }
 
 /* 卡片内的键值对：标签定宽，保证同一行卡片的信息竖向对齐 */
@@ -548,7 +579,7 @@
   border-radius: 4px;
 }
 
-/* 接入状态标签：待接入为警告色系、已接入为主色系；不只依赖颜色 */
+/* 状态标签基础样式（拉合闸状态使用）；不只依赖颜色区分 */
 .device-cell__tag {
   display: inline-block;
   padding: 1px 8px;
@@ -558,16 +589,17 @@
   border-radius: 4px;
 }
 
-.device-cell__tag.is-pending {
-  color: #d48806;
-  background: rgba(250, 173, 20, 0.12);
-  border: 1px solid rgba(250, 173, 20, 0.3);
-}
-
-.device-cell__tag.is-accessed {
+/* 拉合闸状态标签：合闸为主色系（供电中）、分闸为警示色系（已断电） */
+.device-cell__tag.is-closed {
   color: #0f7b6c;
   background: rgba(15, 123, 108, 0.1);
   border: 1px solid rgba(15, 123, 108, 0.2);
+}
+
+.device-cell__tag.is-open {
+  color: #d4380d;
+  background: rgba(250, 84, 28, 0.1);
+  border: 1px solid rgba(250, 84, 28, 0.26);
 }
 
 /* 在线状态：圆点 + 文字，灰度下仍可区分 */
@@ -592,6 +624,33 @@
 
 .device-cell__online.is-off {
   color: #ff4d4f;
+}
+
+/* 关联负荷策略：时控 / 负控条数标签并排，配色与负荷策略页一致 */
+.device-cell__strategy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.device-cell__strategy-tag {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.device-cell__strategy-tag.is-time {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border: 1px solid rgba(15, 123, 108, 0.2);
+}
+
+.device-cell__strategy-tag.is-load {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border: 1px solid rgba(250, 173, 20, 0.3);
 }
 
 /* 规格型号与用能单元路径：单行 / 双行省略 */
@@ -1059,6 +1118,16 @@
   color: rgba(0, 0, 0, 0.45);
 }
 
+/* 查询到平台设备信息：正向反馈 */
+.devform__hint.is-ok {
+  color: #0f7b6c;
+}
+
+/* 未查询到、需人工填写：警示反馈 */
+.devform__hint.is-warn {
+  color: #d48806;
+}
+
 /* ---------- 设备 GPS 选点（与组织架构 CMP-ORG-14 统一交互） ---------- */
 .devgps {
   width: 100%;
@@ -1374,16 +1443,63 @@
   min-width: 0;
 }
 
+/* 标题行：标识类与状态类各成一组，同一行不换行；组间用竖线、组内用圆点分隔 */
 .device-detail__title-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* 同类元素聚为一组，组内以圆点相连 */
+.device-detail__title-group {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+/* 状态组不参与收缩，空间不足时只让设备名称收缩省略 */
+.device-detail__title-group:last-child {
+  flex: none;
+}
+
+/* 状态之间的竖线分隔：随行高自适应 */
+.device-detail__title-sep {
+  flex: none;
+  width: 1px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* 同类状态之间的圆点分隔 */
+.device-detail__title-dot {
+  flex: none;
+  font-size: 13px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.device-detail__title-muted {
+  flex: none;
+  font-size: 13px;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 标题行内除标题外的元素保持原尺寸，仅让设备名称收缩省略 */
+.device-detail__title-row .device-cell__type,
+.device-detail__title-row .device-cell__tag,
+.device-detail__title-row .device-cell__online,
+.device-detail__title-row .device-detail__signal {
+  flex: none;
 }
 
 .device-detail__title {
   overflow: hidden;
   max-width: 100%;
+  min-width: 0;
   margin: 0;
   font-size: 20px;
   font-weight: 600;
@@ -1565,11 +1681,156 @@
   color: rgba(0, 0, 0, 0.45);
 }
 
-/* 设备档案：按「设备标识 / 安装与位置 / 通信与接入 / 备注」分组铺排。
+/* ---------- 关联负荷策略（详情页 CARD-05） ---------- */
+/* 触发方式汇总：时控 / 负控各多少条，配色与负荷策略页保持一致 */
+.device-detail__strategy-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.device-detail__strategy-chip {
+  padding: 2px 10px;
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 999px;
+}
+
+.device-detail__strategy-chip.is-time {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border: 1px solid rgba(15, 123, 108, 0.2);
+}
+
+.device-detail__strategy-chip.is-load {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border: 1px solid rgba(250, 173, 20, 0.3);
+}
+
+/* 无关联策略的空态：图标 + 标题 + 说明，区别于「数据未上报」 */
+.device-detail__strategy-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px 12px;
+  text-align: center;
+  background: #f7faf9;
+  border-radius: 8px;
+}
+
+.device-detail__strategy-empty-icon {
+  margin-bottom: 4px;
+  font-size: 22px;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.device-detail__strategy-empty-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.device-detail__strategy-empty-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.device-detail__strategy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.device-detail__strategy-item {
+  padding: 12px 14px;
+  background: #f7faf9;
+  border: 1px solid #eef2f1;
+  border-radius: 8px;
+}
+
+.device-detail__strategy-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.device-detail__strategy-name {
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 触发方式标签：与负荷策略页一致，时控主色系 / 负控警告色系 */
+.device-detail__strategy-type {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 4px;
+}
+
+.device-detail__strategy-type.is-time {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border: 1px solid rgba(15, 123, 108, 0.2);
+}
+
+.device-detail__strategy-type.is-load {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+  border: 1px solid rgba(250, 173, 20, 0.3);
+}
+
+/* 生效状态：生效中绿、待生效橙、其余灰 */
+.device-detail__strategy-state {
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 18px;
+  border-radius: 4px;
+}
+
+.device-detail__strategy-state.is-active {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.device-detail__strategy-state.is-pending {
+  color: #d48806;
+  background: rgba(250, 173, 20, 0.12);
+}
+
+.device-detail__strategy-state.is-inactive {
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.device-detail__strategy-cond {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.6);
+  word-break: break-word;
+}
+
+/* 设备档案：按「设备标识 / 安装与位置 / 备注」分组铺排，两列等宽 + 备注跨整行。
    每组内部为「固定宽度标签 + 取值」两列栅格，标签竖向对齐，避免字段名长短不一时错位。 */
 .device-detail__archive {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 32px;
   margin-top: 12px;
 }
@@ -1655,6 +1916,67 @@
 .device-detail__badge.is-follow {
   color: #0f7b6c;
   background: rgba(15, 123, 108, 0.08);
+}
+
+/* 信号强度（详情页标题行）：条形图标组 + 数值，图标按区间着色 */
+.device-detail__signal {
+  display: inline-flex;
+  flex: none;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* 条形图标组：4 根由矮到高的竖条，点亮格数表达强弱，灰度下亦可区分 */
+.device-detail__signal-bars {
+  display: inline-flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 14px;
+}
+
+.device-detail__signal-bars i {
+  width: 3px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 1px;
+}
+
+.device-detail__signal-bars i:nth-child(1) {
+  height: 4px;
+}
+
+.device-detail__signal-bars i:nth-child(2) {
+  height: 7px;
+}
+
+.device-detail__signal-bars i:nth-child(3) {
+  height: 10px;
+}
+
+.device-detail__signal-bars i:nth-child(4) {
+  height: 13px;
+}
+
+/* 点亮的竖条跟随区间配色（良好 / 一般 / 较差） */
+.device-detail__signal.is-good .device-detail__signal-bars i.is-on {
+  background: #0f7b6c;
+}
+
+.device-detail__signal.is-fair .device-detail__signal-bars i.is-on {
+  background: #d48806;
+}
+
+.device-detail__signal.is-weak .device-detail__signal-bars i.is-on {
+  background: #cf1322;
+}
+
+.device-detail__signal-value {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.device-detail__signal.is-weak .device-detail__signal-value {
+  color: #cf1322;
 }
 
 /* 专属数据区：按类型分组，组内两列网格 */
@@ -1805,9 +2127,10 @@
   font-weight: 400;
 }
 
-/* 筛选行：两个下拉定宽，关键字输入占满剩余空间 */
+/* 筛选行：时间段 + 两个下拉定宽，关键字输入占满剩余空间，导出按钮贴右 */
 .mqttlog__filter {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   margin: 14px 0 12px;
@@ -1817,9 +2140,14 @@
   width: 160px;
 }
 
+.mqttlog__filter-item--date {
+  width: 320px;
+}
+
 .mqttlog__filter-item--grow {
   flex: 1 1 auto;
   width: auto;
+  min-width: 160px;
 }
 
 .mqttlog__table {
@@ -2440,14 +2768,19 @@
 }
 
 /* ---------- 窄屏适应 ---------- */
-@media (max-width: 1279px) {
-  /* 中等宽度：按钮组换行后仍贴右 */
-  .device-filter__body {
-    row-gap: 12px;
+@media (max-width: 1439px) {
+  /* 中等宽度：每行 4 项 */
+  .device-field {
+    flex: 0 0 calc((100% - 48px) / 4);
   }
 }
 
 @media (max-width: 991px) {
+  /* 每行 3 项 */
+  .device-field {
+    flex: 0 0 calc((100% - 32px) / 3);
+  }
+
   /* 设备档案收为单列，分组依次纵向排列 */
   .device-detail__archive {
     grid-template-columns: minmax(0, 1fr);
@@ -2470,9 +2803,9 @@
     padding: 14px 12px 12px;
   }
 
-  /* 窄屏下每个条件项独占一行，避免控件被压得读不清 */
+  /* 窄屏下每行 2 项，避免控件被压得读不清 */
   .device-field {
-    flex: 1 1 100%;
+    flex: 0 0 calc((100% - 16px) / 2);
     min-width: 0;
   }
 

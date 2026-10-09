@@ -123,8 +123,9 @@
                   :min="item.min"
                   :max="item.max"
                   :precision="item.precision ?? 0"
-                  :placeholder="`请输入${item.name}`"
-                  @change="(value: number | string | null) => updateValue(item.key, value === null || value === undefined ? '' : String(value))"
+                  :step="1"
+                  placeholder="请输入正整数"
+                  @change="(value: string | number | null) => updateValue(item.key, value === null || value === undefined ? '' : String(value))"
                 />
                 <span v-if="errorOf(item)" class="devparam__error">{{ errorOf(item) }}</span>
               </div>
@@ -169,14 +170,11 @@ const drawerWidth = computed(() => Math.min(Math.max(Math.round(window.innerWidt
 /** 参数分组与组内参数项，空分组已由 store 过滤 */
 const groups = computed(() => (props.device ? paramGroupsWithItems() : []))
 
-/** 可读写条件：设备已接入且在线（与设备控制保持一致的前置条件） */
-const reachable = computed(
-  () => Boolean(props.device) && props.device!.accessStatus === '已接入' && props.device!.onlineStatus === '在线',
-)
+/** 可读写条件：设备在线（与设备控制保持一致的前置条件） */
+const reachable = computed(() => Boolean(props.device) && props.device!.onlineStatus === '在线')
 
 const unreachableReason = computed(() => {
   if (!props.device) return ''
-  if (props.device.accessStatus !== '已接入') return '该设备尚未接入平台，无法读写设备参数。'
   if (props.device.onlineStatus !== '在线') return '该设备当前离线，参数读写无法送达，请确认设备通信状态后重试。'
   return ''
 })

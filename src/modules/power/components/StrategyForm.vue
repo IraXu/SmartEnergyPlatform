@@ -347,8 +347,8 @@
               <strong>{{ scope.total }}</strong> 个设备
             </span>
             <span class="lst-form__summary-kind">{{ draft.deviceIds.length ? '静态范围' : '动态范围' }}</span>
-            <span v-if="scope.pending || scope.offline" class="lst-form__summary-warn">
-              其中 {{ scope.pending }} 台待接入、{{ scope.offline }} 台离线
+            <span v-if="scope.offline" class="lst-form__summary-warn">
+              其中 {{ scope.offline }} 台离线
             </span>
           </div>
           <p v-if="draft.unitIds.length && !scope.total" class="lst-form__warn">
@@ -707,9 +707,8 @@ const deviceOptions = computed(() => {
       label: device.name,
       value: device.id,
       name: device.name,
-      // 异常状态（待接入 / 离线）才提示：在线且已接入的设备无需占用候选行的注意力
-      abnormal:
-        device.accessStatus !== '已接入' ? '未接入' : device.onlineStatus !== '在线' ? '离线' : '',
+      // 异常状态（离线）才提示：在线设备无需占用候选行的注意力
+      abnormal: device.onlineStatus !== '在线' ? '离线' : '',
     })
   })
   return [...groups.values()]
@@ -729,7 +728,7 @@ function handleUnitChange() {
   message.info(`已移除 ${removed.length} 台不在作用范围内的设备`)
 }
 
-/** 作用对象的设备统计（总数 / 待接入 / 离线） */
+/** 作用对象的设备统计（总数 / 离线） */
 const scope = computed(() => scopeStats({ unitIds: draft.unitIds, deviceIds: draft.deviceIds }))
 
 /* ---------- 保存 ---------- */

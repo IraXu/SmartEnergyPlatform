@@ -30,7 +30,7 @@
 
     <!-- 可升级与跳过条数（批量） -->
     <p v-if="isBatch" class="ota-upgrade__count">
-      可升级 <strong>{{ upgradeCount }}</strong> 台，将跳过 {{ skipped }} 台（已是最新版本 / 未接入 / 升级中）
+      可升级 <strong>{{ upgradeCount }}</strong> 台，将跳过 {{ skipped }} 台（已是最新版本 / 从未建连 / 升级中）
     </p>
 
     <!-- 版本对比 / 目标版本 -->

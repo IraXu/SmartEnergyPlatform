@@ -124,7 +124,7 @@ export const PRESET_OTA_STATES: Array<Omit<OtaState, 'detectedAt' | 'lastUpgrade
     failReason: '设备离线或通信失败',
     taskId: 'OTA-20260926-0001',
   },
-  // DEV-0005 待接入：无固件信息
+  // DEV-0005 未上云：无固件信息
   {
     deviceId: 'DEV-0005',
     currentVersion: '',
@@ -160,7 +160,7 @@ export const PRESET_OTA_STATES: Array<Omit<OtaState, 'detectedAt' | 'lastUpgrade
     failReason: '',
     taskId: 'OTA-20260926-0001',
   },
-  // DEV-0009 待接入：无固件信息
+  // DEV-0009 未上云：无固件信息
   {
     deviceId: 'DEV-0009',
     currentVersion: '',

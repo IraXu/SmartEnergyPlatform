@@ -466,7 +466,7 @@
   text-overflow: ellipsis;
 }
 
-/* 待接入 / 离线：仅在不可正常执行时提示，与列表标签同一套配色 */
+/* 离线 / 从未上线：仅在不可正常执行时提示，与列表标签同一套配色 */
 .lst-opt__warn {
   flex: none;
   padding: 0 6px;
@@ -777,25 +777,6 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   word-break: break-all;
-}
-
-.lst-scoped__tag {
-  display: inline-block;
-  padding: 1px 8px;
-  font-size: 12px;
-  line-height: 20px;
-  white-space: nowrap;
-  border-radius: 4px;
-}
-
-.lst-scoped__tag.is-accessed {
-  color: #0f7b6c;
-  background: rgba(15, 123, 108, 0.1);
-}
-
-.lst-scoped__tag.is-pending {
-  color: rgba(0, 0, 0, 0.45);
-  background: rgba(0, 0, 0, 0.04);
 }
 
 .lst-scoped__online {
@@ -1435,7 +1416,7 @@
   word-break: break-word;
 }
 
-/* 失败原因：失败为红色告警，跳过（未接入 / 离线）为次要色，避免把「未接入」读成故障 */
+/* 失败原因：失败为红色告警，跳过（从未上线 / 离线）为次要色，避免把「从未上线」读成故障 */
 .lst-record__reason {
   display: block;
   overflow: hidden;

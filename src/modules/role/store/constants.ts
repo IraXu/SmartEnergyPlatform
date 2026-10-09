@@ -8,7 +8,7 @@ export const ROLE_LOGS_KEY = 'proto_role_logs'
 export const ROLE_VERSION_KEY = 'proto_role_data_version'
 
 /** 【原型说明】演示数据结构版本，调整演示数据时提升版本以清理旧数据 */
-export const ROLE_DATA_VERSION = '14'
+export const ROLE_DATA_VERSION = '15'
 
 /** 角色名称长度（PRD F-ROL-04 业务规则） */
 export const ROLE_NAME_MIN = 2

@@ -137,6 +137,34 @@
   border-radius: 6px;
 }
 
+/* 归属企业过多时（OVERLAY-06）：浮层限高并内部滚动，不撑破视口、不整页滚动。
+   限高取「视口高 - 上下留白」，并夹在 200px~360px 之间；滚动条做细并与选项留出间距。 */
+.admin-org-dropdown .ant-dropdown-menu {
+  max-height: clamp(200px, calc(100vh - 160px), 360px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.admin-org-dropdown .ant-dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-org-dropdown .ant-dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-org-dropdown .ant-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.admin-org-dropdown .ant-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.32);
+}
+
 .admin-org-dropdown .ant-dropdown-menu-title-content {
   overflow: visible;
   text-overflow: clip;

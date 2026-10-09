@@ -159,7 +159,7 @@ export function createPresetStrategies(): Strategy[] {
       deviceIds: ['DEV-0005'],
       startDate: dateText(dayOffset(-10)),
       endDate: '',
-      remark: '施工临时用电表尚未接入，先停用待接入后启用',
+      remark: '施工临时用电表当前离线，先停用待设备上云后启用',
       createdAt: now - 10 * DAY,
       createdBy: '日向雏田',
       updatedAt: now - 2 * DAY,
@@ -243,7 +243,7 @@ export function createPresetBatches(): ExecBatch[] {
           unitId: unit.id,
           action,
           result: skipped ? '已跳过' : failed ? '失败' : '成功',
-          reason: skipped ? '设备未接入' : failed ? '设备离线或通信失败' : '',
+          reason: skipped ? '设备离线' : failed ? '设备离线或通信失败' : '',
         } satisfies ExecDeviceResult
       }),
     )
@@ -282,7 +282,7 @@ export function createPresetBatches(): ExecBatch[] {
         { deviceId: 'DEV-0008', deviceName: 'A 栋照明分表', unitId: 'NODE-P1-B1-U1', action: '拉闸', result: '成功', reason: '' },
         { deviceId: 'DEV-0006', deviceName: 'A 栋接入网关', unitId: 'NODE-P1-B1-U1', action: '拉闸', result: '成功', reason: '' },
         { deviceId: 'DEV-0002', deviceName: '2 号车间动力表', unitId: 'NODE-P1-B1-U2', action: '拉闸', result: '失败', reason: '设备离线或通信失败' },
-        { deviceId: 'DEV-0005', deviceName: '临时施工用电表', unitId: 'NODE-P1-B1-U2', action: '拉闸', result: '已跳过', reason: '设备未接入' },
+        { deviceId: 'DEV-0005', deviceName: '临时施工用电表', unitId: 'NODE-P1-B1-U2', action: '拉闸', result: '已跳过', reason: '设备离线' },
       ],
     },
     {
@@ -298,7 +298,7 @@ export function createPresetBatches(): ExecBatch[] {
         { deviceId: 'DEV-0008', deviceName: 'A 栋照明分表', unitId: 'NODE-P1-B1-U1', action: '合闸', result: '成功', reason: '' },
         { deviceId: 'DEV-0006', deviceName: 'A 栋接入网关', unitId: 'NODE-P1-B1-U1', action: '合闸', result: '成功', reason: '' },
         { deviceId: 'DEV-0002', deviceName: '2 号车间动力表', unitId: 'NODE-P1-B1-U2', action: '合闸', result: '失败', reason: '设备离线或通信失败' },
-        { deviceId: 'DEV-0005', deviceName: '临时施工用电表', unitId: 'NODE-P1-B1-U2', action: '合闸', result: '已跳过', reason: '设备未接入' },
+        { deviceId: 'DEV-0005', deviceName: '临时施工用电表', unitId: 'NODE-P1-B1-U2', action: '合闸', result: '已跳过', reason: '设备离线' },
       ],
     },
     {
@@ -311,7 +311,7 @@ export function createPresetBatches(): ExecBatch[] {
       action: '拉闸',
       devices: [
         { deviceId: 'DEV-0003', deviceName: '中央空调机房总表', unitId: 'NODE-P1-B2-U1', action: '拉闸', result: '成功', reason: '' },
-        { deviceId: 'DEV-0009', deviceName: 'B 栋办公分表', unitId: 'NODE-P1-B2-U1', action: '拉闸', result: '已跳过', reason: '设备未接入' },
+        { deviceId: 'DEV-0009', deviceName: 'B 栋办公分表', unitId: 'NODE-P1-B2-U1', action: '拉闸', result: '已跳过', reason: '设备离线' },
       ],
     },
     {
@@ -377,7 +377,7 @@ export function createPresetBatches(): ExecBatch[] {
       triggerDetail: '按日 22:00',
       action: '拉闸',
       devices: [
-        { deviceId: 'DEV-0005', deviceName: '临时施工用电表', unitId: 'NODE-P1-B1-U2', action: '拉闸', result: '已跳过', reason: '设备未接入' },
+        { deviceId: 'DEV-0005', deviceName: '临时施工用电表', unitId: 'NODE-P1-B1-U2', action: '拉闸', result: '已跳过', reason: '设备离线' },
       ],
     },
     {
@@ -390,7 +390,7 @@ export function createPresetBatches(): ExecBatch[] {
       action: '合闸',
       devices: [
         { deviceId: 'DEV-0003', deviceName: '中央空调机房总表', unitId: 'NODE-P1-B2-U1', action: '合闸', result: '成功', reason: '' },
-        { deviceId: 'DEV-0009', deviceName: 'B 栋办公分表', unitId: 'NODE-P1-B2-U1', action: '合闸', result: '已跳过', reason: '设备未接入' },
+        { deviceId: 'DEV-0009', deviceName: 'B 栋办公分表', unitId: 'NODE-P1-B2-U1', action: '合闸', result: '已跳过', reason: '设备离线' },
       ],
     },
     {
@@ -406,7 +406,7 @@ export function createPresetBatches(): ExecBatch[] {
         { deviceId: 'DEV-0008', deviceName: 'A 栋照明分表', unitId: 'NODE-P1-B1-U1', action: '合闸', result: '成功', reason: '' },
         { deviceId: 'DEV-0006', deviceName: 'A 栋接入网关', unitId: 'NODE-P1-B1-U1', action: '合闸', result: '成功', reason: '' },
         { deviceId: 'DEV-0002', deviceName: '2 号车间动力表', unitId: 'NODE-P1-B1-U2', action: '合闸', result: '失败', reason: '设备离线或通信失败' },
-        { deviceId: 'DEV-0005', deviceName: '临时施工用电表', unitId: 'NODE-P1-B1-U2', action: '合闸', result: '已跳过', reason: '设备未接入' },
+        { deviceId: 'DEV-0005', deviceName: '临时施工用电表', unitId: 'NODE-P1-B1-U2', action: '合闸', result: '已跳过', reason: '设备离线' },
       ],
     },
   ]

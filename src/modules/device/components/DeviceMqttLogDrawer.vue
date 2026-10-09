@@ -2,7 +2,8 @@
   OVERLAY-09 MQTT 通讯日志抽屉（PRD F-DEV-14）
   【原型说明】从设备详情页工具栏打开，右侧滑出。
   仅展示该设备最近 30 天的通讯日志（超出部分系统自动删除），
-  支持按通讯方向与结果筛选、分页，并可展开单条日志查看报文与失败原因。
+  支持按时间段（精确到时分秒）、通讯方向与结果筛选、关键字搜索、分页，
+  并可展开单条日志查看报文与失败原因；有导出权限时可导出当前筛选结果。
   日志为只读记录，抽屉内不提供任何编辑与删除入口。
 -->
 <template>
@@ -58,8 +59,16 @@
         </div>
       </section>
 
-      <!-- 筛选：通讯方向 / 通讯结果 / 事件关键字 -->
+      <!-- 筛选：时间段 / 通讯方向 / 通讯结果 / 事件关键字 + 导出 -->
       <div class="mqttlog__filter">
+        <a-range-picker
+          v-model:value="rangeFilter"
+          class="mqttlog__filter-item mqttlog__filter-item--date"
+          :show-time="SHOW_TIME"
+          :format="DATE_FORMAT"
+          :presets="RANGE_PRESETS"
+          :placeholder="['开始时间', '结束时间']"
+        />
         <a-select
           v-model:value="directionFilter"
           class="mqttlog__filter-item"
@@ -80,6 +89,10 @@
           allow-clear
           placeholder="按事件或主题筛选"
         />
+        <a-button v-if="canExport" type="primary" :loading="exporting" @click="handleExport">
+          <template #icon><DownloadOutlined /></template>
+          导出
+        </a-button>
       </div>
 
       <a-table
@@ -135,10 +148,14 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import type { TableColumnsType } from 'antdv-next'
-import { CloseOutlined, ExclamationCircleOutlined } from '@antdv-next/icons'
-import { deviceMqttLogs, formatTime, mqttLogSummary } from '../store'
-import type { Device, MqttDirection, MqttResult } from '../store'
+import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
+import { message } from 'antdv-next'
+import type { RangePickerProps, TableColumnsType } from 'antdv-next'
+import { CloseOutlined, DownloadOutlined, ExclamationCircleOutlined } from '@antdv-next/icons'
+import { currentPermissions } from '@/modules/role/store'
+import { deviceMqttLogs, downloadText, formatTime, mqttLogSummary } from '../store'
+import type { Device, MqttDirection, MqttLog, MqttResult } from '../store'
 
 const props = defineProps<{
   /** 抽屉开关（v-model:open） */
@@ -152,6 +169,9 @@ const emit = defineEmits<{ 'update:open': [boolean] }>()
 /** 抽屉宽度：日志表列较多（时间 / 方向 / 事件 / 主题 / 结果 / 耗时 / 详情），故下限高于用能单元抽屉 */
 const drawerWidth = computed(() => Math.min(Math.max(Math.round(window.innerWidth * 0.58), 760), 1080))
 
+/** 导出为按钮级权限：无 `device:ledger:mqtt:export` 时不渲染导出入口 */
+const canExport = computed(() => currentPermissions().includes('device:ledger:mqtt:export'))
+
 const DIRECTION_OPTIONS = [
   { label: '上行（设备→平台）', value: '上行' },
   { label: '下行（平台→设备）', value: '下行' },
@@ -161,8 +181,21 @@ const RESULT_OPTIONS = [
   { label: '失败', value: '失败' },
 ]
 
+/** 时间快捷范围：与上下线记录、告警中心保持一致的操作习惯 */
+const RANGE_PRESETS: RangePickerProps['presets'] = [
+  { label: '今日', value: [dayjs().startOf('day'), dayjs().endOf('day')] },
+  { label: '近 7 天', value: [dayjs().add(-6, 'd').startOf('day'), dayjs().endOf('day')] },
+  { label: '近 30 天', value: [dayjs().add(-29, 'd').startOf('day'), dayjs().endOf('day')] },
+]
+
+/** 时间选择精确到时分秒：面板给出时 / 分 / 秒三列，输入框按同一格式回显 */
+const SHOW_TIME: RangePickerProps['showTime'] = { format: 'HH:mm:ss' }
+const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
 const directionFilter = ref<MqttDirection | null>(null)
 const resultFilter = ref<MqttResult | null>(null)
+/** 时间段筛选：直接生效（无需点查询），与方向 / 结果 / 关键字同为即时筛选 */
+const rangeFilter = ref<[Dayjs, Dayjs] | null>(null)
 const keyword = ref('')
 const page = ref(1)
 const pageSize = ref(10)
@@ -176,6 +209,7 @@ watch(
     if (open) return
     directionFilter.value = null
     resultFilter.value = null
+    rangeFilter.value = null
     keyword.value = ''
     page.value = 1
     expandedKeys.value = []
@@ -186,11 +220,27 @@ const summary = computed(() =>
   props.device ? mqttLogSummary(props.device.id) : { total: 0, failed: 0, earliestAt: null, keepDays: 30 },
 )
 
-/** 筛选后的日志：方向与结果为精确匹配，关键字匹配事件名或主题 */
+/**
+ * 时间范围闭区间取到「秒」：起始下沉到该秒第 0 毫秒、结束上抬到该秒第 999 毫秒，
+ * 保证所选时刻本身与其所在整秒内的记录都能命中（日期控件已支持选到时分秒）。
+ */
+const rangeBounds = computed(() => {
+  const range = rangeFilter.value
+  if (!range?.[0] || !range?.[1]) return [null, null] as [number | null, number | null]
+  return [range[0].startOf('second').valueOf(), range[1].endOf('second').valueOf()] as [
+    number,
+    number,
+  ]
+})
+
+/** 筛选后的日志：时间段为闭区间，方向与结果为精确匹配，关键字匹配事件名或主题 */
 const filteredRows = computed(() => {
   if (!props.device) return []
   const value = keyword.value.trim().toLowerCase()
+  const [from, to] = rangeBounds.value
   return deviceMqttLogs(props.device.id).filter((log) => {
+    if (from !== null && log.at < from) return false
+    if (to !== null && log.at > to) return false
     if (directionFilter.value && log.direction !== directionFilter.value) return false
     if (resultFilter.value && log.result !== resultFilter.value) return false
     if (!value) return true
@@ -217,7 +267,7 @@ const pagination = computed(() => ({
 }))
 
 /** 筛选条件变化时回到第 1 页并收起展开行，避免停留在越界页码 */
-watch([directionFilter, resultFilter, keyword], () => {
+watch([directionFilter, resultFilter, rangeFilter, keyword], () => {
   page.value = 1
   expandedKeys.value = []
 })
@@ -230,6 +280,46 @@ const columns: TableColumnsType = [
   { key: 'result', title: '结果', width: 72 },
   { key: 'cost', title: '耗时', width: 84 },
 ]
+
+/* ---------- 导出 ---------- */
+
+const exporting = ref(false)
+
+/** CSV 字段转义：含逗号 / 引号 / 换行的值用双引号包裹，内部引号翻倍 */
+function csvCell(value: string) {
+  return `"${value.replace(/"/g, '""')}"`
+}
+
+/** 导出当前筛选结果（含全部匹配行，不受分页影响） */
+async function handleExport() {
+  if (!filteredRows.value.length) {
+    message.warning('当前没有可导出的通讯日志')
+    return
+  }
+  exporting.value = true
+  // 【原型说明】模拟文件生成耗时，无真实导出接口
+  await new Promise((resolve) => setTimeout(resolve, 400))
+  const header = ['通讯时间', '方向', '事件', '主题', '结果', '耗时(ms)', '失败原因', '报文内容']
+  const body = filteredRows.value.map((log: MqttLog) =>
+    [
+      formatTime(log.at),
+      log.direction,
+      log.event,
+      log.topic,
+      log.result,
+      log.cost === null ? '' : String(log.cost),
+      log.error,
+      log.payload,
+    ]
+      .map(csvCell)
+      .join(','),
+  )
+  const content = `\uFEFF${[header.map(csvCell).join(','), ...body].join('\n')}`
+  const stamp = dayjs().format('YYYYMMDDHHmmss')
+  downloadText(`${props.device?.name ?? '设备'}-MQTT通讯日志-${stamp}.csv`, content)
+  exporting.value = false
+  message.success(`已导出 ${filteredRows.value.length} 条通讯日志`)
+}
 
 function close() {
   emit('update:open', false)

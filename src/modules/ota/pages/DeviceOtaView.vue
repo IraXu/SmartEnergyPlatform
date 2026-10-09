@@ -455,9 +455,9 @@ function simulateLoadFail() {
   }, 420)
 }
 
-/** 【原型说明】把当前列表中的已接入设备标记为离线，用于验证检测与升级失败路径 */
+/** 【原型说明】把当前列表中的在线设备标记为离线，用于验证检测与升级失败路径 */
 function simulateOffline() {
-  const targets = filterRows(filters).filter((row) => row.device.accessStatus === '已接入' && row.device.onlineStatus === '在线')
+  const targets = filterRows(filters).filter((row) => row.device.onlineStatus === '在线')
   if (!targets.length) {
     message.info('当前列表中没有在线设备可供模拟')
     return
@@ -511,7 +511,7 @@ const detectingId = ref<string | null>(null)
 
 /** 检测入口禁用原因（悬停说明） */
 function detectDisabledReason(row: OtaRow) {
-  if (row.device.accessStatus !== '已接入') return '设备未接入，无法进行 OTA 操作'
+  if (row.device.accessedAt === null) return '设备从未建连，无法进行 OTA 操作'
   if (row.upgradeStatus === '升级中') return '设备升级中，请等待升级完成'
   return ''
 }
@@ -531,10 +531,10 @@ const rowSelection = computed(() => ({
   }),
 }))
 
-/** 选择框是否可用：待接入与升级中设备不可勾选 */
+/** 选择框是否可用：从未建连与升级中设备不可勾选 */
 function isSelectable(row: OtaRow) {
-  const state = row.device.accessStatus === '已接入'
-  return state && row.upgradeStatus !== '升级中'
+  const connected = row.device.accessedAt !== null
+  return connected && row.upgradeStatus !== '升级中'
 }
 
 const crossPageSelected = computed(() => {
@@ -717,7 +717,7 @@ function handleResetData() {
 const tipLines = [
   '固件包由平台运营方统一维护，企业侧只读；本期仅支持手动即时升级，升级不可回滚。',
   '新固件标识由「当前固件版本」与「最新固件版本」比较自动得出；检测可刷新设备真实版本。',
-  '批量升级会跳过已是最新、未接入与升级中的设备；升级进度以定时器模拟推进。',
+  '批量升级会跳过已是最新、从未建连与升级中的设备；升级进度以定时器模拟推进。',
   '演示数据：设备与设备类型取自「设备台账」，固件基线为演示数据。',
 ]
 </script>

@@ -8,7 +8,7 @@
  * - 批量导入删除按文件中的 License 定位设备，仅删除命中设备
  * - 设备迁移的语义为改所属用能单元，不追溯历史数据；支持单条与批量
  * - 设备均可删除，彻底删除不可恢复；删除不影响历史告警
- * - 接入状态与在线状态由采集侧驱动，本模块只读；不设启用 / 停用
+ * - 在线状态与拉合闸状态由设备侧驱动，本模块只读；不设启用 / 停用
  */
 
 import { session } from '@/modules/auth/store'
@@ -19,13 +19,13 @@ import { DEVICE_TYPES } from '../mock/seed'
 import { CODE_MAX, IMPORT_MAX_ROWS, NAME_MAX } from './constants'
 import { devices, logs, persistDevices, persistLogs } from './storage'
 import type {
-  AccessStatus,
   Device,
   DeviceChangeType,
   DeviceFilters,
   DeviceInput,
   ImportDeleteRow,
   ImportRow,
+  LatchStatus,
   OnlineStatus,
   SortOrder,
 } from './types'
@@ -159,25 +159,24 @@ function unitScopeIds(unitId: string | null): string[] | null {
 
 /** 按条件查询设备；多个维度之间为「且」关系 */
 export function filterDevices(filters: DeviceFilters): Device[] {
-  const keyword = normalizeText(filters.keyword).toLowerCase()
+  const name = normalizeText(filters.name).toLowerCase()
+  const imei = normalizeText(filters.imei).toLowerCase()
+  const license = normalizeText(filters.license).toLowerCase()
+  const meterNo = normalizeText(filters.meterNo).toLowerCase()
   const scope = unitScopeIds(filters.unitId)
 
   return devices.filter((device) => {
-    if (keyword) {
-      const hit =
-        device.name.toLowerCase().includes(keyword) ||
-        device.imei.toLowerCase().includes(keyword) ||
-        device.cardNo.toLowerCase().includes(keyword) ||
-        device.license.toLowerCase().includes(keyword)
-      if (!hit) return false
-    }
+    if (name && !device.name.toLowerCase().includes(name)) return false
+    if (imei && !device.imei.toLowerCase().includes(imei)) return false
+    if (license && !device.license.toLowerCase().includes(license)) return false
+    if (meterNo && !device.meterNo.toLowerCase().includes(meterNo)) return false
     if (filters.types.length && !filters.types.includes(device.type)) return false
     if (scope && !scope.includes(device.unitId)) return false
-    if (filters.accessStatuses.length && !filters.accessStatuses.includes(device.accessStatus)) return false
-    // 未接入设备没有在线状态，不参与在线状态筛选（PRD F-DEV-02）
-    if (filters.onlineStatuses.length) {
-      if (!device.onlineStatus || !filters.onlineStatuses.includes(device.onlineStatus)) return false
+    // 无拉合闸状态的设备（未上报）不参与拉合闸状态筛选
+    if (filters.latchStatuses.length) {
+      if (!device.latchStatus || !filters.latchStatuses.includes(device.latchStatus)) return false
     }
+    if (filters.onlineStatuses.length && !filters.onlineStatuses.includes(device.onlineStatus)) return false
     return true
   })
 }
@@ -198,6 +197,7 @@ export const getDevice = (id: string) => devices.find((device) => device.id === 
 export interface DeviceFormErrors {
   name?: string
   license?: string
+  imei?: string
   unitId?: string
   lng?: string
 }
@@ -208,20 +208,34 @@ export function findLicenseOwner(license: string, excludeId?: string) {
   return devices.find((device) => device.license.toLowerCase() === value && device.id !== excludeId) ?? null
 }
 
+/** 按 License 查询到的设备身份信息：识别码（IMEI）与表号 */
+export interface DeviceIdentity {
+  imei: string
+  /** 与上级网关通讯的设备以表号唯一判定；插卡 4G 设备可为空 */
+  meterNo: string
+}
+
 /**
- * 【原型说明】按 License 查询平台侧的设备识别码（IMEI）。
+ * 【原型说明】按 License 查询平台侧的设备识别码（IMEI）与表号。
  * 真实实现为调用平台接口按 License 反查设备；原型内以稳定的伪随机规则模拟：
- * 同一 License 始终返回同一 IMEI，前缀 8645 便于识别为演示数据。
+ * 同一 License 始终返回同一结果，便于演示「自动带出」与「未查询到」两条分支。
+ * 未查询到时返回 null，由用户按现场实际自定义填写。
  */
-export function queryImeiByLicense(license: string) {
+export function queryDeviceIdentityByLicense(license: string): DeviceIdentity | null {
   const value = normalizeText(license)
-  if (!value) return ''
+  if (!value) return null
   // 以 License 字符的累加哈希作为种子，保证结果稳定可复现
   let seed = 0
   for (let index = 0; index < value.length; index += 1) {
     seed = (seed * 31 + value.charCodeAt(index)) % 100000000
   }
-  return `8645${String(seed).padStart(13, '0')}`
+  // 约每 7 个 License 有 1 个平台无记录，用于演示「未查询到、需人工填写」的分支
+  if (seed % 7 === 0) return null
+  return {
+    imei: `8645${String(seed).padStart(13, '0')}`,
+    // 经网关通讯的设备才带表号，按 seed 取模区分
+    meterNo: seed % 3 === 0 ? '' : `32${String(seed).padStart(10, '0')}`,
+  }
 }
 
 /** 校验新增 / 编辑设备的表单（PRD F-DEV-04 / F-DEV-11）；同一字段只返回一条提示 */
@@ -244,6 +258,11 @@ export function validateDevice(input: DeviceInput, excludeId?: string): DeviceFo
   if (!input.unitId) errors.unitId = '请选择所属用能单元'
   else if (!getNode(input.unitId)) errors.unitId = '所选用能单元已失效，请重新选择'
 
+  // 设备识别码（IMEI）：必填，由平台按 License 查询带出或用户按现场实际填写
+  const imei = normalizeText(input.imei)
+  if (!imei) errors.imei = '请输入设备识别码（IMEI）'
+  else if (imei.length > CODE_MAX) errors.imei = `设备识别码最多 ${CODE_MAX} 个字符`
+
   // GPS 由所属用能单元带出或地图选点确定，不应出现只有经度没有纬度的情况
   if ((input.lng === null) !== (input.lat === null)) errors.lng = 'GPS 坐标不完整，请重新选点'
 
@@ -255,8 +274,9 @@ export const hasFormError = (errors: DeviceFormErrors) => Object.keys(errors).le
 /* ---------- 新增 / 编辑 / 删除 ---------- */
 
 /**
- * 新增设备（F-DEV-04）：建档后默认接入状态为「待接入」。
- * 设备类型、设备识别码（IMEI）、卡号与专属数据均为设备上云后由服务端 / 平台返回，建档时按 License 预查 IMEI。
+ * 新增设备（F-DEV-04）：建档后设备尚未与平台建连，在线状态为「离线」、拉合闸状态为空。
+ * 设备识别码（IMEI）与表号在表单中按 License 预查带出或由用户自定义；
+ * 设备类型、卡号与专属数据均为设备上云后由服务端 / 平台返回。
  */
 export async function createDevice(input: DeviceInput): Promise<Device> {
   await delay()
@@ -267,8 +287,10 @@ export async function createDevice(input: DeviceInput): Promise<Device> {
   const device: Device = {
     id: `DEV-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     name: normalizeText(input.name),
-    // IMEI 由平台按 License 反查得到；未上云时可能查不到
-    imei: queryImeiByLicense(license),
+    // IMEI：平台按 License 反查带出，未查询到时由用户自定义填写
+    imei: normalizeText(input.imei),
+    // 表号：经网关通讯的设备才有，平台带出或用户自定义；插卡 4G 设备可留空
+    meterNo: normalizeText(input.meterNo),
     // 卡号（ICCID）与设备类型由服务端在设备上云后返回
     cardNo: '',
     license,
@@ -285,8 +307,10 @@ export async function createDevice(input: DeviceInput): Promise<Device> {
     commType: normalizeText(input.commType),
     protocol: normalizeText(input.protocol),
     gatewayImei: normalizeText(input.gatewayImei),
-    accessStatus: '待接入',
-    onlineStatus: null,
+    // 建档时设备尚未与平台建连，在线状态为「离线」（两态互斥）
+    onlineStatus: '离线',
+    latchStatus: null,
+    signalStrength: '',
     accessedAt: null,
     lastReportAt: null,
     // 设备图片由「智慧物联生态平台」维护，建档时尚未维护，卡片展示兜底图
@@ -313,11 +337,11 @@ export async function updateDevice(id: string, input: DeviceInput): Promise<void
   const name = normalizeText(input.name)
   const license = normalizeText(input.license)
   if (device.name !== name) changes.push(`名称由「${device.name}」改为「${name}」`)
-  if (device.license !== license) {
-    // License 变更后需重新按新 License 查询平台侧的 IMEI
-    changes.push(`License 由「${device.license}」改为「${license}」`)
-    device.imei = queryImeiByLicense(license)
-  }
+  if (device.license !== license) changes.push(`License 由「${device.license}」改为「${license}」`)
+  const imei = normalizeText(input.imei)
+  if (device.imei !== imei) changes.push(`设备识别码由「${device.imei || '—'}」改为「${imei || '—'}」`)
+  const meterNo = normalizeText(input.meterNo)
+  if (device.meterNo !== meterNo) changes.push(`表号由「${device.meterNo || '—'}」改为「${meterNo || '—'}」`)
   if (device.model !== normalizeText(input.model)) changes.push('修改了规格型号')
   if (device.factory !== normalizeText(input.factory)) changes.push('修改了生产厂家')
   if (device.factoryDate !== normalizeText(input.factoryDate)) changes.push('修改了出厂日期')
@@ -331,6 +355,8 @@ export async function updateDevice(id: string, input: DeviceInput): Promise<void
 
   device.name = name
   device.license = license
+  device.imei = imei
+  device.meterNo = meterNo
   device.model = normalizeText(input.model)
   device.factory = normalizeText(input.factory)
   device.factoryDate = normalizeText(input.factoryDate)
@@ -438,10 +464,12 @@ export async function moveDevices(ids: string[], targetUnitId: string): Promise<
 
 /* ---------- 批量导入（F-DEV-05） ---------- */
 
-/** 导入模板列名；与「新增设备 › 手动录入」的填写项保持一致，设备类型、IMEI 与卡号由平台 / 服务端返回，不在模板列中 */
+/** 导入模板列名；与「新增设备 › 手动录入」的填写项保持一致，设备类型与卡号由平台 / 服务端返回，不在模板列中 */
 export const IMPORT_HEADERS = [
   '设备名称',
   'License',
+  '设备识别码（IMEI）',
+  '表号',
   '所属用能单元编码',
   '安装位置描述',
   '备注',
@@ -453,6 +481,8 @@ export function buildImportTemplate() {
   const sample = [
     '1 号总表',
     'LIC-8F2A-1043-7C61',
+    '86451290000001',
+    '320000000001',
     'UNIT-HN-A-001',
     'A 栋一层东侧配电间 1 号柜',
     '一层东侧主进线总表',
@@ -498,11 +528,30 @@ function findUnitByCode(codeText: string) {
   return matched.length === 1 ? matched[0] : null
 }
 
+/**
+ * 解析导入行中的设备识别码（IMEI）与表号：
+ * 优先取文件中填写的值；未填写时按 License 查询平台带出；
+ * 平台亦无记录时留空，由用户在编辑中补充。
+ */
+function resolveImportIdentity(raw: Record<string, string>): DeviceIdentity {
+  const license = normalizeText(raw['License'])
+  const providedImei = normalizeText(raw['设备识别码（IMEI）'])
+  const providedMeterNo = normalizeText(raw['表号'])
+  const queried = providedImei && providedMeterNo ? null : queryDeviceIdentityByLicense(license)
+  return {
+    imei: providedImei || queried?.imei || '',
+    meterNo: providedMeterNo || queried?.meterNo || '',
+  }
+}
+
 function rowToInput(raw: Record<string, string>): DeviceInput {
   const unit = findUnitByCode(normalizeText(raw['所属用能单元编码']))
+  const identity = resolveImportIdentity(raw)
   return {
     name: raw['设备名称'] ?? '',
     license: raw['License'] ?? '',
+    imei: identity.imei,
+    meterNo: identity.meterNo,
     unitId: unit?.id ?? '',
     // 模板不含安装日期、规格与通信信息，建档后可在编辑中补充
     model: '',
@@ -536,6 +585,8 @@ function validateImportRow(raw: Record<string, string>): string {
     return codeExists ? `所属用能单元编码不唯一：${unitCode}` : `所属用能单元编码不存在：${unitCode}`
   }
   if (findLicenseOwner(license)) return `License 已存在：${license}`
+  // 设备识别码（IMEI）为必填：填写值或按 License 查询带出，两者皆无则无法建档
+  if (!resolveImportIdentity(raw).imei) return '缺少设备识别码（IMEI）：请填写，或核对 License 后由平台带出'
   return ''
 }
 
@@ -583,8 +634,10 @@ export async function importDevices(rows: ImportRow[]): Promise<{ success: numbe
     const device: Device = {
       id: `DEV-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: normalizeText(input.name),
-      // IMEI 由平台按 License 反查得到
-      imei: queryImeiByLicense(license),
+      // IMEI：文件中填写，或按 License 查询平台带出
+      imei: normalizeText(input.imei),
+      // 表号：经网关通讯的设备才有；填写值或平台带出，可为空
+      meterNo: normalizeText(input.meterNo),
       // 卡号与设备类型由服务端在设备上云后返回
       cardNo: '',
       license,
@@ -601,8 +654,10 @@ export async function importDevices(rows: ImportRow[]): Promise<{ success: numbe
       commType: normalizeText(input.commType),
       protocol: normalizeText(input.protocol),
       gatewayImei: normalizeText(input.gatewayImei),
-      accessStatus: '待接入',
-      onlineStatus: null,
+      // 导入后设备尚未与平台建连，在线状态为「离线」（两态互斥）
+      onlineStatus: '离线',
+      latchStatus: null,
+      signalStrength: '',
       accessedAt: null,
       lastReportAt: null,
       // 设备图片由「智慧物联生态平台」维护，导入后由该平台补齐
@@ -748,5 +803,5 @@ export function deviceLogs(deviceId: string) {
 
 /* ---------- 选项常量 ---------- */
 
-export const ACCESS_STATUS_OPTIONS: AccessStatus[] = ['待接入', '已接入']
 export const ONLINE_STATUS_OPTIONS: OnlineStatus[] = ['在线', '离线']
+export const LATCH_STATUS_OPTIONS: LatchStatus[] = ['合闸', '分闸']

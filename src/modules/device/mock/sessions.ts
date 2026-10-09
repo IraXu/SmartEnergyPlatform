@@ -69,7 +69,7 @@ interface RawSession {
 
 /**
  * 【原型说明】为单台设备生成最近 30 天的上下线事件流水（按时间倒序）。
- * 仅「已接入」设备有上下线记录：待接入设备从未与平台建连。
+ * 仅已与平台建连的设备有上下线记录：从未建连（无首次接入时间）的设备无记录。
  */
 export function createPresetSessions(devices: Device[]): DeviceSessionEvent[] {
   const now = Date.now()
@@ -77,7 +77,7 @@ export function createPresetSessions(devices: Device[]): DeviceSessionEvent[] {
   const events: DeviceSessionEvent[] = []
 
   devices
-    .filter((device) => device.accessStatus === '已接入' && device.imei)
+    .filter((device) => device.accessedAt !== null && device.imei)
     .forEach((device) => {
       const random = seeded(seedOf(device.imei))
       const online = device.onlineStatus === '在线'

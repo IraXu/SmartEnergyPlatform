@@ -223,14 +223,6 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
 }
 
-/* 未接入：实心灰点 */
-.loc-marker--unknown {
-  width: 14px;
-  height: 14px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 2px solid #ffffff;
-}
-
 /* 选中态：放大 + 主色光环（两种维度共用） */
 .loc-marker--active {
   z-index: 4;
@@ -588,15 +580,6 @@
   border-radius: 50%;
 }
 
-.loc-legend__unknown {
-  width: 10px;
-  height: 10px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1.5px solid #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
 .loc-legend__active {
   width: 12px;
   height: 12px;
@@ -728,10 +711,6 @@
   border-top-color: #faad14;
 }
 
-.loc-card__head--unknown {
-  border-top-color: rgba(0, 0, 0, 0.25);
-}
-
 .loc-card__avatar {
   display: inline-flex;
   flex: none;
@@ -751,11 +730,6 @@
 .loc-card__avatar--offline {
   color: #d48806;
   background: #fff7e6;
-}
-
-.loc-card__avatar--unknown {
-  color: rgba(0, 0, 0, 0.45);
-  background: #f5f5f5;
 }
 
 .loc-card__title {
@@ -797,10 +771,6 @@
 
 .loc-card__online--offline {
   color: #d48806;
-}
-
-.loc-card__online--unknown {
-  color: rgba(0, 0, 0, 0.45);
 }
 
 .loc-card__body {
@@ -1006,7 +976,7 @@
   color: rgba(0, 0, 0, 0.88);
 }
 
-/* 在线状态：圆点 + 文字（未接入设备展示占位符） */
+/* 在线状态：圆点 + 文字（从未上线的设备展示占位符） */
 .loc-online {
   display: inline-flex;
   align-items: center;
@@ -1027,10 +997,6 @@
 
 .loc-online--offline .loc-online__dot {
   background: #faad14;
-}
-
-.loc-online--unknown .loc-online__dot {
-  background: rgba(0, 0, 0, 0.25);
 }
 
 /* ---------- 窄屏（1366~1439px）：收窄悬浮面板 ---------- */

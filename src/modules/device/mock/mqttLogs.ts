@@ -55,14 +55,14 @@ function seedOf(text: string) {
 
 /**
  * 【原型说明】为单台设备生成最近 30 天的 MQTT 通讯日志。
- * 仅「已接入」设备有通讯记录：待接入设备未与平台建连，日志为空。
+ * 仅已与平台建连的设备有通讯记录：从未建连（无首次接入时间）的设备日志为空。
  */
 export function createPresetMqttLogs(devices: Device[]): MqttLog[] {
   const now = Date.now()
   const logs: MqttLog[] = []
 
   devices
-    .filter((device) => device.accessStatus === '已接入' && device.imei)
+    .filter((device) => device.accessedAt !== null && device.imei)
     .forEach((device) => {
       const random = seeded(seedOf(device.imei))
       // 每台设备每日 3～6 条，30 天累计约 100～180 条，兼顾真实性又不至于过于冗长

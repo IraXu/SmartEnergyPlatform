@@ -254,14 +254,46 @@ export function resolveScopeDevices(strategy: Pick<Strategy, 'unitIds' | 'device
   return devices.filter((device) => strategy.deviceIds.includes(device.id) && scopeUnitIds.has(device.unitId))
 }
 
-/** 作用范围的设备统计：总数与其中待接入 / 离线台数（用于保存前的范围回显） */
+/** 作用范围的设备统计：总数与其中离线台数（用于保存前的范围回显） */
 export function scopeStats(strategy: Pick<Strategy, 'unitIds' | 'deviceIds'>) {
   const list = resolveScopeDevices(strategy)
   return {
     total: list.length,
-    pending: list.filter((device) => device.accessStatus !== '已接入').length,
-    offline: list.filter((device) => device.accessStatus === '已接入' && device.onlineStatus !== '在线').length,
+    offline: list.filter((device) => device.onlineStatus !== '在线').length,
   }
+}
+
+/**
+ * 某台设备关联的负荷策略（设备台账详情页展示）。
+ * 判定口径与作用范围解析一致：显式选中该设备，或在该策略作用用电单元下由动态范围覆盖。
+ */
+export function strategiesForDevice(deviceId: string): Strategy[] {
+  return strategies.filter((strategy) =>
+    resolveScopeDevices(strategy).some((device) => device.id === deviceId),
+  )
+}
+
+/** 设备关联负荷策略的条数汇总（时控 / 负控分开统计），供设备台账列表按列展示 */
+export interface DeviceStrategyCount {
+  time: number
+  load: number
+}
+
+/**
+ * 全量设备的关联策略条数索引：设备 id → { 时控, 负控 }。
+ * 一次性遍历全部策略解析作用范围，避免列表逐行调用时的重复计算。
+ */
+export function strategyCountsByDevice(): Map<string, DeviceStrategyCount> {
+  const map = new Map<string, DeviceStrategyCount>()
+  strategies.forEach((strategy) => {
+    resolveScopeDevices(strategy).forEach((device) => {
+      const entry = map.get(device.id) ?? { time: 0, load: 0 }
+      if (strategy.triggerType === '时控') entry.time += 1
+      else entry.load += 1
+      map.set(device.id, entry)
+    })
+  })
+  return map
 }
 
 /** 可在作用用电单元范围内选择的设备（作用设备选择器的选项来源） */
@@ -647,16 +679,6 @@ function triggerDetailOf(strategy: Strategy, action: ActionType) {
 function buildBatch(strategy: Strategy, action: ActionType, targets: Device[]): ExecBatch {
   execSeq += 1
   const results: ExecDeviceResult[] = targets.map((device) => {
-    if (device.accessStatus !== '已接入') {
-      return {
-        deviceId: device.id,
-        deviceName: device.name,
-        unitId: device.unitId,
-        action,
-        result: '已跳过',
-        reason: '设备未接入',
-      }
-    }
     if (device.onlineStatus !== '在线') {
       return {
         deviceId: device.id,

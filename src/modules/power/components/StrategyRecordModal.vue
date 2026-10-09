@@ -111,7 +111,7 @@
               </template>
 
               <template v-else-if="column.key === 'reason'">
-                <!-- 失败为异常、跳过为预期外未执行：同一列用颜色区分，避免把「未接入」读成故障 -->
+                <!-- 失败为异常、跳过为预期外未执行：同一列用颜色区分，避免把「设备离线」读成故障 -->
                 <span
                   v-if="device.reason"
                   class="lst-record__reason"

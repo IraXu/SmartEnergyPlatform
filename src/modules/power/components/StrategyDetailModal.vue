@@ -109,7 +109,6 @@
               <span class="lst-detail__chip" :class="isWhole ? 'is-dynamic' : 'is-static'">
                 {{ isWhole ? '动态范围 · 全部设备' : '静态范围 · 指定设备' }}
               </span>
-              <span v-if="scope.pending" class="lst-detail__chip is-pending">{{ scope.pending }} 台待接入</span>
               <span v-if="scope.offline" class="lst-detail__chip is-pending">{{ scope.offline }} 台离线</span>
             </span>
             <!-- 静态范围设备清单数量可控，直接列出 -->
@@ -198,11 +197,8 @@ const unitCount = computed(() => unitGroups.value.reduce((total, group) => total
 
 const scope = computed(() => {
   const list = strategy.value ? resolveScopeDevices(strategy.value) : []
-  const pending = list.filter((device) => device.accessStatus !== '已接入').length
-  const offline = list.filter(
-    (device) => device.accessStatus === '已接入' && device.onlineStatus !== '在线',
-  ).length
-  return { total: list.length, list, pending, offline }
+  const offline = list.filter((device) => device.onlineStatus !== '在线').length
+  return { total: list.length, list, offline }
 })
 
 /** 作用设备名称清单：超出 10 台时展示前 10 台并附「等 N 台」 */

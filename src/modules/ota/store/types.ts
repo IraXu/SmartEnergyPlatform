@@ -44,7 +44,7 @@ export interface FirmwareBaseline {
 /** 设备的固件与升级状态（OTA 侧数据，按设备标识关联设备台账） */
 export interface OtaState {
   deviceId: string
-  /** 设备最近一次上报 / 检测到的当前固件版本；待接入或未上报为空字符串 */
+  /** 设备最近一次上报 / 检测到的当前固件版本；从未建连或未上报为空字符串 */
   currentVersion: string
   /** 最近一次检测时间 */
   detectedAt: number | null

@@ -167,13 +167,10 @@ function delay(ms = 900) {
 
 /**
  * 下发改备控制指令（F-DEV-15）。
- * 设备必须为「已接入」且在线才能接收指令；其余情况直接返回失败并说明原因，
+ * 设备必须在线才能接收指令；其余情况直接返回失败并说明原因，
  * 不产生通讯日志（未建连即无通讯发生）。
  */
 export async function sendDeviceCommand(device: Device, command: DeviceCommand): Promise<CommandResult> {
-  if (device.accessStatus !== '已接入') {
-    return { ok: false, message: '设备尚未接入平台，无法下发控制指令' }
-  }
   if (device.onlineStatus !== '在线') {
     return { ok: false, message: '设备当前离线，指令无法送达，请确认设备通信状态后重试' }
   }

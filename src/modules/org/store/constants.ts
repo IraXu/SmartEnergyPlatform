@@ -8,7 +8,7 @@ export const ORG_LOGS_KEY = 'proto_org_logs'
 export const ORG_VERSION_KEY = 'proto_org_data_version'
 
 /** 【原型说明】演示数据结构版本，调整演示数据时提升版本以清理旧数据 */
-export const ORG_DATA_VERSION = '6'
+export const ORG_DATA_VERSION = '7'
 
 /** 节点名称长度（PRD F-ORG-03 业务规则） */
 export const NAME_MIN = 2

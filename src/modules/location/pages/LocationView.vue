@@ -248,7 +248,6 @@
           <template v-else>
             <span class="loc-legend__item"><span class="loc-legend__dot" />在线</span>
             <span class="loc-legend__item"><span class="loc-legend__ring" />离线</span>
-            <span class="loc-legend__item"><span class="loc-legend__unknown" />未接入</span>
             <span class="loc-legend__item"><span class="loc-legend__active" />已选中</span>
           </template>
         </div>
@@ -827,7 +826,7 @@ function handleCanvasKeydown(event: KeyboardEvent) {
 
 /* ---------- 标记形态 ---------- */
 function stateClass(state: DeviceMarker['onlineState']) {
-  return state === '在线' ? 'online' : state === '离线' ? 'offline' : 'unknown'
+  return state === '在线' ? 'online' : 'offline'
 }
 
 /* ---------- 演示入口（悬浮在地图右上角，可折叠） ---------- */

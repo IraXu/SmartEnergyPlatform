@@ -20,9 +20,9 @@
       </p>
       <p class="ota-detect__scope">{{ scopeLabel }}</p>
 
-      <!-- 跳过说明：存在未接入或升级中设备时展示 -->
+      <!-- 跳过说明：存在从未建连或升级中设备时展示 -->
       <p v-if="skippedCount" class="ota-detect__skip">
-        其中 {{ skippedCount }} 台不可检测（未接入或升级中），将跳过
+        其中 {{ skippedCount }} 台不可检测（从未建连或升级中），将跳过
       </p>
 
       <!-- 检测进度与结果汇总 -->
@@ -71,7 +71,7 @@ const done = ref(0)
 const total = ref(0)
 const result = ref<DetectBatchResult>({ newFirmware: 0, upToDate: 0, failed: 0, skipped: 0 })
 
-/** 提交时将被跳过的台数（未接入 / 升级中） */
+/** 提交时将被跳过的台数（从未建连 / 升级中） */
 const skippedCount = computed(() => {
   const targets = props.deviceIds
     .map((id) => devices.find((item) => item.id === id))
@@ -119,8 +119,8 @@ async function handleOk() {
 
     const { newFirmware, upToDate, failed, skipped } = summary
     if (newFirmware + upToDate + failed === 0) {
-      // 全部被跳过（未接入 / 升级中）或全部不可检测
-      message.warning(skipped ? '所选设备均不可检测（未接入或升级中）' : '检测失败，所选设备均未响应，请确认设备在线状态后重试')
+      // 全部被跳过（从未建连 / 升级中）或全部不可检测
+      message.warning(skipped ? '所选设备均不可检测（从未建连或升级中）' : '检测失败，所选设备均未响应，请确认设备在线状态后重试')
     } else if (failed === 0) {
       message.success(`检测完成：有新固件 ${newFirmware} 台，已是最新 ${upToDate} 台`)
     } else {

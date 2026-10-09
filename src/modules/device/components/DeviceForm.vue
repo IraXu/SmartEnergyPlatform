@@ -18,13 +18,34 @@
             :maxlength="CODE_MAX"
             placeholder="设备唯一标识，全平台唯一"
           />
+          <p class="devform__hint">填写后自动查询设备信息</p>
         </a-form-item>
 
-        <a-form-item label="设备识别码（IMEI）">
-          <a-input :value="imei" disabled placeholder="填写 License 后由平台自动带出" />
-          <p class="devform__hint">
-            由平台按 License 查询返回，不支持手动填写；未查询到说明该设备尚未与平台对接
-          </p>
+        <a-form-item
+          label="设备识别码（IMEI）"
+          required
+          :validate-status="errors.imei ? 'error' : undefined"
+          :help="errors.imei ?? undefined"
+        >
+          <a-input
+            v-model:value="form.imei"
+            :maxlength="CODE_MAX"
+            :loading="identityQuerying"
+            :placeholder="imeiPlaceholder"
+            @input="imeiTouched = true"
+          />
+          <p class="devform__hint" :class="identityHintClass">{{ identityHint }}</p>
+        </a-form-item>
+
+        <a-form-item label="表号">
+          <a-input
+            v-model:value="form.meterNo"
+            :maxlength="CODE_MAX"
+            :loading="identityQuerying"
+            :placeholder="meterNoPlaceholder"
+            @input="meterNoTouched = true"
+          />
+          <p class="devform__hint">网关通讯设备以表号判定，插卡 4G 设备可留空</p>
         </a-form-item>
       </div>
 
@@ -138,18 +159,19 @@
 <script setup lang="ts">
 /**
  * 【原型说明】新增设备（弹窗内「手动录入 / 批量导入」两种方式共用）与编辑设备的表单。
- * - License 为用户填写的唯一标识，置于首位；设备识别码（IMEI）由平台按 License 查询带出，只读
+ * - License 为用户填写的唯一标识；填写后自动向平台查询该设备信息
+ * - 设备识别码（IMEI）与表号：平台查询到则自动填入；未查询到时支持按现场实际人工填写（可编辑）
  * - 归属信息含所属用能单元、安装位置描述与 GPS 位置；GPS 随所属用能单元自动填入，支持地图选点自定义
  * - 不含设备类型、卡号、安装日期、规格、通信与状态字段（设备类型与卡号由服务端在设备上云后返回）
  */
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import DeviceGpsPicker from './DeviceGpsPicker.vue'
 import {
   CODE_MAX,
   INSTALL_POSITION_MAX,
   NAME_MAX,
   REMARK_MAX,
-  queryImeiByLicense,
+  queryDeviceIdentityByLicense,
   unitLocation,
   unitTreeData,
 } from '../store'
@@ -177,8 +199,88 @@ const unitTree = computed(() => unitTreeData())
 const unitLng = computed(() => unitLocation(form.value.unitId || '').lng)
 const unitLat = computed(() => unitLocation(form.value.unitId || '').lat)
 
-/** 设备识别码（IMEI）：由平台按 License 查询带出，只读展示 */
-const imei = computed(() => queryImeiByLicense(form.value.license))
+/* ---------- License → 平台查询身份信息（IMEI / 表号） ---------- */
+
+/** 查询状态：idle 未查询 / querying 查询中 / matched 已查到并自动填入 / nomatch 未查到（需人工填写） */
+type IdentityState = 'idle' | 'querying' | 'matched' | 'nomatch'
+
+const identityState = ref<IdentityState>('idle')
+const identityQuerying = computed(() => identityState.value === 'querying')
+/** 用户是否手动改写过识别码 / 表号；改写后不再被自动查询结果覆盖 */
+const imeiTouched = ref(false)
+const meterNoTouched = ref(false)
+let queryTimer: number | undefined
+
+/** 清掉待执行的查询，避免防抖窗口内组件已卸载仍回调 */
+function clearQueryTimer() {
+  if (queryTimer !== undefined) {
+    window.clearTimeout(queryTimer)
+    queryTimer = undefined
+  }
+}
+
+/**
+ * 监听 License 变化，防抖后模拟「按 License 查询平台设备信息」。
+ * 查询到：自动填入识别码与表号（用户已手改的字段不覆盖）；
+ * 未查询到：置为 nomatch，由用户按现场实际填写。
+ */
+watch(
+  () => form.value.license,
+  () => {
+    clearQueryTimer()
+    imeiTouched.value = false
+    meterNoTouched.value = false
+    const license = form.value.license.trim()
+    if (!license) {
+      identityState.value = 'idle'
+      return
+    }
+    identityState.value = 'querying'
+    queryTimer = window.setTimeout(() => {
+      const identity = queryDeviceIdentityByLicense(license)
+      if (!identity) {
+        identityState.value = 'nomatch'
+        return
+      }
+      identityState.value = 'matched'
+      form.value = {
+        ...form.value,
+        imei: imeiTouched.value ? form.value.imei : identity.imei,
+        meterNo: meterNoTouched.value ? form.value.meterNo : identity.meterNo,
+      }
+    }, 420)
+  },
+)
+
+onBeforeUnmount(clearQueryTimer)
+
+/** 识别码输入框占位文案：按查询状态区分 */
+const imeiPlaceholder = computed(() =>
+  identityState.value === 'nomatch' ? '未查询到，可手动填写' : '填写 License 后自动带入',
+)
+
+/** 表号占位文案：插卡 4G 设备可留空 */
+const meterNoPlaceholder = computed(() =>
+  identityState.value === 'nomatch' ? '未查询到，可手动填写' : '填写 License 后自动带入',
+)
+
+/** 查询提示文案：让用户明确「已自动带入」或「未查到、可自定义」 */
+const identityHint = computed(() => {
+  switch (identityState.value) {
+    case 'querying':
+      return '正在查询…'
+    case 'matched':
+      return '已自动带入，可手动修正'
+    case 'nomatch':
+      return '平台未查询到，请手动填写'
+    default:
+      return '必填，可由平台自动带入'
+  }
+})
+
+const identityHintClass = computed(() =>
+  identityState.value === 'nomatch' ? 'is-warn' : identityState.value === 'matched' ? 'is-ok' : '',
+)
 
 /**
  * 选择所属用能单元：GPS 默认跟随该用能单元坐标，已自定义过则不覆盖。

@@ -47,19 +47,17 @@ export const LOAD_DELAY = 420
  */
 export const REFRESH_DELAY = 260
 
-/** 在线状态筛选选项（含未接入的「未知」态） */
-export const ONLINE_STATE_OPTIONS: DeviceOnlineState[] = ['在线', '离线', '未知']
+/** 在线状态筛选选项（在线 / 离线两态） */
+export const ONLINE_STATE_OPTIONS: DeviceOnlineState[] = ['在线', '离线']
 
-/** 在线状态展示文案：未接入设备为「未知」，界面展示占位符 */
+/** 在线状态展示文案 */
 export const ONLINE_STATE_TEXT: Record<DeviceOnlineState, string> = {
   在线: '在线',
   离线: '离线',
-  未知: '—',
 }
 
-/** 在线状态在地图标记上的悬停说明文案（未接入设备用「未接入」表述，更易理解） */
+/** 在线状态在地图标记上的悬停说明文案 */
 export const MARKER_STATE_TEXT: Record<DeviceOnlineState, string> = {
   在线: '在线',
   离线: '离线',
-  未知: '未接入',
 }

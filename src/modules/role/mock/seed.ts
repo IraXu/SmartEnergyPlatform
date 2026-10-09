@@ -52,6 +52,7 @@ export const PRESET_ROLES: Role[] = [
       'device:ledger:control:switchoff',
       'device:ledger:control:reconnect',
       'device:ledger:param',
+      'device:ledger:mqtt:export',
       'device:ota',
       'device:ota:detect',
       'device:ota:upgrade',

@@ -74,6 +74,28 @@ export function currentParamValue(device: Device, key: string): string {
   return values[key] ?? ''
 }
 
+/**
+ * 【原型说明】列表列使用的 CT / PT 变比只读展示文本。
+ * 只读取值、不写入缓存（避免仅渲染列表就改变「已抄读」状态）；
+ * 未上云（无设备类型）或设备未回读参数时返回空字符串，界面展示占位符。
+ */
+export function deviceRatioText(device: Device): string {
+  const values = paramValues.get(device.id) ?? createPresetParamValues(device.imei, device.type)
+  const pt = values.ptRatio
+  const ct = values.ctRatio
+  if (!pt && !ct) return ''
+  return `CT ${ct || '—'} / PT ${pt || '—'}`
+}
+
+/**
+ * 【原型说明】CT / PT 变比拆分为独立取值，供详情页「设备专属数据」分项展示。
+ * 同样只读、不写入缓存；未上云或未回读时对应项为空字符串。
+ */
+export function deviceRatioValues(device: Device): { ct: string; pt: string } {
+  const values = paramValues.get(device.id) ?? createPresetParamValues(device.imei, device.type)
+  return { ct: values.ctRatio ?? '', pt: values.ptRatio ?? '' }
+}
+
 /* ---------- 校验 ---------- */
 
 /** 校验单个参数的待下发值；通过时返回空字符串 */
@@ -88,6 +110,8 @@ export function validateParamValue(item: DeviceParamItem, raw: string): string {
 
   const num = Number(value)
   if (!Number.isFinite(num)) return `${item.name}须为数字`
+  // 精度为 0（含未声明）的数值项仅支持整数，避免出现小数倍比
+  if ((item.precision ?? 0) === 0 && !Number.isInteger(num)) return `${item.name}须为正整数`
   if (item.min !== undefined && num < item.min) return `${item.name}不得小于 ${item.min}${item.unit ?? ''}`
   if (item.max !== undefined && num > item.max) return `${item.name}不得大于 ${item.max}${item.unit ?? ''}`
   return ''
@@ -124,7 +148,6 @@ function delay(ms = 700) {
 }
 
 function assertReachable(device: Device): string {
-  if (device.accessStatus !== '已接入') return '设备尚未接入平台，无法读写参数'
   if (device.onlineStatus !== '在线') return '设备当前离线，参数读写无法送达，请确认设备通信状态后重试'
   return ''
 }

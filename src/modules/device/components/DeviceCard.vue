@@ -1,7 +1,7 @@
 <!--
   【原型说明】设备台账的卡片视图：单台设备一张卡片。
-  展示设备图片（取自「智慧物联生态平台」，未维护时用默认兜底图）、设备名称、
-  License、设备识别码（IMEI）、设备类型与在线状态；点击卡片进入设备详情。
+  概览层：左侧缩略图 + 设备名称与类型；右上角为在线状态，其下方为拉合闸状态。
+  其后依次为归属层（所属用能单元）与标识层（License / 识别码 / 表号）；点击卡片进入设备详情。
 -->
 <template>
   <div
@@ -13,6 +13,7 @@
     @keydown.enter.prevent="emit('open', device)"
     @keydown.space.prevent="emit('open', device)"
   >
+    <!-- 概览层：缩略图 + 名称/类型；右侧竖排在线状态与拉合闸状态 -->
     <div class="devcard__top">
       <div class="devcard__thumb">
         <img
@@ -26,26 +27,35 @@
 
       <div class="devcard__head">
         <span class="devcard__name" :title="device.name">{{ device.name }}</span>
+        <span class="devcard__type" :class="{ 'is-empty': !device.type }" :title="device.type || '平台未返回类型'">
+          {{ device.type || '平台未返回类型' }}
+        </span>
       </div>
 
-      <div class="devcard__aside">
-        <span v-if="!device.onlineStatus" class="device-cell__empty devcard__online">未接入</span>
-        <span
-          v-else
-          class="device-cell__online devcard__online"
-          :class="device.onlineStatus === '在线' ? 'is-on' : 'is-off'"
-        >
+      <!-- 右上角状态列：在线状态在上、拉合闸状态在下，竖向对齐 -->
+      <div class="devcard__states">
+        <span class="device-cell__online devcard__online" :class="device.onlineStatus === '在线' ? 'is-on' : 'is-off'">
           <i class="device-cell__dot" />
           {{ device.onlineStatus }}
         </span>
-        <span v-if="device.type" class="device-cell__type devcard__type" :title="device.type">{{ device.type }}</span>
-        <span v-else class="device-cell__empty devcard__type">平台未返回类型</span>
+        <span
+          v-if="device.latchStatus"
+          class="device-cell__tag devcard__latch"
+          :class="device.latchStatus === '合闸' ? 'is-closed' : 'is-open'"
+        >
+          {{ device.latchStatus }}
+        </span>
+        <span v-else class="device-cell__empty devcard__latch">闸位未上报</span>
       </div>
     </div>
 
-    <!-- 所属用能单元：独占一整行，避免被缩略图与右侧信息挤到省略 -->
-    <p class="devcard__unit" :title="unitText">{{ unitText }}</p>
+    <!-- 归属层：所属用能单元独占一整行，避免被缩略图挤到省略 -->
+    <p class="devcard__unit" :title="unitText">
+      <ApartmentOutlined class="devcard__unit-icon" />
+      <span class="devcard__unit-text">{{ unitText }}</span>
+    </p>
 
+    <!-- 标识层：三个标识紧凑成组 -->
     <dl class="devcard__meta">
       <div class="devcard__row">
         <dt>License</dt>
@@ -79,6 +89,22 @@
           </button>
         </dd>
       </div>
+      <div class="devcard__row">
+        <dt>表号</dt>
+        <dd>
+          <span class="device-cell__mono" :title="device.meterNo">{{ device.meterNo || '—' }}</span>
+          <button
+            v-if="device.meterNo"
+            type="button"
+            class="devcard__copy"
+            title="复制表号"
+            aria-label="复制表号"
+            @click.stop="copy(device.meterNo, '表号')"
+          >
+            <CopyOutlined />
+          </button>
+        </dd>
+      </div>
     </dl>
   </div>
 </template>
@@ -86,7 +112,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { message } from 'antdv-next'
-import { CopyOutlined } from '@antdv-next/icons'
+import { ApartmentOutlined, CopyOutlined } from '@antdv-next/icons'
 import { DEFAULT_DEVICE_IMAGE } from '../mock/seed'
 import { isUnitInvalid, unitPath, type Device } from '../store'
 

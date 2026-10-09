@@ -94,12 +94,6 @@
               <span class="lst-scoped__path" :title="unitPath(record.unitId)">{{ unitPath(record.unitId) }}</span>
             </template>
 
-            <template v-else-if="column.key === 'accessStatus'">
-              <span class="lst-scoped__tag" :class="record.accessStatus === '已接入' ? 'is-accessed' : 'is-pending'">
-                {{ record.accessStatus }}
-              </span>
-            </template>
-
             <template v-else-if="column.key === 'onlineStatus'">
               <span v-if="!record.onlineStatus" class="lst-scoped__empty-cell">—</span>
               <span v-else class="lst-scoped__online" :class="record.onlineStatus === '在线' ? 'is-on' : 'is-off'">
@@ -193,7 +187,6 @@ const columns: TableColumnsType<Device> = [
   { title: '设备名称', key: 'name', width: 180 },
   { title: '设备类型', key: 'type', width: 120 },
   { title: '所属用能单元', key: 'unit', width: 220 },
-  { title: '接入状态', key: 'accessStatus', width: 96 },
   { title: '在线状态', key: 'onlineStatus', width: 96 },
 ]
 

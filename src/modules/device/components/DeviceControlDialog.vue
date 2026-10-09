@@ -43,7 +43,7 @@
         show-icon
         message="当前账号未被授予任何设备控制指令权限，请联系管理员在「角色管理」中配置后重试。"
       />
-      <!-- 设备不可控（未接入 / 离线）：说明原因，仍展示清单便于了解设备可用能力 -->
+      <!-- 设备不可控（离线）：说明原因，仍展示清单便于了解设备可用能力 -->
       <a-alert
         v-else-if="!controllable"
         class="devctl__alert"
@@ -85,7 +85,7 @@
       </div>
 
       <p class="devctl__note">
-        指令下发结果会记入「MQTT 通讯日志」；设备需「已接入」且在线才能接收指令。
+        指令下发结果会记入「MQTT 通讯日志」；设备需在线才能接收指令。
       </p>
     </div>
   </a-modal>
@@ -154,12 +154,11 @@ const perms = computed(() => currentPermissions())
 const granted = (item: DeviceCommandItem) => perms.value.includes(item.permission)
 const hasAnyPermission = computed(() => DEVICE_COMMANDS.some((item) => granted(item)))
 
-/** 可控制条件：设备已接入且在线（PRD F-DEV-15 前置条件） */
-const controllable = computed(() => Boolean(props.device) && props.device!.accessStatus === '已接入' && props.device!.onlineStatus === '在线')
+/** 可控制条件：设备在线（PRD F-DEV-15 前置条件） */
+const controllable = computed(() => Boolean(props.device) && props.device!.onlineStatus === '在线')
 
 const unavailableReason = computed(() => {
   if (!props.device) return ''
-  if (props.device.accessStatus !== '已接入') return '该设备尚未接入平台，暂不支持下发控制指令。'
   if (props.device.onlineStatus !== '在线') return '该设备当前离线，控制指令无法送达，请确认设备通信状态后重试。'
   return ''
 })

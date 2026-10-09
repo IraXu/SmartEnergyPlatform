@@ -114,16 +114,48 @@
 
 /* ---------- 选择登录企业（P-06） ---------- */
 /* 选项为整行可点卡片：选中的企业给主色描边与浅底，未选中给浅灰底，靠底色与描边共同表达选中态 */
+/*
+ * 企业数量较多时（EX-73）：列表区限高并内部滚动，卡片整体不超出视口，选项高度不压缩。
+ * 限高取「视口高 - 卡片其余内容估算高度（标题/复选框/按钮/返回/提示条 + 上下内边距）」，
+ * 并夹在 160px~360px 之间，避免超短屏被压扁或超高屏留白过多。
+ */
 .org-picker {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  max-height: clamp(160px, calc(100vh - 460px), 360px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  /* 滚动条占位：给右侧留出间距，避免贴住选项描边 */
+  padding-right: 6px;
+  margin-right: -6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.org-picker::-webkit-scrollbar {
+  width: 6px;
+}
+
+.org-picker::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.org-picker::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.org-picker::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.32);
 }
 
 .org-option {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex: none;
   width: 100%;
   padding: 20px 18px;
   text-align: left;

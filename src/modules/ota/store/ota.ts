@@ -5,8 +5,8 @@
  * - 新固件标识由「设备当前版本」与「平台固件基线中该设备匹配的最新版本」比较自动得出
  * - 检测为只读性质的版本刷新；升级为对设备产生实质影响的操作，均按权限点渲染
  * - 本期仅支持手动即时升级，升级目标版本取自固件基线，不可人工指定；升级不可回滚
- * - 待接入设备不具备通信能力，不可检测与升级
- * - 批量升级跳过「已是最新 / 未接入 / 升级中」的设备
+ * - 从未建连（无首次接入时间）的设备不具备通信能力，不可检测与升级
+ * - 批量升级跳过「已是最新 / 从未建连 / 升级中」的设备
  *
  * 【原型模拟说明】检测与升级以定时器模拟设备回执；离线设备在演示中被判定为升级失败。
  */
@@ -89,13 +89,13 @@ function compareVersion(a: string, b: string): number | null {
 
 /**
  * 计算新固件标识（PRD F-OTA-02）。
- * 判定顺序：未上云 / 未接入 → 不可判断；未匹配基线 → 不可判断；
+ * 判定顺序：从未建连 → 不可判断；未匹配基线 → 不可判断；
  * 版本无法解析 → 不可判断；当前版本未上报 → 待检测；最新 > 当前 → 有新固件；否则无新固件。
  */
 export function computeFirmwareState(device: Device, currentVersion: string): FirmwareState {
   const release = latestReleaseOf(device)
   if (!release) return '不可判断'
-  if (!currentVersion) return device.accessStatus === '已接入' ? '待检测' : '不可判断'
+  if (!currentVersion) return device.accessedAt !== null ? '待检测' : '不可判断'
   const compared = compareVersion(release.version, currentVersion)
   if (compared === null) return '不可判断'
   return compared > 0 ? '有新固件' : '无新固件'
@@ -130,7 +130,7 @@ export interface OtaRow {
   /** 行标识（取自设备标识，供表格 row-key 使用） */
   id: string
   device: Device
-  /** 当前固件版本；未上报 / 未接入为空 */
+  /** 当前固件版本；未上报 / 从未建连为空 */
   currentVersion: string
   /** 平台最新固件版本；未匹配到基线为空 */
   latestVersion: string
@@ -139,9 +139,9 @@ export interface OtaRow {
   progress: number
   failReason: string
   taskId: string | null
-  /** 是否可检测：已接入且非升级中 */
+  /** 是否可检测：在线过且非升级中 */
   canDetect: boolean
-  /** 是否可升级：有新固件、已接入且非升级中 */
+  /** 是否可升级：有新固件、在线过且非升级中 */
   canUpgrade: boolean
   /** 是否有可查看的升级内容：匹配到基线且有比当前更高的版本 */
   hasUpgradeContent: boolean
@@ -154,7 +154,8 @@ function buildRow(device: Device): OtaRow {
   const currentVersion = state.currentVersion
   const firmwareState = computeFirmwareState(device, currentVersion)
   const upgrading = state.upgradeStatus === '升级中'
-  const accessed = device.accessStatus === '已接入'
+  // 曾与平台建连（有首次接入时间）的设备才可进行 OTA 操作
+  const connected = device.accessedAt !== null
   const compared = release && currentVersion ? compareVersion(release.version, currentVersion) : null
   const hasUpgradeContent = Boolean(release) && (currentVersion === '' || (compared !== null && compared > 0))
   return {
@@ -167,8 +168,8 @@ function buildRow(device: Device): OtaRow {
     progress: state.progress,
     failReason: state.failReason,
     taskId: state.taskId,
-    canDetect: accessed && !upgrading,
-    canUpgrade: firmwareState === '有新固件' && accessed && !upgrading,
+    canDetect: connected && !upgrading,
+    canUpgrade: firmwareState === '有新固件' && connected && !upgrading,
     hasUpgradeContent,
   }
 }
@@ -220,7 +221,7 @@ export async function detectDevice(deviceId: string): Promise<DetectResult> {
   await delay(600)
   const device = ledgerDevices.find((item) => item.id === deviceId)
   if (!device) throw new Error('该设备已被删除')
-  if (device.accessStatus !== '已接入') throw new Error('设备未接入，无法进行 OTA 操作')
+  if (device.accessedAt === null) throw new Error('设备从未建连，无法进行 OTA 操作')
   const state = otaStateOf(deviceId)
   if (state.upgradeStatus === '升级中') throw new Error('设备升级中，请等待升级完成')
   // 【原型说明】离线设备检测失败，用于验证失败路径
@@ -241,18 +242,18 @@ export interface DetectBatchResult {
   upToDate: number
   /** 检测失败的台数 */
   failed: number
-  /** 提交时被跳过的台数（未接入 / 升级中） */
+  /** 提交时被跳过的台数（从未建连 / 升级中） */
   skipped: number
 }
 
 /** 设备是否可参与批量检测 */
 export const isDetectable = (device: Device) =>
-  device.accessStatus === '已接入' && otaStateOf(device.id).upgradeStatus !== '升级中'
+  device.accessedAt !== null && otaStateOf(device.id).upgradeStatus !== '升级中'
 
-/** 设备是否可参与批量升级（有新固件 / 已接入 / 非升级中） */
+/** 设备是否可参与批量升级（有新固件 / 在线过 / 非升级中） */
 export const isUpgradable = (device: Device) =>
   computeFirmwareState(device, otaStateOf(device.id).currentVersion) === '有新固件' &&
-  device.accessStatus === '已接入' &&
+  device.accessedAt !== null &&
   otaStateOf(device.id).upgradeStatus !== '升级中'
 
 /** 批量检测（F-OTA-05）：逐台下发版本查询，跳过不可检测的设备 */
@@ -325,7 +326,7 @@ export async function upgradeDevice(deviceId: string): Promise<UpgradeTask> {
   await delay(460)
   const device = ledgerDevices.find((item) => item.id === deviceId)
   if (!device) throw new Error('该设备已被删除')
-  if (device.accessStatus !== '已接入') throw new Error('设备未接入，无法进行 OTA 操作')
+  if (device.accessedAt === null) throw new Error('设备从未建连，无法进行 OTA 操作')
   const state = otaStateOf(deviceId)
   if (state.upgradeStatus === '升级中') throw new Error('该设备正在升级中')
   if (computeFirmwareState(device, state.currentVersion) !== '有新固件') throw new Error('该设备暂无可用升级内容')
@@ -339,7 +340,7 @@ export interface UpgradeSubmitResult {
   task: UpgradeTask
   /** 可升级台数 */
   upgradeCount: number
-  /** 被跳过的台数（已是最新 / 未接入 / 升级中） */
+  /** 被跳过的台数（已是最新 / 从未建连 / 升级中） */
   skipped: number
 }
 

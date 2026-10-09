@@ -23,11 +23,20 @@ export interface DeviceTypeItem {
   groups: Array<{ title: string; fields: DeviceMetricField[] }>
 }
 
-/** 接入状态：待接入 / 已接入（由采集侧驱动，本模块只读） */
-export type AccessStatus = '待接入' | '已接入'
-
-/** 在线状态：在线 / 离线（未接入设备没有在线状态） */
+/** 在线状态：在线 / 离线（由设备通信状态决定，两态互斥） */
 export type OnlineStatus = '在线' | '离线'
+
+/**
+ * 拉合闸状态：设备侧回路的通断状态，由设备上报，本模块只读。
+ * 未上报时无该状态（为 null）。
+ */
+export type LatchStatus = '合闸' | '分闸'
+
+/**
+ * 信号强度：仅 4G 等无线通讯方式的设备有此项，由设备上报。
+ * 以 0-31 的原始值（CSQ）或 0-100 的百分比承载，统一以文本展示。
+ */
+export type SignalStrength = string
 
 /** 设备的专属数据快照：字段名 → 展示值；未上报或未定义时为空 */
 export type DeviceMetrics = Record<string, string>
@@ -41,13 +50,19 @@ export interface Device {
   /** 设备名称（用户可读名） */
   name: string
   /**
-   * 设备识别码（IMEI）：由平台按 License 查询返回，前端不可录入与编辑。
-   * 未查询到（设备未上云）时为空。
+   * 设备识别码（IMEI）：填写 License 后由平台查询带出并自动填入；
+   * 平台未查询到（设备未上云）时允许用户按现场实际自定义填写。
    */
   imei: string
   /**
+   * 表号：填写 License 后由平台 / 网关查询带出并自动填入；
+   * 与上级网关通讯的设备以表号唯一判定，插卡的 4G 智能电表以 IMEI 唯一判定；
+   * 平台未查询到且该设备无表号时留空。
+   */
+  meterNo: string
+  /**
    * 卡号（ICCID）：设备建档完成后由服务端返回，前端不可录入与编辑。
-   * 未完成装卡 / 未接入的设备为空，界面展示占位符。
+   * 未完成装卡 / 未上云设备为空，界面展示占位符。
    */
   cardNo: string
   /** License：必填且全平台唯一，是用户在表单中填写的设备唯一标识 */
@@ -81,11 +96,19 @@ export interface Device {
   protocol: string
   /** 上级网关的设备识别码（文本记录，本期不做拓扑校验） */
   gatewayImei: string
-  /** 接入状态：由采集侧驱动，本模块只读 */
-  accessStatus: AccessStatus
-  /** 在线状态：由通信状态决定，本模块只读；未接入设备为 null */
-  onlineStatus: OnlineStatus | null
-  /** 接入时间 */
+  /** 在线状态：由通信状态决定，本模块只读；在线 / 离线两态互斥 */
+  onlineStatus: OnlineStatus
+  /**
+   * 拉合闸状态：设备侧回路的通断状态，由设备上报，本模块只读；
+   * 未上报时为 null，界面展示占位符。
+   */
+  latchStatus: LatchStatus | null
+  /**
+   * 信号强度：仅无线通讯方式（如 4G / NB-IoT）的设备有值，由设备上报；
+   * 有线通讯（以太网）或未上报时为空字符串。
+   */
+  signalStrength: SignalStrength
+  /** 首次接入时间（设备首次与平台建连的时间） */
   accessedAt: number | null
   /** 最近上报时间 */
   lastReportAt: number | null
@@ -261,15 +284,21 @@ export type DeviceParamValues = Record<string, string>
 
 /** 查询条件 */
 export interface DeviceFilters {
-  /** 设备名称 / 设备识别码 / License：按三者模糊匹配（或关系） */
-  keyword: string
+  /** 设备名称：按名称模糊匹配 */
+  name: string
+  /** 设备识别码（IMEI）：按识别码模糊匹配 */
+  imei: string
+  /** License：按 License 模糊匹配 */
+  license: string
+  /** 表号：按表号模糊匹配 */
+  meterNo: string
   /** 设备类型，多选；空数组表示全部；未上云的设备类型为空，不参与筛选 */
   types: string[]
   /** 所属用能单元；选中节点时表示「该节点及其全部下级」 */
   unitId: string | null
-  /** 接入状态，多选；空数组表示全部 */
-  accessStatuses: AccessStatus[]
-  /** 在线状态，多选；空数组表示全部；未接入设备不参与筛选 */
+  /** 拉合闸状态，多选；空数组表示全部；无该状态（未上报）的设备不参与筛选 */
+  latchStatuses: LatchStatus[]
+  /** 在线状态，多选；空数组表示全部 */
   onlineStatuses: OnlineStatus[]
 }
 
@@ -278,12 +307,18 @@ export type SortOrder = 'descend' | 'ascend'
 
 /**
  * 新增 / 编辑设备的表单入参。
- * 不含设备类型、设备识别码（IMEI）、卡号与状态：这三者均由服务端 / 平台返回，状态由采集侧决定。
+ * 不含设备类型、卡号与状态：这些由服务端 / 平台返回，状态由设备侧决定。
+ * 设备识别码（IMEI）与表号：填写 License 后由平台查询自动带出；
+ * 平台未查询到时允许用户按现场实际自定义填写。
  */
 export interface DeviceInput {
   name: string
-  /** 设备唯一标识，必填且全平台唯一；IMEI 由平台按 License 查询带出 */
+  /** 设备唯一标识，必填且全平台唯一；IMEI 与表号由平台按 License 查询带出 */
   license: string
+  /** 设备识别码（IMEI）：平台带出或用户自定义 */
+  imei: string
+  /** 表号：平台 / 网关带出或用户自定义；插卡 4G 设备可留空 */
+  meterNo: string
   model: string
   factory: string
   factoryDate: string

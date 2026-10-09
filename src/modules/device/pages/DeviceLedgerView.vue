@@ -12,11 +12,69 @@
     <section class="device-filter" aria-label="设备查询条件">
       <div class="device-filter__body">
         <div class="device-field">
-          <label class="device-field__label">设备名称 / 识别码 / License</label>
-          <a-input
-            v-model:value="draftFilters.keyword"
+          <label class="device-field__label">所属用能单元</label>
+          <a-tree-select
+            v-model:value="draftFilters.unitId"
             class="device-field__control"
-            placeholder="设备名称 / 识别码 / License"
+            show-search
+            allow-clear
+            tree-default-expand-all
+            tree-node-filter-prop="title"
+            placeholder="全部用能单元"
+            :tree-data="unitTree"
+            :field-names="{ label: 'title', value: 'value', children: 'children' }"
+            :styles="{ popup: { root: { maxHeight: '320px', overflow: 'auto' } } }"
+          />
+        </div>
+
+        <div class="device-field">
+          <label class="device-field__label">设备名称</label>
+          <a-input
+            v-model:value="draftFilters.name"
+            class="device-field__control"
+            placeholder="请输入设备名称"
+            allow-clear
+            :maxlength="SEARCH_MAX"
+            @press-enter="applyFilters"
+          >
+            <template #prefix><SearchOutlined class="device-field__prefix" /></template>
+          </a-input>
+        </div>
+
+        <div class="device-field">
+          <label class="device-field__label">设备识别码（IMEI）</label>
+          <a-input
+            v-model:value="draftFilters.imei"
+            class="device-field__control"
+            placeholder="请输入设备识别码"
+            allow-clear
+            :maxlength="SEARCH_MAX"
+            @press-enter="applyFilters"
+          >
+            <template #prefix><SearchOutlined class="device-field__prefix" /></template>
+          </a-input>
+        </div>
+
+        <div class="device-field">
+          <label class="device-field__label">License</label>
+          <a-input
+            v-model:value="draftFilters.license"
+            class="device-field__control"
+            placeholder="请输入 License"
+            allow-clear
+            :maxlength="SEARCH_MAX"
+            @press-enter="applyFilters"
+          >
+            <template #prefix><SearchOutlined class="device-field__prefix" /></template>
+          </a-input>
+        </div>
+
+        <div class="device-field">
+          <label class="device-field__label">表号</label>
+          <a-input
+            v-model:value="draftFilters.meterNo"
+            class="device-field__control"
+            placeholder="请输入表号"
             allow-clear
             :maxlength="SEARCH_MAX"
             @press-enter="applyFilters"
@@ -40,31 +98,15 @@
         </div>
 
         <div class="device-field">
-          <label class="device-field__label">所属用能单元</label>
-          <a-tree-select
-            v-model:value="draftFilters.unitId"
-            class="device-field__control"
-            show-search
-            allow-clear
-            tree-default-expand-all
-            tree-node-filter-prop="title"
-            placeholder="全部用能单元"
-            :tree-data="unitTree"
-            :field-names="{ label: 'title', value: 'value', children: 'children' }"
-            :styles="{ popup: { root: { maxHeight: '320px', overflow: 'auto' } } }"
-          />
-        </div>
-
-        <div class="device-field">
-          <label class="device-field__label">接入状态</label>
+          <label class="device-field__label">拉合闸状态</label>
           <a-select
-            v-model:value="draftFilters.accessStatuses"
+            v-model:value="draftFilters.latchStatuses"
             class="device-field__control"
             mode="multiple"
             allow-clear
             max-tag-count="responsive"
-            placeholder="全部接入状态"
-            :options="accessOptions"
+            placeholder="全部拉合闸状态"
+            :options="latchOptions"
           />
         </div>
 
@@ -189,6 +231,11 @@
             <span class="device-cell__mono" :title="record.imei">{{ record.imei }}</span>
           </template>
 
+          <template v-else-if="column.key === 'meterNo'">
+            <span v-if="record.meterNo" class="device-cell__mono" :title="record.meterNo">{{ record.meterNo }}</span>
+            <span v-else class="device-cell__empty">—</span>
+          </template>
+
           <template v-else-if="column.key === 'cardNo'">
             <span v-if="record.cardNo" class="device-cell__mono" :title="record.cardNo">{{ record.cardNo }}</span>
             <span v-else class="device-cell__empty">—</span>
@@ -207,6 +254,20 @@
             <span class="device-cell__model" :title="record.model">{{ record.model || '—' }}</span>
           </template>
 
+          <!-- CT/PT 值：取自设备参数（只读展示），未上云或未回读时展示占位符 -->
+          <template v-else-if="column.key === 'ratio'">
+            <span v-if="deviceRatioText(record)" class="device-cell__mono">{{ deviceRatioText(record) }}</span>
+            <span v-else class="device-cell__empty">—</span>
+          </template>
+
+          <!-- 拉合闸状态：设备侧回路上报状态，只读；无该状态（未上报）时展示占位符 -->
+          <template v-else-if="column.key === 'latchStatus'">
+            <span v-if="!record.latchStatus" class="device-cell__empty">—</span>
+            <span v-else class="device-cell__tag" :class="latchClass(record.latchStatus)">
+              {{ record.latchStatus }}
+            </span>
+          </template>
+
           <template v-else-if="column.key === 'unit'">
             <span v-if="isUnitInvalid(record.unitId)" class="device-cell__invalid">
               {{ unitPath(record.unitId) }}
@@ -215,10 +276,19 @@
             <span v-else class="device-cell__path" :title="unitPath(record.unitId)">{{ unitPath(record.unitId) }}</span>
           </template>
 
-          <template v-else-if="column.key === 'accessStatus'">
-            <span class="device-cell__tag" :class="accessClass(record.accessStatus)">
-              {{ record.accessStatus }}
-            </span>
+          <!-- 关联负荷策略：按触发方式分别给出条数标签；无关联展示占位符 -->
+          <template v-else-if="column.key === 'strategy'">
+            <div v-if="strategyChips(record).length" class="device-cell__strategy">
+              <span
+                v-for="chip in strategyChips(record)"
+                :key="chip.label"
+                class="device-cell__strategy-tag"
+                :class="chip.type === '时控' ? 'is-time' : 'is-load'"
+              >
+                {{ chip.label }}
+              </span>
+            </div>
+            <span v-else class="device-cell__empty">—</span>
           </template>
 
           <template v-else-if="column.key === 'onlineStatus'">
@@ -369,12 +439,12 @@
 /**
  * PAGE-01 设备台账
  * 【原型说明】维护本企业设备档案与所属用能单元。
- * 列表字段为「选择框 / 设备名称 / License / 设备识别码（IMEI）/ 卡号 / 设备类型 /
- * 规格型号 / 所属用能单元 / 接入状态 / 在线状态 / 添加时间 / 操作」，
- * 默认按添加时间倒序、每页 20 条；
- * 支持五项条件查询与重置、跨页勾选、单条与批量迁移、单条与批量删除、
+ * 列表字段为「选择框 / 所属用能单元 / 设备名称 / License / 设备识别码（IMEI）/ 表号 /
+ * 卡号 / 设备类型 / 关联负荷策略 / 在线状态 / 添加时间 / 操作」，
+ * 默认按添加时间倒序、每页 20 条；「规格型号」「CT/PT 值」「拉合闸状态」与「关联负荷策略」默认隐藏，可在「列设置」中勾选显示；
+ * 支持八项条件查询与重置、跨页勾选、单条与批量迁移、单条与批量删除、
  * 新增统一入口（弹窗内切换手动录入 / 批量导入），以及按文件批量删除。
- * 本期不含设备启用 / 停用，在线状态与接入状态均为只读。
+ * 本期不含设备启用 / 停用，在线状态与拉合闸状态均为只读。
  */
 import { computed, h, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -393,6 +463,7 @@ import {
 } from '@antdv-next/icons'
 import ProtoTip from '@/shared/components/ProtoTip.vue'
 import { currentPermissions } from '@/modules/role/store'
+import { strategyCountsByDevice } from '@/modules/power/store'
 import DeviceCard from '../components/DeviceCard.vue'
 import DeviceColumnSetting from '../components/DeviceColumnSetting.vue'
 import DeviceForm from '../components/DeviceForm.vue'
@@ -400,12 +471,13 @@ import DeviceImportDeleteDialog from '../components/DeviceImportDeleteDialog.vue
 import DeviceImportDialog from '../components/DeviceImportDialog.vue'
 import DeviceMoveDialog from '../components/DeviceMoveDialog.vue'
 import {
-  ACCESS_STATUS_OPTIONS,
+  LATCH_STATUS_OPTIONS,
   ONLINE_STATUS_OPTIONS,
   SEARCH_MAX,
   createDevice,
   deleteDevice,
   deleteDevices,
+  deviceRatioText,
   deviceTypeGroups,
   deviceViewMode,
   filterDevices,
@@ -421,11 +493,11 @@ import {
   visibleColumnMetas,
 } from '../store'
 import type {
-  AccessStatus,
   Device,
   DeviceFilters,
   DeviceFormErrors,
   DeviceInput,
+  LatchStatus,
   SortOrder,
 } from '../store'
 
@@ -476,10 +548,13 @@ watch(viewMode, (mode) => {
 
 /* ---------- 查询条件 ---------- */
 const defaultFilters = (): DeviceFilters => ({
-  keyword: '',
+  name: '',
+  imei: '',
+  license: '',
+  meterNo: '',
   types: [],
   unitId: null,
-  accessStatuses: [],
+  latchStatuses: [],
   onlineStatuses: [],
 })
 
@@ -491,7 +566,7 @@ const draftFilters = reactive<DeviceFilters>(defaultFilters())
 const filters = reactive<DeviceFilters>(defaultFilters())
 const typeGroups = computed(() => deviceTypeGroups())
 const unitTree = computed(() => unitTreeData())
-const accessOptions = ACCESS_STATUS_OPTIONS.map((value) => ({ label: value, value }))
+const latchOptions = LATCH_STATUS_OPTIONS.map((value) => ({ label: value, value }))
 const onlineOptions = ONLINE_STATUS_OPTIONS.map((value) => ({ label: value, value }))
 
 /** 排序：仅按添加时间，两态切换（默认倒序） */
@@ -505,7 +580,7 @@ function applyFilters() {
   Object.assign(filters, {
     ...draftFilters,
     types: [...draftFilters.types],
-    accessStatuses: [...draftFilters.accessStatuses],
+    latchStatuses: [...draftFilters.latchStatuses],
     onlineStatuses: [...draftFilters.onlineStatuses],
   })
   page.value = 1
@@ -612,7 +687,22 @@ function formatTimePart(at: number) {
   return `${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
-const accessClass = (status: AccessStatus) => (status === '已接入' ? 'is-accessed' : 'is-pending')
+/** 拉合闸状态配色：合闸为常规主色、分闸为警示色，避免仅靠文字难以扫读 */
+const latchClass = (status: LatchStatus) => (status === '合闸' ? 'is-closed' : 'is-open')
+
+/* ---------- 关联负荷策略列 ---------- */
+/** 设备 id → 关联策略条数索引；一次性解析，列表逐行读取 */
+const strategyCounts = computed(() => strategyCountsByDevice())
+
+/** 某设备的关联策略标签：时控 x 条 / 负控 x 条；均无时返回空数组（界面展示占位符） */
+function strategyChips(device: Device) {
+  const count = strategyCounts.value.get(device.id)
+  if (!count) return []
+  const chips: Array<{ type: '时控' | '负控'; label: string }> = []
+  if (count.time) chips.push({ type: '时控', label: `时控 ${count.time} 条` })
+  if (count.load) chips.push({ type: '负控', label: `负控 ${count.load} 条` })
+  return chips
+}
 
 /* ---------- 跨页勾选 ---------- */
 const selectedIds = ref<string[]>([])
@@ -669,6 +759,8 @@ const createModeOptions = computed(() => {
 const emptyInput = (): DeviceInput => ({
   name: '',
   license: '',
+  imei: '',
+  meterNo: '',
   model: '',
   factory: '',
   factoryDate: '',
@@ -714,6 +806,8 @@ function openEdit(device: Device) {
   formValue.value = {
     name: device.name,
     license: device.license,
+    imei: device.imei,
+    meterNo: device.meterNo,
     model: device.model,
     factory: device.factory,
     factoryDate: device.factoryDate,
@@ -911,22 +1005,26 @@ watch(sortOrder, () => {
 /* ---------- 演示提示 ---------- */
 const tipLines = [
   '本期设备台账支持：建档（新增设备内切换添加方式）、编辑、迁移（改所属用能单元）、删除，以及设备详情页。',
-  '列表 12 列：选择框 / 设备名称 / License / 设备识别码（IMEI）/ 卡号 / 设备类型 / 规格型号 / 所属用能单元 / 接入状态 / 在线状态 / 添加时间 / 操作；设备名称固定在左侧、操作列固定在右侧，每页 20 条。',
-  '设备列表右上角「列设置」可调整列：非固定列可勾选隐藏、可拖动排序；设备名称 / License / 设备识别码为核心列，常驻显示不可隐藏。',
-  '设备列表支持「列表 / 卡片」两种展示方式（默认列表），入口在列表右上角；卡片展示设备缩略图、设备名称、所属用能单元、设备类型、在线状态、License 与设备识别码（IMEI），点击卡片进入设备详情；License 与 IMEI 支持一键复制。',
+  '列表默认展示：选择框 / 所属用能单元 / 设备名称 / License / 设备识别码（IMEI）/ 表号 / 卡号 / 设备类型 / 在线状态 / 添加时间 / 操作；所属用能单元与设备名称固定在左侧、操作列固定在右侧，每页 20 条。',
+  '列表右上角「列设置」可调整列：非固定列可勾选隐藏、可拖动排序；设备名称为核心列，常驻显示不可隐藏；「规格型号」「CT/PT 值」「拉合闸状态」「关联负荷策略」默认隐藏，勾选后显示。',
+  '「关联负荷策略」列默认隐藏，勾选后展示该设备被负荷策略作用的条数：有关联时按触发方式给出「时控 N 条」「负控 N 条」标签（配色与负荷策略页一致），无关联时展示占位符 `—`。',
+  '设备标识兼容两类：与上级网关通讯的设备以「表号」唯一判定，插卡的 4G 智能电表以「设备识别码（IMEI）」唯一判定；两者均由平台 / 网关返回、只读展示，未上云或未回读时展示占位符 `—`。',
+  '「拉合闸状态」为设备侧回路的通断状态（合闸 / 分闸），由设备上报、只读；未上报时展示占位符 `—`。',
+  '「CT/PT 值」取自设备的 CT 变比与 PT 变比（设备参数），只读展示；未上云或未回读时展示占位符 `—`，完整参数读写入口在设备详情页的「设备参数」。',
+  '设备列表支持「列表 / 卡片」两种展示方式（默认列表），入口在列表右上角；卡片按「概览 → 归属 → 标识」分层：顶部为缩略图、设备名称与「类型 · 拉合闸 · 在线状态」信息行，中部为所属用能单元，底部为 License、设备识别码（IMEI）与表号；点击卡片进入设备详情，License、IMEI 与表号支持一键复制。',
   '卡片中的设备缩略图取自「智慧物联生态平台」，该平台未维护该设备图片（或图片加载失败）时展示默认兜底图；图片与详情页字段一致均为只读。',
   '默认按「添加时间」倒序（最新的在最上方）；点击「添加时间」列头在「降序 ⇄ 升序」两态间切换，不提供「取消排序」。',
-  '查询条件五项：设备名称 / 识别码 / License（同一输入框模糊匹配）、设备类型、所属用能单元（含下级）、接入状态、在线状态；点「查询」或回车生效，「重置」回到默认条件。',
+  '查询条件八项（按此顺序排列）：所属用能单元（含下级）、设备名称、设备识别码（IMEI）、License、表号（后四者为独立输入框，模糊匹配）、设备类型、拉合闸状态、在线状态；「查询」「重置」按钮紧随条件控件之后，点「查询」或回车生效，「重置」回到默认条件。',
   '「新增设备」入口位于查询控件下方、设备列表左上方，一个入口覆盖两类建档方式；弹窗顶部以「添加方式」切换——手动录入 / 批量导入，切换即换弹窗内容。',
   '新增设备填 License、设备名称（必填）与归属信息（所属用能单元、安装位置描述、GPS 位置），可选填备注；不含设备类型、安装时间、规格与通信信息。',
-  'License 是用户填写的设备唯一标识（必填且全平台唯一）；设备识别码（IMEI）在填写 License 后由平台查询自动带出、只读不可手填；设备类型与卡号（ICCID）由服务端在设备上云后返回。',
+  'License 是用户填写的设备唯一标识（必填且全平台唯一）；填写完成后自动向平台查询该设备信息，查询到则将设备识别码（IMEI）与表号自动填入；未查询到时支持按现场实际手动填写，识别码为必填、表号可留空。设备类型与卡号（ICCID）由服务端在设备上云后返回。',
   'GPS 位置默认取所属用能单元的坐标（选择用能单元后自动填入），如需精确到设备安装点，可点击「地图选点」自定义；自定义后标记为「已自定义」并可一键恢复为用能单元坐标。',
-  '「编辑」字段与新增保持一致：仅设备名称、License、安装位置描述、GPS 位置与备注；所属用能单元通过「迁移」调整，不在编辑中修改。',
-  '「批量导入」方式下先下载模板再上传文件：模板列为设备名称 / License / 所属用能单元 / 安装位置描述 / 备注；其中「所属用能单元」填用能单元编码（在「组织架构 › 用能单元」列表中查看）；逐行校验并给出失败原因与失败报告，导入为部分成功语义（有效行入库、失败行跳过），只新增不更新已有设备。',
+  '「编辑」字段与新增保持一致：仅设备名称、License、设备识别码（IMEI）、表号、安装位置描述、GPS 位置与备注；所属用能单元通过「迁移」调整，不在编辑中修改。',
+  '「批量导入」方式下先下载模板再上传文件：模板列为设备名称 / License / 设备识别码（IMEI）/ 表号 / 所属用能单元编码 / 安装位置描述 / 备注；其中「所属用能单元」填用能单元编码（在「组织架构 › 用能单元」列表中查看），识别码与表号可留空由平台按 License 带出；逐行校验并给出失败原因与失败报告，导入为部分成功语义（有效行入库、失败行跳过），只新增不更新已有设备。',
   '「批量导入删除」按文件批量删除设备：下载模板后仅填写 License 列，上传后逐行核对该 License 是否存在，确认删除后命中行被删除、未命中行跳过并给出说明；删除为彻底删除不可恢复，历史告警仍保留。',
   '「迁移」的唯一语义是改所属用能单元，不追溯历史数据；目标用能单元选中后回显完整层级路径，单条与批量均需二次确认，批量迁移中已在目标单元下的设备会自动跳过。',
   '「删除」为彻底删除且不可恢复，单条、批量与按文件批量删除均需二次确认；历史告警按告警记录中的设备信息保留，不因删除丢失定位。',
-  '接入状态与在线状态由采集侧驱动，本页只读、不提供修改入口；设备无「启用 / 停用」状态。',
+  '在线状态与拉合闸状态由设备侧驱动，本页只读、不提供修改入口；设备无「启用 / 停用」状态。',
   '设备所属用能单元取自「系统管理 › 组织架构」中维护的用能单元节点；设备的历史告警在「告警中心」按所属设备筛选查看。',
 ]
 

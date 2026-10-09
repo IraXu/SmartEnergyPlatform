@@ -157,9 +157,9 @@ export const DEFAULT_DEVICE_IMAGE =
 
 /**
  * 【原型演示数据】设备台账初始数据。
- * 覆盖两类归类（计量表计 / 网关设备）、两种接入状态与在线 / 离线；
+ * 覆盖两类归类（计量表计 / 网关设备）与在线 / 离线、拉合闸状态；
  * unitId 指向组织架构模块中的用能单元节点（见 modules/org/mock/seed.ts）。
- * 设备类型与卡号（ICCID）均为设备上云后由服务端返回的只读值，待接入设备为空。
+ * 设备类型、卡号（ICCID）与表号均为设备上云后由服务端 / 网关返回的只读值，未上云设备为空。
  * GPS 默认取所属用能单元坐标（gpsCustom 为 false）；个别设备为「地图选点自定义」的演示样本。
  * metrics 只存数值文本，单位由设备类型字典的字段定义提供。
  * hasImage 仅用于演示数据：false 表示该设备在「智慧物联生态平台」未维护图片，卡片展示兜底图。
@@ -168,6 +168,8 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: '1 号总表',
     imei: '864512030001001',
+    // 与上级网关（A 栋接入网关）通讯，以表号做唯一判定
+    meterNo: '320000000001',
     cardNo: '89860619000000000001',
     license: 'LIC-8F2A-1043-7C61',
     type: '三相智能电表',
@@ -183,8 +185,9 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: '4G',
     protocol: 'DL/T645',
     gatewayImei: '864512039001001',
-    accessStatus: '已接入',
     onlineStatus: '在线',
+    latchStatus: '合闸',
+    signalStrength: '24',
     accessedAt: ago(60),
     lastReportAt: ago(0, 0.2),
     metrics: {
@@ -219,6 +222,8 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: '2 号车间动力表',
     imei: '864512030001002',
+    // 与上级网关通讯，以表号做唯一判定
+    meterNo: '320000000002',
     cardNo: '89860619000000000002',
     license: 'LIC-8F2A-1044-7C62',
     type: '三相智能电表',
@@ -235,8 +240,9 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: '4G',
     protocol: 'DL/T645',
     gatewayImei: '864512039001001',
-    accessStatus: '已接入',
     onlineStatus: '离线',
+    latchStatus: '分闸',
+    signalStrength: '',
     accessedAt: ago(60),
     lastReportAt: ago(2, 5),
     metrics: {
@@ -271,6 +277,8 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: '中央空调机房总表',
     imei: '864512030001003',
+    // 以太网直连、不经网关，无表号，以设备识别码（IMEI）唯一判定
+    meterNo: '',
     cardNo: '89860619000000000003',
     license: 'LIC-9B31-2207-4D08',
     type: '三相智能电表',
@@ -286,8 +294,10 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: '以太网',
     protocol: 'DL/T645',
     gatewayImei: '',
-    accessStatus: '已接入',
     onlineStatus: '在线',
+    latchStatus: '合闸',
+    // 以太网直连，无信号强度
+    signalStrength: '',
     accessedAt: ago(110),
     lastReportAt: ago(0, 0.1),
     metrics: {
@@ -322,6 +332,7 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: '华东园区总配电表',
     imei: '864512030001004',
+    meterNo: '320000000004',
     cardNo: '89860619000000000004',
     license: 'LIC-9B31-2208-4D09',
     type: '智能电表',
@@ -337,8 +348,9 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: '4G',
     protocol: 'DL/T645',
     gatewayImei: '864512039001002',
-    accessStatus: '已接入',
     onlineStatus: '在线',
+    latchStatus: '合闸',
+    signalStrength: '17',
     accessedAt: ago(30),
     lastReportAt: ago(0, 0.4),
     metrics: {
@@ -359,6 +371,8 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: '临时施工用电表',
     imei: '864512030001005',
+    // 未上云：表号由平台在设备上云后返回，暂为空
+    meterNo: '',
     cardNo: '',
     license: 'LIC-7C05-3312-5E24',
     type: '',
@@ -374,8 +388,10 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: '4G',
     protocol: 'DL/T645',
     gatewayImei: '864512039001001',
-    accessStatus: '待接入',
-    onlineStatus: null,
+    // 设备未上云，无上报数据，按离线呈现
+    onlineStatus: '离线',
+    latchStatus: null,
+    signalStrength: '',
     accessedAt: null,
     lastReportAt: null,
     metrics: {},
@@ -386,6 +402,8 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: 'A 栋接入网关',
     imei: '864512039001001',
+    // 网关设备本身不参与表号定位（表号用于经其接入的表计）
+    meterNo: '',
     cardNo: '89860619000000000006',
     license: 'LIC-GW01-7788-11A2',
     type: '智能网关',
@@ -401,8 +419,10 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: '4G',
     protocol: 'Modbus-TCP',
     gatewayImei: '',
-    accessStatus: '已接入',
     onlineStatus: '在线',
+    // 网关无供电回路，不呈现拉合闸状态
+    latchStatus: null,
+    signalStrength: '26',
     accessedAt: ago(88),
     lastReportAt: ago(0, 0.1),
     metrics: {
@@ -416,6 +436,7 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: '华东园区接入网关',
     imei: '864512039001002',
+    meterNo: '',
     cardNo: '89860619000000000007',
     license: 'LIC-GW02-8899-22B3',
     type: '智能网关',
@@ -431,8 +452,9 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: '4G',
     protocol: 'Modbus-TCP',
     gatewayImei: '',
-    accessStatus: '已接入',
     onlineStatus: '离线',
+    latchStatus: null,
+    signalStrength: '',
     accessedAt: ago(42),
     lastReportAt: ago(1, 6),
     metrics: {
@@ -446,6 +468,8 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: 'A 栋照明分表',
     imei: '864512031001001',
+    // NB-IoT 直连、不经网关，无表号，以设备识别码（IMEI）唯一判定
+    meterNo: '',
     cardNo: '89860619000000000008',
     license: 'LIC-WTA1-4412-6F07',
     type: '智能电表',
@@ -461,8 +485,9 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: 'NB-IoT',
     protocol: 'DL/T645',
     gatewayImei: '',
-    accessStatus: '已接入',
     onlineStatus: '在线',
+    latchStatus: '合闸',
+    signalStrength: '',
     accessedAt: ago(58),
     lastReportAt: ago(0, 1.2),
     metrics: {
@@ -483,6 +508,8 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
   {
     name: 'B 栋办公分表',
     imei: '864512032001001',
+    // 未上云：表号由平台在设备上云后返回，暂为空
+    meterNo: '',
     cardNo: '',
     license: 'LIC-GSA1-5523-7E18',
     type: '',
@@ -498,8 +525,9 @@ const PRESET_DEVICES: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { ha
     commType: 'NB-IoT',
     protocol: 'DL/T645',
     gatewayImei: '',
-    accessStatus: '待接入',
-    onlineStatus: null,
+    onlineStatus: '离线',
+    latchStatus: null,
+    signalStrength: '',
     accessedAt: null,
     lastReportAt: null,
     metrics: {},
@@ -575,6 +603,45 @@ const gatewayMetrics = (linked: number, index: number) => ({
   在线率: drift(96.4, 0.6, index),
 })
 
+/**
+ * 【原型演示数据】补充设备：所在用能单元不在任何负荷策略的作用范围内，
+ * 用于验证「设备不关联负荷策略」的展示（详情页空态与列表列占位符）。
+ * 追加在清单末尾，避免影响既有演示数据的设备编号（DEV-0001 ~ DEV-0032）。
+ */
+function createExtraDevices(): Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { hasImage?: boolean }> {
+  return [
+    {
+      name: '二次供水泵房总表',
+      imei: '864512034001001',
+      // NB-IoT 直连、不经网关，无表号，以设备识别码（IMEI）唯一判定
+      meterNo: '',
+      cardNo: '89860619000000000033',
+      license: 'LIC-WSP1-6634-8A29',
+      type: '三相智能电表',
+      model: 'DTZ341-3×220/380V',
+      factory: '示例仪表厂',
+      factoryDate: '2026-07-18',
+      // 该用能单元未被任何负荷策略作用，故该设备无关联策略
+      unitId: 'NODE-P1-B2-U2',
+      installDate: '2026-07-26',
+      installPosition: 'B 栋地下一层水泵房配电柜',
+      lng: 113.8818,
+      lat: 22.5643,
+      gpsCustom: false,
+      commType: 'NB-IoT',
+      protocol: 'DL/T645',
+      gatewayImei: '',
+      onlineStatus: '在线',
+      latchStatus: '合闸',
+      signalStrength: '',
+      accessedAt: ago(40),
+      lastReportAt: ago(0, 0.3),
+      metrics: bulkMetrics(true, 3),
+      remark: '生活供水加压，暂未纳入负荷策略管控',
+    },
+  ]
+}
+
 function createBulkDevices(): Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { hasImage?: boolean }> {
   const list: Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'> & { hasImage?: boolean }> = []
 
@@ -586,15 +653,25 @@ function createBulkDevices(): Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'
       const isGateway = slot === 1
       const threePhase = !isGateway && unitIndex % 2 === 0
       const type = isGateway ? '智能网关' : threePhase ? '三相智能电表' : '智能电表'
-      // 「待接入」「离线」按固定间隔取样，保证三种接入 / 在线组合都有样本
-      const accessStatus = serial % 11 === 0 ? '待接入' : '已接入'
-      const onlineStatus = accessStatus === '待接入' ? null : serial % 9 === 0 ? '离线' : '在线'
+      // 在线状态两态互斥：按固定间隔取样，保证在线 / 离线都有样本
+      const onlineStatus: Device['onlineStatus'] = serial % 9 === 0 ? '离线' : '在线'
       const imei = `8645129${String(serial).padStart(7, '0')}`
+      // 计量表计经网关接入，以表号做唯一判定；网关本身无表号
+      const meterNo = isGateway ? '' : `32${String(serial).padStart(10, '0')}`
+      // 通讯方式：网关多为 4G，计量表计按单元交替 4G / NB-IoT
+      const commType = isGateway ? '4G' : unitIndex % 2 === 0 ? '4G' : 'NB-IoT'
+      // 拉合闸状态由设备上报：网关无该状态；离线按分闸呈现；在线含少量已拉闸样本
+      const latchStatus: Device['latchStatus'] =
+        isGateway ? null : onlineStatus === '离线' || serial % 13 === 0 ? '分闸' : '合闸'
+      // 信号强度：4G 设备上报 CSQ（0-31），其他通讯方式或离线设备为空
+      const signalStrength =
+        commType !== '4G' || onlineStatus === '离线' ? '' : String(10 + (serial % 21))
 
       list.push({
         name: deviceName,
         imei,
-        cardNo: accessStatus === '已接入' ? `8986061900000${String(serial).padStart(6, '0')}` : '',
+        meterNo,
+        cardNo: `8986061900000${String(serial).padStart(6, '0')}`,
         license: `LIC-XB${String(unitIndex + 1).padStart(2, '0')}-${String(slot).padStart(2, '0')}-${String(serial).padStart(4, '0')}`,
         type,
         model: isGateway ? 'GW-200' : threePhase ? 'DTZ341-3×220/380V' : 'DDS341-220V',
@@ -608,13 +685,14 @@ function createBulkDevices(): Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'
         lng: Number((104.0665 + Math.floor(unitIndex / 4) * 0.0004).toFixed(6)),
         lat: Number((30.5723 + (unitIndex % 4) * 0.0001).toFixed(6)),
         gpsCustom: false,
-        commType: isGateway ? '4G' : unitIndex % 2 === 0 ? '4G' : 'NB-IoT',
+        commType,
         protocol: isGateway ? 'Modbus-TCP' : 'DL/T645',
         gatewayImei: isGateway ? '' : `${unit.id}-GW`,
-        accessStatus,
         onlineStatus,
-        accessedAt: accessStatus === '已接入' ? ago(20 + (serial % 30)) : null,
-        lastReportAt: onlineStatus === '在线' ? ago(0, 0.3) : onlineStatus === '离线' ? ago(1, 6) : null,
+        latchStatus,
+        signalStrength,
+        accessedAt: ago(20 + (serial % 30)),
+        lastReportAt: onlineStatus === '在线' ? ago(0, 0.3) : ago(1, 6),
         metrics: isGateway
           ? gatewayMetrics(unit.deviceNames.length - 1, unitIndex)
           : bulkMetrics(threePhase, unitIndex),
@@ -628,7 +706,7 @@ function createBulkDevices(): Array<Omit<Device, 'id' | 'createdAt' | 'imageUrl'
 
 /** 生成初始演示设备清单：按数组顺序赋予递增添加时间（越靠前添加越早） */
 export function createPresetDevices(): Device[] {
-  const preset = [...PRESET_DEVICES, ...createBulkDevices()]
+  const preset = [...PRESET_DEVICES, ...createBulkDevices(), ...createExtraDevices()]
   const base = Date.now() - preset.length * 2 * DAY
   return preset.map(({ hasImage, ...item }, index) => ({
     ...item,

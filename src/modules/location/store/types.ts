@@ -20,14 +20,14 @@ export interface UnitFilters {
 export interface DeviceFilters {
   /** 设备类型，多选；空数组表示全部 */
   types: string[]
-  /** 在线状态，多选；空数组表示全部；未接入设备为「未知」 */
+  /** 在线状态，多选；空数组表示全部 */
   onlineStatuses: DeviceOnlineState[]
   /** 所属用能单元；选中时表示「该用能单元本身」（用能单元无下级） */
   unitId: string | null
 }
 
-/** 设备在地图上的在线状态（含未接入的「未知」态） */
-export type DeviceOnlineState = '在线' | '离线' | '未知'
+/** 设备在地图上的在线状态（与设备台账一致，两态互斥） */
+export type DeviceOnlineState = '在线' | '离线'
 
 /**
  * 地图上的一个标记（用能单元维度与设备维度共用位置信息）。
@@ -43,7 +43,7 @@ export interface MapMarker {
 
 /** 用能单元维度的标记：聚合标记 + 该单元下的设备数 */
 export interface UnitMarker extends MapMarker {
-  /** 该用能单元下的全部设备数（含未接入、离线设备） */
+  /** 该用能单元下的全部设备数（含离线设备） */
   deviceCount: number
   /** 用能单元编码 */
   unitCode: string

@@ -102,6 +102,6 @@ const cardStyle = computed(() => {
 })
 
 function stateClass(state: DeviceOnlineState) {
-  return state === '在线' ? 'online' : state === '离线' ? 'offline' : 'unknown'
+  return state === '在线' ? 'online' : 'offline'
 }
 </script>

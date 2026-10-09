@@ -16,7 +16,7 @@ export const DEVICE_COLUMN_PREFS_KEY = 'proto_device_column_prefs'
 export const DEVICE_VIEW_KEY = 'proto_device_view_mode'
 
 /** 【原型说明】演示数据结构版本，调整演示数据时提升版本以清理旧数据 */
-export const DEVICE_DATA_VERSION = '15'
+export const DEVICE_DATA_VERSION = '20'
 
 /** MQTT 通讯日志保留天数：仅保留最近 30 天，超出部分自动删除（PRD F-DEV-14） */
 export const MQTT_LOG_KEEP_DAYS = 30
@@ -34,7 +34,7 @@ export const CARD_NO_MAX = 32
 export const INSTALL_POSITION_MAX = 100
 export const REMARK_MAX = 200
 
-/** 查询关键字长度上限（设备名称 / 设备识别码 / License 共用同一输入框） */
+/** 查询关键字长度上限（设备名称 / 设备识别码 / License / 表号 各输入框共用） */
 export const SEARCH_MAX = 50
 
 /** 批量导入：单次最大行数、文件大小上限、接受的扩展名 */
@@ -42,4 +42,11 @@ export const IMPORT_MAX_ROWS = 2000
 export const IMPORT_FILE_MAX_MB = 10
 export const IMPORT_ACCEPT_EXTS = ['.xlsx', '.xls', '.csv']
 
-export const DEVICE_ALL_KEYS = [DEVICE_LIST_KEY, DEVICE_LOGS_KEY, DEVICE_MQTT_LOGS_KEY, DEVICE_SESSIONS_KEY] as const
+export const DEVICE_ALL_KEYS = [
+  DEVICE_LIST_KEY,
+  DEVICE_LOGS_KEY,
+  DEVICE_MQTT_LOGS_KEY,
+  DEVICE_SESSIONS_KEY,
+  // 列展示偏好随演示数据一并重置，保证默认列顺序（所属用能单元置首）与默认隐藏列生效
+  DEVICE_COLUMN_PREFS_KEY,
+] as const

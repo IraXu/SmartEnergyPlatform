@@ -19,18 +19,23 @@ export interface LedgerColumnMeta {
   core?: boolean
   /** 固定列：'start' 锁定左侧、'end' 锁定右侧；固定列不参与拖动排序 */
   fixed?: 'start' | 'end'
+  /** 默认隐藏：初始不在列表展示，可由用户在「列设置」中勾选显示 */
+  hidden?: boolean
 }
 
 /** 默认列清单与默认顺序（行选择列的 48px 由表格自身提供，不计入本清单） */
 export const LEDGER_COLUMNS: LedgerColumnMeta[] = [
+  { key: 'unit', title: '所属用能单元', width: 180, fixed: 'start' },
   { key: 'name', title: '设备名称', width: 140, core: true, fixed: 'start' },
-  { key: 'license', title: 'License', width: 176, core: true },
-  { key: 'imei', title: '设备识别码（IMEI）', width: 168, core: true },
+  { key: 'license', title: 'License', width: 176 },
+  { key: 'imei', title: '设备识别码（IMEI）', width: 168 },
+  { key: 'meterNo', title: '表号', width: 168 },
   { key: 'cardNo', title: '卡号', width: 168 },
   { key: 'type', title: '设备类型', width: 106 },
-  { key: 'model', title: '规格型号', width: 130 },
-  { key: 'unit', title: '所属用能单元', width: 180 },
-  { key: 'accessStatus', title: '接入状态', width: 96 },
+  { key: 'model', title: '规格型号', width: 130, hidden: true },
+  { key: 'ratio', title: 'CT/PT 值', width: 132, hidden: true },
+  { key: 'latchStatus', title: '拉合闸状态', width: 106, hidden: true },
+  { key: 'strategy', title: '关联负荷策略', width: 138, hidden: true },
   { key: 'onlineStatus', title: '在线状态', width: 96 },
   { key: 'createdAt', title: '添加时间', width: 132 },
   { key: 'action', title: '操作', width: 130, fixed: 'end' },
@@ -47,9 +52,12 @@ interface LedgerColumnPrefs {
   hidden: string[]
 }
 
+/** 默认隐藏的列（标记 hidden 的列初始不展示，可由用户在「列设置」中勾选显示） */
+const defaultHiddenKeys = () => LEDGER_COLUMNS.filter((column) => column.hidden).map((column) => column.key)
+
 const defaultPrefs = (): LedgerColumnPrefs => ({
   order: LEDGER_COLUMNS.map((column) => column.key),
-  hidden: [],
+  hidden: defaultHiddenKeys(),
 })
 
 /** 归一化偏好：补全新列、剔除未知列、固定列回到两端、核心列与固定列不允许隐藏 */
@@ -64,6 +72,10 @@ function normalizePrefs(raw: Partial<LedgerColumnPrefs> | null): LedgerColumnPre
   const hidden = (Array.isArray(raw?.hidden) ? raw.hidden : []).filter(
     (key) => columnMap.has(key) && !isCoreColumn(key) && !isFixedColumn(key),
   )
+  // 本次新增且标记默认隐藏的列（ratio / latchStatus）对存量偏好也应保持隐藏
+  missing.forEach((key) => {
+    if (columnMap.get(key)?.hidden && !hidden.includes(key)) hidden.push(key)
+  })
   return { order: [...head, ...middle, ...tail], hidden }
 }
 
