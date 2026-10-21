@@ -1,0 +1,687 @@
+/* 平台管理端页面样式：对齐平台管理端各交互设计文档第 3 章视觉 token 与页面布局。
+   仅用于原型交互验证，不作为生产代码。 */
+
+/* ---------- 平台首页 PAL-PAGE-01 ---------- */
+.platform-home {
+  max-width: none;
+}
+
+/* 顶部欢迎卡片：左侧问候与说明，右侧实时时间；主色渐变底 + 柔光装饰 */
+.platform-hello {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 28px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(120deg, #0f7b6c 0%, #12897a 55%, #1aa192 100%);
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(15, 123, 108, 0.2);
+}
+
+/* 右上柔光圆斑：提升卡片层次，不承载信息 */
+.platform-hello::after {
+  content: '';
+  position: absolute;
+  top: -70px;
+  right: -40px;
+  width: 240px;
+  height: 240px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 68%);
+}
+
+/* 左下柔光圆斑：与右上呼应，形成对角光感 */
+.platform-hello::before {
+  content: '';
+  position: absolute;
+  bottom: -90px;
+  left: -30px;
+  width: 220px;
+  height: 220px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.platform-hello__main,
+.platform-hello__clock {
+  position: relative;
+  z-index: 1;
+}
+
+.platform-hello__main {
+  min-width: 0;
+}
+
+.platform-hello__greeting {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.platform-hello__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.platform-hello__dot {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.platform-hello__welcome {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* 右侧实时时间：时间大字号、日期小字号，右对齐 */
+.platform-hello__clock {
+  flex: none;
+  text-align: right;
+}
+
+.platform-hello__time {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+
+.platform-hello__date {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.platform-home__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.platform-home__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.platform-home__desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.platform-home__head-right {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+}
+
+.platform-home__time {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 筛选行：企业单选 + 当前口径说明 + 右侧统计时间与刷新 */
+.platform-home__filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.platform-home__filter-control {
+  width: 320px;
+  max-width: 100%;
+}
+
+.platform-home__filter-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.platform-home__filter-hint {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 统计时间与刷新推到右端，与左侧筛选条件分区 */
+.platform-home__filter-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* 指标卡：三等分栅格 */
+.platform-home__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* 指标卡：白底卡片 + 顶部主色细条，悬停轻微上浮 */
+.platform-metric {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 116px;
+  padding: 22px 24px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.platform-metric::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #0f7b6c 0%, #1aa192 100%);
+  opacity: 0.9;
+}
+
+.platform-metric:hover {
+  border-color: rgba(15, 123, 108, 0.24);
+  box-shadow: 0 10px 24px rgba(15, 123, 108, 0.1);
+  transform: translateY(-2px);
+}
+
+.platform-metric--error {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+}
+
+.platform-metric--error::before {
+  background: #ff4d4f;
+  opacity: 0.6;
+}
+
+.platform-metric__error {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 指标图标：各指标使用不同主色系浅底块，便于区分且整体协调 */
+.platform-metric__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  font-size: 24px;
+  color: #0f7b6c;
+  background: linear-gradient(135deg, rgba(15, 123, 108, 0.14) 0%, rgba(26, 161, 146, 0.08) 100%);
+  border-radius: 14px;
+}
+
+.platform-metric__icon--customer {
+  color: #0f7b6c;
+  background: linear-gradient(135deg, rgba(15, 123, 108, 0.14) 0%, rgba(26, 161, 146, 0.08) 100%);
+}
+
+.platform-metric__icon--device {
+  color: #1d6fb8;
+  background: linear-gradient(135deg, rgba(29, 111, 184, 0.14) 0%, rgba(29, 111, 184, 0.06) 100%);
+}
+
+.platform-metric__icon--online {
+  color: #d48806;
+  background: linear-gradient(135deg, rgba(250, 173, 20, 0.18) 0%, rgba(250, 173, 20, 0.06) 100%);
+}
+
+.platform-metric__main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.platform-metric__label {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.platform-metric__value {
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 指标卡补充说明：如「在线率 72.9%」 */
+.platform-metric__hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 平台首页下半区：企业设备分布 + 快捷入口 ---------- */
+.platform-home__lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.platform-panel {
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.platform-panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.platform-panel__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.platform-panel__note {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 企业设备分布：名次 / 名称 / 条形 / 台数 / 在线率 五段对齐 */
+.platform-rank {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.platform-rank__item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 150px) minmax(0, 1fr) 76px 60px;
+  align-items: center;
+  gap: 12px;
+}
+
+.platform-rank__item + .platform-rank__item {
+  margin-top: 12px;
+}
+
+/* 名次角标：前三名用主色实底突出，其余为中性浅底 */
+.platform-rank__no {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.45);
+  background: #f0f4f3;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.platform-rank__no.is-top {
+  color: #fff;
+  background: linear-gradient(135deg, #12897a 0%, #1aa192 100%);
+}
+
+.platform-rank__name {
+  overflow: hidden;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.75);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.platform-rank__bar {
+  height: 8px;
+  overflow: hidden;
+  background: #f0f4f3;
+  border-radius: 999px;
+}
+
+.platform-rank__bar-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #12897a 0%, #1aa192 100%);
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.platform-rank__count {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.platform-rank__rate {
+  font-size: 12px;
+  color: #0f7b6c;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 快捷入口：整行可点击的列表项 */
+.platform-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.platform-entry__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: #f8fbfa;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.platform-entry__item:hover {
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+.platform-entry__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  font-size: 16px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 9px;
+}
+
+.platform-entry__text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.platform-entry__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.platform-entry__desc {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.platform-entry__arrow {
+  flex: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- 客户&设备 PAL-PAGE-02 ---------- */
+/* 高信息密度列表页：取消业务页通用的 960px 居中限制 */
+.platform-customer {
+  max-width: none;
+}
+
+/* 规模统计区：四张独立指标卡横向铺排 */
+.platform-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+/* 单张统计卡：白底 + 左色条 + 图标浅底块，悬停轻微上浮 */
+.platform-stat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 88px;
+  padding: 18px 20px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.platform-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: #0f7b6c;
+}
+
+.platform-stat:hover {
+  border-color: rgba(15, 123, 108, 0.24);
+  box-shadow: 0 8px 20px rgba(15, 123, 108, 0.08);
+  transform: translateY(-2px);
+}
+
+.platform-stat__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  color: #0f7b6c;
+  background: linear-gradient(135deg, rgba(15, 123, 108, 0.14) 0%, rgba(26, 161, 146, 0.06) 100%);
+  border-radius: 12px;
+}
+
+.platform-stat__main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.platform-stat__label {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.platform-stat__value {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 各统计卡差异化配色：企业=主色、设备=蓝、在线设备=橙、在线率=紫 */
+.platform-stat--enterprise::before {
+  background: #0f7b6c;
+}
+.platform-stat--enterprise .platform-stat__icon {
+  color: #0f7b6c;
+  background: linear-gradient(135deg, rgba(15, 123, 108, 0.14) 0%, rgba(26, 161, 146, 0.06) 100%);
+}
+
+.platform-stat--device::before {
+  background: #1d6fb8;
+}
+.platform-stat--device .platform-stat__icon {
+  color: #1d6fb8;
+  background: linear-gradient(135deg, rgba(29, 111, 184, 0.14) 0%, rgba(29, 111, 184, 0.06) 100%);
+}
+
+.platform-stat--online::before {
+  background: #d48806;
+}
+.platform-stat--online .platform-stat__icon {
+  color: #d48806;
+  background: linear-gradient(135deg, rgba(250, 173, 20, 0.18) 0%, rgba(250, 173, 20, 0.06) 100%);
+}
+
+.platform-stat--rate::before {
+  background: #7c4dff;
+}
+.platform-stat--rate .platform-stat__icon {
+  color: #7c4dff;
+  background: linear-gradient(135deg, rgba(124, 77, 255, 0.14) 0%, rgba(124, 77, 255, 0.06) 100%);
+}
+
+/* 设备名称：只读文本（无操作项，不做可点击链接） */
+.platform-device__name {
+  display: block;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 平台成员列表：姓名与「系统内置 / 待改密」标签同行（复用企业成员单元格样式） */
+.member-cell__nameline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.member-cell__nameline .ant-tag {
+  margin: 0;
+}
+
+/* 平台成员列表：内置账号不可停用的说明行（中性色，区别于警告色附注） */
+.member-cell__note {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 重置密码结果态：一次性密码等宽大字号展示，便于逐位核对 */
+.platform-reset__pwd {
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  background: #f5f7fa;
+  border-radius: 8px;
+}
+
+/* 客户&设备列表工具行左侧的设备总数提示 */
+.platform-list__hint {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 客户&设备列表：用能单元路径顶级的企业名，字重略加重以突出所属企业 */
+.platform-unit__enterprise {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+/* 平台设备详情：所属企业/用能单元路径中的企业名，加折行以免超长挤压 */
+.platform-detail__enterprise {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* 平台设备详情：只读视图标识 */
+.platform-detail__readonly {
+  margin: 0;
+  color: #0f7b6c;
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+/* ---------- 窄屏适应 ---------- */
+@media (max-width: 991px) {
+  .platform-home__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .platform-home__lower {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .platform-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .platform-hello {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .platform-hello__clock {
+    text-align: left;
+  }
+
+  .platform-home__head {
+    flex-direction: column;
+  }
+
+  .platform-home__cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

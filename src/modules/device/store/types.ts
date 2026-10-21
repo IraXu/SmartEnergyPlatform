@@ -142,16 +142,23 @@ export interface DeviceChangeLog {
   detail: string
 }
 
-/** 设备控制指令（PRD F-DEV-15）：校时 / 抄表 / 合闸 / 分闸 / 重连 */
-export type DeviceCommand = '校时' | '抄表' | '合闸' | '分闸' | '重连'
+/** 设备控制指令（PRD F-DEV-15 / F-DEV-20）：5 个基础指令 + 2 个清零操作 */
+export type DeviceCommand = '校时' | '抄表' | '合闸' | '分闸' | '重连' | '电量清零' | '设备事件清零'
 
-/** 指令风险等级：danger 类指令（分闸 / 合闸）影响现场供电，需在确认弹窗中突出风险提示 */
+/** 指令分组：设备控制弹窗按「读取类 / 开关类 / 通讯类 / 清零类」分组铺排 */
+export type DeviceCommandGroup = '读取类' | '开关类' | '通讯类' | '清零类'
+
+/** 清零执行状态：提交成功不代表设备执行成功（PRD F-DEV-20） */
+export type ClearState = '已提交' | '执行成功' | '执行失败' | '结果未知'
+
+/** 指令风险等级：danger 类指令（分闸 / 合闸 / 两类清零）影响现场供电或计量数据 */
 export type DeviceCommandRisk = 'normal' | 'danger'
 
 /**
  * 设备控制指令的权限点标识。
  * 每个指令独立授权，最小颗粒度落到指令级：
- * 只授予「分闸」即可让一线人员停电，但不具备送电（合闸）能力。
+ * 只授予「分闸」即可让一线人员停电，但不具备送电（合闸）能力；
+ * 电量清零与设备事件清零亦分开授权（F-DEV-20）。
  */
 export type DeviceCommandPermission =
   | 'device:ledger:control:timesync'
@@ -159,11 +166,15 @@ export type DeviceCommandPermission =
   | 'device:ledger:control:switchon'
   | 'device:ledger:control:switchoff'
   | 'device:ledger:control:reconnect'
+  | 'device:ledger:control:powerclear'
+  | 'device:ledger:control:eventclear'
 
 /** 设备控制指令字典项 */
 export interface DeviceCommandItem {
   /** 指令名称，同时作为下发记录中的事件名 */
   name: DeviceCommand
+  /** 所属分组 */
+  group: DeviceCommandGroup
   /** 一句话说明指令的作用 */
   desc: string
   /** 风险等级 */
@@ -209,6 +220,8 @@ export interface CommandResult {
   ok: boolean
   /** 展示给用户的结论文案 */
   message: string
+  /** 清零操作的执行状态；基础指令不返回 */
+  state?: ClearState
 }
 
 /** 上下线事件类型：上线与离线各自独立成一条记录 */

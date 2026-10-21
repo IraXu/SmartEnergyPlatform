@@ -142,6 +142,7 @@ import {
   clearLock,
   codeCooldownSeconds,
   createSession,
+  createPlatformSession,
   detectAccountType,
   findAccount,
   getLock,
@@ -154,6 +155,7 @@ import {
   resolveEntry,
   verifyCode,
 } from '@/modules/auth/store'
+import { findPlatformMember, getPlatformRole } from '@/modules/platform/store'
 import { recordSessionLog } from '@/modules/log/store'
 
 const router = useRouter()
@@ -188,6 +190,7 @@ const tipLines = [
   '预置账号：+8613800138000 / +8613900139000 / admin@example.com，密码均为 Energy2026。',
   '预置国际手机号：+6591234567（新加坡），用于验证区号切换与登录。',
   '预置停用账号：+8613700137000，用于验证「账号已被停用」提示。',
+  '平台管理端账号：admin@energyplatform.com（平台超管）或 zhangyy@energyplatform.com，密码均为 Platform2026，登录后进入平台端。',
   '账号输入框自动识别手机号与邮箱：输入数字显示区号选择，输入含 @ 的内容自动切换为邮箱。',
   '验证码为原型模拟，点击获取后会在提示中回显，6 位数字，5 分钟有效。',
   '连续输错密码 5 次将锁定账号 15 分钟，锁定后可用验证码登录立即恢复。',
@@ -326,6 +329,13 @@ function captchaMatches(): boolean {
 async function handleSubmit() {
   const identifier = form.identifier.trim()
   const account = findAccount(identifier)
+  // 平台成员为独立身份体系，与平台账号池分离，需单独校验（F-PA-01）
+  const platformMember = findPlatformMember(identifier)
+
+  if (platformMember) {
+    await handlePlatformSubmit(platformMember)
+    return
+  }
 
   if (mode.value === 'password') {
     if (lockRemain.value > 0) {
@@ -439,8 +449,54 @@ async function handleSubmit() {
 }
 
 /**
- * 凭证校验通过后的去向：单企业直接进入，多企业按「记住选择」自动进入或转选择页。
- * 账号归属多家企业时，本页只完成身份校验，企业由「选择登录企业」页确认。
+ * 平台成员登录：独立于企业账号池的身份校验（F-PA-01）。
+ * 凭证校验通过后直接建立平台端会话并进入平台管理端。
+ */
+async function handlePlatformSubmit(member: NonNullable<ReturnType<typeof findPlatformMember>>) {
+  if (member.status === 'disabled') {
+    formAlert.value = { type: 'error', text: '该平台成员已被停用，请联系平台超级管理员', closable: true }
+    return
+  }
+  if (mode.value === 'otp') {
+    formAlert.value = {
+      type: 'info',
+      text: '平台成员暂仅支持密码登录，请切换至密码登录',
+      closable: true,
+    }
+    return
+  }
+  submitting.value = true
+  formAlert.value = null
+  await new Promise((resolve) => window.setTimeout(resolve, 700))
+  if (member.password !== form.password) {
+    form.password = ''
+    formAlert.value = { type: 'error', text: '账号或密码不正确', closable: true }
+    submitting.value = false
+    return
+  }
+  const roleNames = member.roleIds
+    .map((roleId) => getPlatformRole(roleId)?.name)
+    .filter((name): name is string => Boolean(name))
+  createPlatformSession({
+    memberId: member.id,
+    name: member.name,
+    identifier: member.identifier,
+    accountType: 'email',
+    countryCode: '',
+    super: member.super,
+    roleIds: [...member.roleIds],
+    roleNames,
+    remember: form.remember,
+  })
+  submitting.value = false
+  message.success('登录成功，正在进入平台管理端')
+  router.replace({ name: 'platform-home' })
+}
+
+/**
+ * 凭证校验通过后的去向：
+ * 1. 平台成员（F-PA-01）：不属任何企业，直接进入平台管理端，不出现选择企业页；
+ * 2. 企业账号：单企业直接进入，多企业按「记住选择」自动进入或转选择页。
  */
 function goAfterAuth(account: NonNullable<ReturnType<typeof findAccount>>, wasLocked = false) {
   const decision = resolveEntry(account)

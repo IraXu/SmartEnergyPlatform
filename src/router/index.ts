@@ -7,6 +7,8 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { setupRouterGuard } from './guard'
 import { authRoutes } from './modules/auth'
 import { adminRoutes } from './modules/dashboard'
+import { energyRoutes } from './modules/energy'
+import { platformRoutes } from './modules/platform'
 import './types'
 
 const router = createRouter({
@@ -15,6 +17,8 @@ const router = createRouter({
     { path: '', redirect: '/login' },
     ...authRoutes,
     ...adminRoutes,
+    ...energyRoutes,
+    ...platformRoutes,
     { path: '/:pathMatch(.*)*', redirect: '/login' },
   ],
 })

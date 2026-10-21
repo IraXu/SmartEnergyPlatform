@@ -12,7 +12,7 @@
           :menu="orgMenu"
           :classes="{ root: 'admin-org-dropdown' }"
           :open="orgMenuOpen"
-          trigger="click"
+          :trigger="['click']"
           placement="bottomRight"
           @open-change="orgMenuOpen = $event"
           @menu-click="handleOrgMenuClick"
@@ -27,7 +27,7 @@
         <a-dropdown
           :menu="accountMenu"
           :open="accountMenuOpen"
-          trigger="click"
+          :trigger="['click']"
           placement="bottomRight"
           @open-change="accountMenuOpen = $event"
           @menu-click="handleMenuClick"
@@ -177,12 +177,16 @@ import {
   LogoutOutlined,
   RightOutlined,
   SettingOutlined,
+  ThunderboltOutlined,
 } from '@antdv-next/icons'
 import EnterpriseBadge from '@/shared/components/EnterpriseBadge.vue'
 import { clearSession, enterOrg, findAccount, membershipsOf, session } from '@/modules/auth/store'
 import { logoOf } from '@/modules/enterprise/store'
 import { recordSessionLog } from '@/modules/log/store'
 import { maskIdentifier } from '@/shared/utils/mask'
+import { applyEnterpriseScope } from '@/shared/enterpriseScope'
+import { hasPermission as hasEnergyPermission } from '@/modules/energy/store'
+import { PERM as ENERGY_PERM } from '@/modules/energy/store/constants'
 
 /** 站点部署基路径：兼容 GitHub Pages 子路径与本地根路径 */
 const baseUrl = import.meta.env.BASE_URL
@@ -208,7 +212,7 @@ type NavItem = {
 }
 
 /** 业务域组：自上而下排列 */
-const mainNav: NavItem[] = [
+const baseNav: NavItem[] = [
   { key: 'dashboard', label: '工作台', icon: HomeOutlined, route: '/dashboard' },
   // 点位地图为一级菜单入口，点击直接进入；该模块为只读空间视图，不设二级功能页
   { key: 'location', label: '点位地图', icon: HeatMapOutlined, route: '/location' },
@@ -235,7 +239,35 @@ const mainNav: NavItem[] = [
       },
     ],
   },
+  // 能源数据为 v1.0.1 新增业务域：其下含用能分析 / 设备数据分析 / 报表统计
 ]
+
+/**
+ * 能源数据一级项：目录级 `energy` + 菜单级权限分别渲染；
+ * 无目录权限或无任何可见子页面时整项隐藏（UI-ENOV-04/05）。
+ */
+const energyNav = computed<NavItem[]>(() => {
+  const children: NavChild[] = []
+  if (hasEnergyPermission(ENERGY_PERM.analysis)) {
+    children.push({ key: 'energy-analysis', label: '用能分析', route: '/energy/analysis' })
+  }
+  if (hasEnergyPermission(ENERGY_PERM.monitor)) {
+    children.push({ key: 'energy-monitor', label: '设备数据分析', route: '/energy/monitor' })
+  }
+  if (hasEnergyPermission(ENERGY_PERM.report)) {
+    children.push({ key: 'energy-report', label: '报表统计', route: '/energy/report' })
+  }
+  if (!hasEnergyPermission(ENERGY_PERM.energy) || !children.length) return []
+  return [{ key: 'energy', label: '能源数据', icon: ThunderboltOutlined, expandable: true, children }]
+})
+
+/** 能源数据一级项位于「告警中心」下方、「设备管理」上方 */
+const mainNav = computed<NavItem[]>(() => {
+  const nav = [...baseNav]
+  const alarmIndex = nav.findIndex((item) => item.key === 'alarm')
+  if (energyNav.value.length) nav.splice(alarmIndex + 1, 0, ...energyNav.value)
+  return nav
+})
 
 /** 系统组：固定在一级导航栏底部，与业务域以分割线隔离 */
 const bottomNav: NavItem[] = [
@@ -255,7 +287,7 @@ const bottomNav: NavItem[] = [
   },
 ]
 
-const navItems = computed(() => [...mainNav, ...bottomNav])
+const navItems = computed(() => [...mainNav.value, ...bottomNav])
 
 const router = useRouter()
 const route = useRoute()
@@ -277,6 +309,8 @@ const openItem = computed(() => (openKey.value ? navItems.value.find((item) => i
 /** 一级项是否对应当前所在模块：模块自身路由或任一二级项（含三级项）路由命中即视为当前模块 */
 function isCurrent(item: NavItem) {
   if (item.route) return route.path === item.route
+  // 能源数据：用电统计设置已取消，相关独立页仅作历史原型留存，同样归属本模块
+  if (item.key === 'energy') return route.path.startsWith('/energy')
   return Boolean(item.children?.some((child) => isChildCurrent(child) || isGroupCurrent(child)))
 }
 
@@ -465,7 +499,8 @@ function handleOrgMenuClick({ key }: { key: string }) {
     return
   }
   message.success(`已切换至「${entered.orgName}」`)
-  // 切换企业按「重新进入系统」处理：刷新当前页面数据与顶栏信息，停留当前页面
+  // 切换企业按「重新进入系统」处理：按新企业上下文重载演示数据并刷新当前页面
+  applyEnterpriseScope(true)
   refreshOrgContext()
 }
 

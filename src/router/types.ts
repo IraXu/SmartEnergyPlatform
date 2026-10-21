@@ -17,6 +17,11 @@ declare module 'vue-router' {
      * 已进入企业的账号访问该页会跳回首页；未进入企业时访问业务页会跳回该页。
      */
     pendingOrg?: boolean
+    /**
+     * 平台管理端页面。平台成员（scope = platform）允许进入；
+     * 企业端账号访问会被跳回企业端首页，平台成员访问企业端页面会被跳回平台首页。
+     */
+    platform?: boolean
   }
 }
 

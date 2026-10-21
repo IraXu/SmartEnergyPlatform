@@ -1,5 +1,8 @@
 <template>
-  <div class="perm-menu" :class="{ 'perm-menu--nested': depth > 0, 'perm-menu--dim': dim }">
+  <div
+    class="perm-menu"
+    :class="{ 'perm-menu--nested': depth > 0, 'perm-menu--dim': dim, 'perm-menu--with-children': childMenus.length }"
+  >
     <!-- 菜单行头（CMP-ROL-19）：菜单级节点自带「可进入该页面」语义；
          若其下还有下级菜单，则自身无页面、仅作分组容器（勾选即整块授权其下全部子功能） -->
     <div class="perm-menu__head">

@@ -18,12 +18,13 @@ export * from './session'
 export * from './account'
 export * from './lock'
 export * from './code'
-
 export { accounts, codeMap, lockMap, recentOrgMap, rememberedOrgMap, session } from './storage'
 
 /** 【原型调试】重置演示数据，便于反复验证流程 */
 export function resetPrototypeData() {
   removeKeys(ALL_STORAGE_KEYS)
+  // 清空企业级数据隔离记录，使下次进入企业时按当前企业上下文重新装载演示数据
+  localStorage.removeItem('proto_enterprise_scope_org')
   accounts.splice(0, accounts.length, ...PRESET_ACCOUNTS)
   Object.keys(lockMap).forEach((key) => delete lockMap[key])
   Object.keys(codeMap).forEach((key) => delete codeMap[key])

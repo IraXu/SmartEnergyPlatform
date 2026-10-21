@@ -31,7 +31,7 @@
           v-if="node.kind !== 'root' && hasMenuAction"
           :menu="{ items: menuItems }"
           :open="menuOpen"
-          trigger="click"
+          :trigger="['click']"
           placement="bottomRight"
           @open-change="menuOpen = $event"
           @menu-click="handleMenuClick"

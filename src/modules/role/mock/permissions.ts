@@ -95,6 +95,8 @@ export const PERMISSION_TREE: PermissionNode[] = [
         action('device:ledger:control:switchon', '设备控制 · 合闸'),
         action('device:ledger:control:switchoff', '设备控制 · 分闸'),
         action('device:ledger:control:reconnect', '设备控制 · 重连'),
+        action('device:ledger:control:powerclear', '设备控制 · 电量清零'),
+        action('device:ledger:control:eventclear', '设备控制 · 设备事件清零'),
         action('device:ledger:param', '设备参数配置'),
         // MQTT 通讯日志为只读；「查看」随设备台账菜单进入能力，导出单独授权
         action('device:ledger:mqtt:export', '导出 MQTT 通讯日志'),

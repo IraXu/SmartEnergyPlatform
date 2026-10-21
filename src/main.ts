@@ -15,6 +15,7 @@ import {
   Drawer,
   Dropdown,
   Empty,
+  FloatButton,
   Form,
   Input,
   InputNumber,
@@ -31,6 +32,7 @@ import {
   Skeleton,
   Slider,
   Space,
+  Spin,
   Statistic,
   Steps,
   Switch,
@@ -61,6 +63,9 @@ import './styles/device.css'
 import './styles/ota.css'
 import './styles/location.css'
 import './styles/load-strategy.css'
+import './styles/platform.css'
+import './styles/workbench.css'
+import './styles/energy.css'
 
 /**
  * 【原型说明】antdv-next 按需注册：只引入原型实际使用的组件。
@@ -83,6 +88,7 @@ const components = [
   Drawer,
   Dropdown,
   Empty,
+  FloatButton,
   Form,
   Input,
   InputNumber,
@@ -99,6 +105,7 @@ const components = [
   Skeleton,
   Slider,
   Space,
+  Spin,
   Statistic,
   Steps,
   Switch,

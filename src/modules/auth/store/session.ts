@@ -158,3 +158,54 @@ export function clearSession() {
   session.current = null
   persistSession()
 }
+
+/* ---------- 平台管理端会话 ---------- */
+
+/**
+ * 【原型说明】平台成员登录分流（F-PA-01）：
+ * 凭证校验通过后，若该账号为平台成员，则建立**平台端会话**（不属任何企业），
+ * 直接进入平台管理端，不出现「选择登录企业」页。
+ * - 内置平台超级管理员：platformSuper = true，权限全量；
+ * - 普通平台成员：按其平台角色计算权限。
+ */
+export function createPlatformSession(payload: {
+  memberId: string
+  name: string
+  identifier: string
+  accountType: 'phone' | 'email'
+  countryCode: string
+  super: boolean
+  roleIds: string[]
+  roleNames: string[]
+  remember: boolean
+}) {
+  const duration = payload.remember ? SESSION_REMEMBER_MS : SESSION_TIMEOUT_MS
+  session.current = {
+    identifier: payload.identifier,
+    accountType: payload.accountType,
+    countryCode: payload.countryCode,
+    orgId: '',
+    role: payload.roleNames[0] ?? '',
+    roleCode: '',
+    orgName: '',
+    industry: '',
+    region: '',
+    contactName: payload.name,
+    contactTitle: '',
+    contactPhone: '',
+    remember: payload.remember,
+    expiresAt: Date.now() + duration,
+    scope: 'platform',
+    platformMemberId: payload.memberId,
+    platformName: payload.name,
+    platformRoleIds: [...payload.roleIds],
+    platformRoles: [...payload.roleNames],
+    platformSuper: payload.super,
+  }
+  persistSession()
+}
+
+/** 当前会话是否为平台管理端会话 */
+export function isPlatformSession(): boolean {
+  return session.current?.scope === 'platform'
+}

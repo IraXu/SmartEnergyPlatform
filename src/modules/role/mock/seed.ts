@@ -35,7 +35,7 @@ export const PRESET_ROLES: Role[] = [
     name: '运维工程师',
     desc: '负责设备与能耗运维的一线人员',
     source: 'custom',
-    // 告警中心：可查看 + 导出；设备管理：可查看设备台账 + 新增 / 编辑 / 迁移 / 全部设备控制指令 / 设备参数配置 + 设备OTA 检测 / 升级 / 查看升级内容 / 查看升级进度与记录 + 负荷策略全部操作（PRD 3.1 运维工程师权限级别）
+    // 告警中心：可查看 + 导出；设备管理：可查看设备台账 + 新增 / 编辑 / 迁移 / 全部设备控制指令（含两类清零）/ 设备参数配置 + 设备OTA 检测 / 升级 / 查看升级内容 / 查看升级进度与记录 + 负荷策略全部操作（PRD 3.1 运维工程师权限级别）
     permissions: [
       'dashboard',
       'location',
@@ -51,6 +51,8 @@ export const PRESET_ROLES: Role[] = [
       'device:ledger:control:switchon',
       'device:ledger:control:switchoff',
       'device:ledger:control:reconnect',
+      'device:ledger:control:powerclear',
+      'device:ledger:control:eventclear',
       'device:ledger:param',
       'device:ledger:mqtt:export',
       'device:ota',

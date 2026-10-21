@@ -129,7 +129,7 @@
                 </dd>
               </div>
               <div class="device-detail__archive-item">
-                <dt>设备识别码</dt>
+                <dt>IMEI</dt>
                 <dd class="device-cell__mono">{{ device.imei || '—' }}</dd>
               </div>
               <div class="device-detail__archive-item">
@@ -244,6 +244,134 @@
         </template>
       </section>
 
+      <!-- CARD-08 / CARD-09 用电曲线：紧随设备专属数据，左右两栏卡片 -->
+      <div v-if="isMeter" class="device-detail__chart-grid">
+        <!-- CARD-08 每日用电量：按所选粒度统计的用电量增量曲线 -->
+        <section class="device-detail__card">
+          <div class="device-detail__card-head">
+            <h2 class="device-detail__card-title">每日用电量</h2>
+            <span class="device-detail__stamp">单位 kWh</span>
+          </div>
+          <div class="device-detail__filter-bar">
+            <a-range-picker
+              v-model:value="dailyDraftRange"
+              class="device-detail__filter-range"
+              size="small"
+              :allow-clear="false"
+              :presets="RANGE_PRESETS"
+              format="YYYY-MM-DD"
+              :disabled-date="dailyDisabledDate"
+            />
+            <a-segmented v-model:value="dailyDraftGranularity" :options="GRANULARITY_OPTIONS" size="small" />
+            <div class="device-detail__filter-actions">
+              <a-button type="primary" size="small" @click="applyDailyQuery">查询</a-button>
+              <a-button size="small" @click="resetDailyQuery">重置</a-button>
+            </div>
+          </div>
+          <div class="device-detail__chart-summary">
+            <span>区间合计 <em>{{ dailySummary.total }}</em> kWh</span>
+            <span>{{ dailyAverageLabel }} <em>{{ dailySummary.average }}</em> kWh</span>
+            <span>峰值 <em>{{ dailySummary.max }}</em> kWh</span>
+          </div>
+          <EnergyLineChart
+            :series="[dailySeries]"
+            unit="kWh"
+            :height="220"
+            :precision="1"
+            :show-quality-legend="false"
+            :show-baseline-toggle="true"
+          />
+          <p class="device-detail__chart-note">
+            口径：按所选粒度统计正向有功电量增量（非累计表底）；跨清零按分段处理，缺边界读数时标记统计不完整。
+          </p>
+        </section>
+
+        <!-- CARD-09 历史数据曲线：智能电表上报指标，同一分组内可多选（不限数量） -->
+        <section class="device-detail__card">
+          <div class="device-detail__card-head">
+            <h2 class="device-detail__card-title">历史数据曲线</h2>
+            <span class="device-detail__stamp">
+              {{
+                historyMetrics.length
+                  ? `${historyMetrics.length} 个指标 · ${historyUnitLabel}`
+                  : '未选择指标'
+              }}
+            </span>
+          </div>
+          <div class="device-detail__filter-bar">
+            <a-select
+              v-model:value="historyDraftMetrics"
+              class="device-detail__filter-metric"
+              size="small"
+              mode="multiple"
+              show-search
+              allow-clear
+              option-filter-prop="label"
+              :max-tag-count="2"
+              :options="metricOptions"
+              placeholder="请选择指标"
+              @change="handleHistoryMetricChange"
+            />
+            <a-range-picker
+              v-model:value="historyDraftRange"
+              class="device-detail__filter-range"
+              size="small"
+              :allow-clear="false"
+              :presets="RANGE_PRESETS"
+              format="YYYY-MM-DD"
+              :disabled-date="historyDisabledDate"
+            />
+            <a-segmented v-model:value="historyDraftGranularity" :options="GRANULARITY_OPTIONS" size="small" />
+            <div class="device-detail__filter-actions">
+              <a-button type="primary" size="small" @click="applyHistoryQuery">查询</a-button>
+              <a-button size="small" @click="resetHistoryQuery">重置</a-button>
+            </div>
+          </div>
+          <template v-if="historyMetrics.length">
+            <div class="device-detail__chart-summary-list">
+              <div
+                v-for="item in historySummaries"
+                :key="item.name"
+                class="device-detail__chart-summary"
+              >
+                <span class="device-detail__chart-summary-name">
+                  {{ item.name }}<template v-if="item.unit">（{{ item.unit }}）</template>
+                </span>
+                <span>当前值 <em>{{ item.last }}</em></span>
+                <span>均值 <em>{{ item.average }}</em></span>
+                <span>峰值 <em>{{ item.max }}</em></span>
+              </div>
+            </div>
+            <EnergyLineChart
+              :series="historySeries"
+              :unit="historyUnit"
+              :height="220"
+              :precision="historyPrecision"
+              :show-quality-legend="false"
+              :show-baseline-toggle="true"
+            />
+          </template>
+          <div v-else class="device-detail__chart-empty">
+            <span class="device-detail__chart-empty-icon">
+              <LineChartOutlined />
+            </span>
+            <p class="device-detail__chart-empty-title">
+              {{ historyDraftMetrics.length ? '点击查询查看历史数据' : '请选择指标并点击查询' }}
+            </p>
+            <p class="device-detail__chart-empty-desc">
+              {{
+                historyDraftMetrics.length
+                  ? `已选择「${historyDraftMetrics.join('、')}」，查询后展示曲线与统计`
+                  : '支持功率、相电压、线电压、电流、电量、象限无功等 81 项电表上报指标'
+              }}
+            </p>
+          </div>
+          <p class="device-detail__chart-note">
+            数据为智能电表上报的原始指标快照；支持时 / 日 / 周 / 月粒度；同一分组内可多选，切换分组会自动取消原分组指标。
+          </p>
+        </section>
+      </div>
+
       <!-- CARD-05 关联负荷策略：设备是否被负荷策略作用，及其触发方式与策略清单 -->
       <section class="device-detail__card">
         <div class="device-detail__card-head">
@@ -310,7 +438,7 @@
 /**
  * PAGE-02 设备详情
  * 【原型说明】以「设备专属数据」为主角呈现单台设备的运行概览，档案信息默认折叠。
- * 版块顺序：设备档案（默认折叠）/ 设备专属数据（含计量参数，按类型与相别分组）/ 关联负荷策略 / 上下线记录；
+ * 版块顺序：设备档案（默认折叠）/ 设备专属数据（含计量参数，按类型与相别分组）/ 用电曲线（每日用电量、历史数据曲线）/ 关联负荷策略 / 上下线记录；
  * 顶部信息区展示在线状态、拉合闸状态与 4G 信号强度；返回入口在页面左上角。
  * 本页为只读运行视图：设备的建档与归属维护在「设备台账」列表页完成，
  * 故不提供编辑 / 迁移 / 删除入口；顶部工具栏只提供设备侧的操作能力——
@@ -319,9 +447,12 @@
  * 「MQTT 通讯日志」（抽屉，只读，保留最近 30 天）。
  * 设备关联的历史告警不在本页展示，统一在「告警中心」按设备筛选查看。
  */
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'antdv-next'
+import type { RangePickerProps } from 'antdv-next'
+import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
 import {
   ArrowLeftOutlined,
   ControlOutlined,
@@ -330,10 +461,13 @@ import {
   DisconnectOutlined,
   DownOutlined,
   FileSearchOutlined,
+  LineChartOutlined,
   ReloadOutlined,
   SlidersOutlined,
 } from '@antdv-next/icons'
 import ProtoTip from '@/shared/components/ProtoTip.vue'
+import EnergyLineChart from '@/modules/energy/components/EnergyLineChart.vue'
+import type { Series } from '@/modules/energy/store/types'
 import { currentPermissions } from '@/modules/role/store'
 import { effectiveStateOf, strategiesForDevice, summaryText } from '@/modules/power/store'
 import type { Strategy } from '@/modules/power/store'
@@ -341,6 +475,18 @@ import DeviceControlDialog from '../components/DeviceControlDialog.vue'
 import DeviceMqttLogDrawer from '../components/DeviceMqttLogDrawer.vue'
 import DeviceParamDrawer from '../components/DeviceParamDrawer.vue'
 import DeviceSessionCard from '../components/DeviceSessionCard.vue'
+import {
+  GRANULARITY_OPTIONS,
+  MAX_RANGE_DAYS,
+  METRIC_GROUPS,
+  METRIC_GROUP_OF,
+  METRIC_INDEX,
+  createEnergySeries,
+  createMetricSeries,
+  formatMetricValue,
+  summarizeSeries,
+  type Granularity,
+} from '../mock/history'
 import {
   deviceRatioValues,
   formatCoordinate,
@@ -435,6 +581,199 @@ const ratioValues = computed(() =>
 const ctRatio = computed(() => ratioValues.value.ct)
 const ptRatio = computed(() => ratioValues.value.pt)
 
+/* ---------- CARD-08 每日用电量 / CARD-09 历史数据曲线 ---------- */
+/** 仅计量表计产生用电数据；网关设备不渲染两张曲线卡 */
+const isMeter = computed(() => Boolean(device.value?.type?.includes('电表')))
+/** 默认查询窗口：含当天在内的近 7 天 */
+function defaultRange(): [Dayjs, Dayjs] {
+  return [dayjs().subtract(6, 'day').startOf('day'), dayjs().endOf('day')]
+}
+
+const dailyGranularity = ref<Granularity>('day')
+const historyGranularity = ref<Granularity>('day')
+/** 已应用的查询条件（图表读取） */
+const dailyRange = ref<[Dayjs, Dayjs]>(defaultRange())
+const historyRange = ref<[Dayjs, Dayjs]>(defaultRange())
+/** 筛选区草稿条件，点击「查询」后才应用 */
+const dailyDraftGranularity = ref<Granularity>('day')
+const historyDraftGranularity = ref<Granularity>('day')
+const dailyDraftRange = ref<[Dayjs, Dayjs]>(defaultRange())
+const historyDraftRange = ref<[Dayjs, Dayjs]>(defaultRange())
+/** 历史指标默认选中三相有功功率；同一分组内可多选，跨分组会取消原分组 */
+const DEFAULT_HISTORY_METRICS = ['A 相有功功率', 'B 相有功功率', 'C 相有功功率']
+const historyMetrics = ref<string[]>([...DEFAULT_HISTORY_METRICS])
+const historyDraftMetrics = ref<string[]>([...DEFAULT_HISTORY_METRICS])
+
+/** 指标下拉：使用 Select 的分组 options（等价 OptGroup），分组标题不可选 */
+const metricOptions = METRIC_GROUPS.map((group) => ({
+  label: group.title,
+  options: group.options.map((option) => ({ label: option.name, value: option.name })),
+}))
+
+function handleHistoryMetricChange(value: string[]) {
+  const next = scopeMetricsToSingleGroup(value, historyDraftMetrics.value)
+  historyDraftMetrics.value = next
+  // 指标被清空时立即移除已应用的曲线，避免旧指标继续展示
+  if (!next.length) historyMetrics.value = []
+}
+
+/** 同一分组内可多选；选择其他分组时只保留新分组的指标 */
+function scopeMetricsToSingleGroup(next: string[], previous: string[]) {
+  if (next.length <= 1) return next
+  const groups = new Set(next.map((name) => METRIC_GROUP_OF[name]))
+  if (groups.size <= 1) return next
+  const added = next.filter((name) => !previous.includes(name))
+  const clicked = added[added.length - 1] ?? next[next.length - 1]
+  const group = METRIC_GROUP_OF[clicked]
+  message.info(`已切换指标分组，仅保留「${group}」下的指标`)
+  return next.filter((name) => METRIC_GROUP_OF[name] === group)
+}
+
+/** 快捷时间范围：覆盖日 / 周 / 月，也可在日期选择器中自定义起止日期 */
+const RANGE_PRESETS: RangePickerProps['presets'] = [
+  { label: '今日', value: [dayjs().startOf('day'), dayjs().endOf('day')] },
+  { label: '近 7 天', value: [dayjs().subtract(6, 'day').startOf('day'), dayjs().endOf('day')] },
+  { label: '近 30 天', value: [dayjs().subtract(29, 'day').startOf('day'), dayjs().endOf('day')] },
+  { label: '近 90 天', value: [dayjs().subtract(89, 'day').startOf('day'), dayjs().endOf('day')] },
+  { label: '本月', value: [dayjs().startOf('month'), dayjs().endOf('day')] },
+  {
+    label: '上月',
+    value: [
+      dayjs().subtract(1, 'month').startOf('month'),
+      dayjs().subtract(1, 'month').endOf('month'),
+    ],
+  },
+]
+
+/** 按粒度限制可选日期范围，避免小时粒度选到过长区间 */
+function disabledDateOf(granularity: Ref<Granularity>) {
+  return (current: Dayjs) =>
+    current.isAfter(dayjs().endOf('day')) ||
+    current.isBefore(dayjs().subtract(MAX_RANGE_DAYS[granularity.value] - 1, 'day').startOf('day'))
+}
+
+const dailyDisabledDate = disabledDateOf(dailyDraftGranularity)
+const historyDisabledDate = disabledDateOf(historyDraftGranularity)
+
+/** 粒度切换后收敛草稿范围，保证查询窗口不超过该粒度的上限 */
+function clampRange(range: [Dayjs, Dayjs], maxDays: number): [Dayjs, Dayjs] {
+  const end = range[1].isAfter(dayjs()) ? dayjs() : range[1]
+  const earliest = end.subtract(maxDays - 1, 'day').startOf('day')
+  return [range[0].isBefore(earliest) ? earliest : range[0], end]
+}
+
+watch(dailyDraftGranularity, (value) => {
+  dailyDraftRange.value = clampRange(dailyDraftRange.value, MAX_RANGE_DAYS[value])
+})
+watch(historyDraftGranularity, (value) => {
+  historyDraftRange.value = clampRange(historyDraftRange.value, MAX_RANGE_DAYS[value])
+})
+
+/** 应用每日用电量筛选条件 */
+function applyDailyQuery() {
+  dailyRange.value = [dailyDraftRange.value[0], dailyDraftRange.value[1]]
+  dailyGranularity.value = dailyDraftGranularity.value
+}
+
+/** 重置每日用电量筛选条件：近 7 天 / 日 */
+function resetDailyQuery() {
+  dailyDraftRange.value = defaultRange()
+  dailyDraftGranularity.value = 'day'
+  dailyRange.value = defaultRange()
+  dailyGranularity.value = 'day'
+  message.success('已重置筛选条件')
+}
+
+/** 应用历史曲线筛选条件：未选指标或跨单位时提示 */
+function applyHistoryQuery() {
+  if (!historyDraftMetrics.value.length) {
+    message.warning('请先选择指标')
+    return
+  }
+  historyMetrics.value = [...historyDraftMetrics.value]
+  historyRange.value = [historyDraftRange.value[0], historyDraftRange.value[1]]
+  historyGranularity.value = historyDraftGranularity.value
+}
+
+/** 重置历史曲线筛选条件：恢复默认三相有功功率，时间回到近 7 天 / 日 */
+function resetHistoryQuery() {
+  historyDraftMetrics.value = [...DEFAULT_HISTORY_METRICS]
+  historyDraftRange.value = defaultRange()
+  historyDraftGranularity.value = 'day'
+  historyMetrics.value = [...DEFAULT_HISTORY_METRICS]
+  historyRange.value = defaultRange()
+  historyGranularity.value = 'day'
+  message.success('已重置筛选条件')
+}
+
+const dailySeries = computed(() =>
+  createEnergySeries(
+    deviceId.value,
+    dailyRange.value[0].valueOf(),
+    dailyRange.value[1].valueOf(),
+    dailyGranularity.value,
+  ),
+)
+const historyUnits = computed(() => [
+  ...new Set(historyMetrics.value.map((name) => METRIC_INDEX[name]?.unit ?? '')),
+])
+const historyUnit = computed(() => (historyUnits.value.length === 1 ? historyUnits.value[0] : ''))
+const historyUnitLabel = computed(() =>
+  historyUnits.value.length > 1 ? '混合单位' : historyUnit.value ? `单位 ${historyUnit.value}` : '无量纲',
+)
+/** 电量类指标数值较大，纵轴保留 1 位小数；其余指标保留 2 位 */
+const historyPrecision = computed(() => (/kWh|kvarh|kVAh/.test(historyUnit.value) ? 1 : 2))
+/** 指标曲线配色：按所选顺序取色 */
+const METRIC_COLORS = ['#0f7b6c', '#1890ff', '#faad14', '#722ed1', '#13c2c2', '#eb2f96', '#52c41a', '#ff4d4f', '#2f54eb', '#8c8c8c']
+/** 未选择指标时返回空序列 */
+const historySeries = computed<Series[]>(() => {
+  if (!historyMetrics.value.length) return []
+  return historyMetrics.value.map((metricName, index) => {
+    const series = createMetricSeries(
+      deviceId.value,
+      metricName,
+      historyRange.value[0].valueOf(),
+      historyRange.value[1].valueOf(),
+      historyGranularity.value,
+    )
+    return {
+      ...series,
+      color: METRIC_COLORS[index % METRIC_COLORS.length],
+    }
+  })
+})
+
+const AVERAGE_LABEL: Record<Granularity, string> = {
+  hour: '时均',
+  day: '日均',
+  week: '周均',
+  month: '月均',
+}
+const dailyAverageLabel = computed(() => AVERAGE_LABEL[dailyGranularity.value])
+
+const dailySummary = computed(() => {
+  const summary = summarizeSeries(dailySeries.value)
+  return {
+    total: formatMetricValue(summary.total, 'kWh'),
+    average: formatMetricValue(summary.average, 'kWh'),
+    max: formatMetricValue(summary.max, 'kWh'),
+  }
+})
+
+const historySummaries = computed(() =>
+  historySeries.value.map((series) => {
+    const summary = summarizeSeries(series)
+    const unit = METRIC_INDEX[series.name]?.unit ?? ''
+    return {
+      name: series.name,
+      unit,
+      last: formatMetricValue(summary.last, unit),
+      average: formatMetricValue(summary.average, unit),
+      max: formatMetricValue(summary.max, unit),
+    }
+  }),
+)
+
 /* ---------- CARD-05 关联负荷策略 ---------- */
 /** 该设备被哪些负荷策略作用（静态选中或动态范围覆盖） */
 const relatedStrategies = computed<Strategy[]>(() => (device.value ? strategiesForDevice(device.value.id) : []))
@@ -477,10 +816,17 @@ function goBack() {
 
 /* ---------- 演示提示 ---------- */
 const tipLines = [
-  '详情页版块顺序：设备档案（默认折叠）/ 设备专属数据（含计量参数，按类型与相别分组）/ 关联负荷策略 / 上下线记录；「返回」按钮在页面左上角。',
+  '详情页版块顺序：设备档案（默认折叠）/ 设备专属数据（含计量参数，按类型与相别分组）/ 用电曲线（左右两张卡）/ 关联负荷策略 / 上下线记录；「返回」按钮在页面左上角。',
+  '「每日用电量」与「历史数据曲线」紧随「设备专属数据」展示：先看当前运行值，再往下看用电趋势，最后才是关联策略与上下线记录，避免高价值趋势信息被压到页面最底部。',
+  '「每日用电量」与「历史数据曲线」紧随「设备专属数据」左右并排：可自定义日期范围，并切换时 / 日 / 周 / 月粒度；日期快捷项覆盖今日、近 7 天、近 30 天、近 90 天、本月、上月。',
+  '「每日用电量」默认展示近 7 天，「历史数据曲线」默认选中 A / B / C 相有功功率，时间同样预置近 7 天；修改条件后点击「查询」生效，「重置」恢复默认三相指标与近 7 天 / 日粒度。',
+  '「历史数据曲线」选择指标并点击「查询」后展示曲线；同一分组内可多选，切换分组会自动取消原分组，点击清除图标可移除全部曲线，「重置」会恢复默认三相指标与时间条件。',
+  '「每日用电量」按所选粒度统计正向有功电量增量（非累计表底），并给出区间合计、时均 / 日均 / 周均 / 月均与峰值；跨清零按分段处理，缺边界读数时标记统计不完整。',
+  '「历史数据曲线」覆盖智能电表上报的功率、相电压、线电压、电流、相位与频率、功率因数、谐波、正反向有功电量、象限无功电量等指标，使用 OptGroup 分组下拉选择；只允许同一分组内多选，切换分组会自动取消原分组指标。',
+  '两张曲线卡仅对计量表计（智能电表 / 三相智能电表）展示；网关设备不产生用电数据，不渲染这两张卡片。',
   '页面顶部信息区在同一行展示设备名称、类型、在线状态、拉合闸状态（合闸 / 分闸，由设备上报、只读）与信号强度（仅通讯方式为 4G 的设备有），各状态之间用竖线分隔；信号强度以条形图标组直观表达强弱（格数越多越强），数值作为辅助。',
-  '「设备档案」默认收起，点击标题行展开：License 置首位，其次为设备识别码（IMEI）、表号、卡号（ICCID）、规格型号与安装位置信息。',
-  '设备档案中的 License、设备识别码（IMEI）、表号与卡号（ICCID）由平台 / 网关 / 服务端返回，本页只读；表号为经上级网关通讯设备在网关侧的唯一标识，未返回时标注「未返回」。',
+  '「设备档案」默认收起，点击标题行展开：License 置首位，其次为 IMEI、表号、卡号（ICCID）、规格型号与安装位置信息。',
+  '设备档案中的 License、IMEI、表号与卡号（ICCID）由平台 / 网关 / 服务端返回，本页只读；表号为经上级网关通讯设备在网关侧的唯一标识，未返回时标注「未返回」。',
   'GPS 位置为设备级坐标：默认与所属用能单元一致（标注「同所属用能单元」），地图选点自定义后标注「设备自定义」。',
   '「设备专属数据」首组为计量参数（CT 变比 / PT 变比，取自设备参数、只读），其后按设备类型动态呈现：单相智能电表展示 A 相与电量两组，三相智能电表展示 A / B / C 相与电量四组；每项按「数值（大字号）+ 单位（小字）」展示，右上角标注最近上报时间。',
   '「关联负荷策略」展示该设备被哪些负荷策略作用：顶部按触发方式汇总「时控 / 负控」各多少条，列表逐条给出策略名称、触发方式、生效状态与触发条件摘要；未被任何策略作用时给出空态，避免与「无数据」混淆。',
@@ -491,9 +837,10 @@ const tipLines = [
   '本页不再展示「关联告警」：设备的历史告警统一在「告警中心」按所属设备筛选查看，避免同一份数据在两处口径不一致。',
   '本页为只读运行视图：设备建档、编辑、迁移、删除统一在「设备台账」列表页完成，详情页不再提供这三个入口，避免同一操作在两处出现。',
   '设备的变更记录（新增、批量添加、编辑、迁移与删除）统一在「系统管理 › 系统日志」中检索。',
-  '「设备控制」支持 5 个指令：校时、抄表、合闸、分闸、重连；全部指令下发前均需二次确认，其中合闸、分闸影响现场供电，确认弹窗会突出风险提示。',
-  '设备控制的前置条件是设备在线：离线设备会禁用全部指令并说明原因；每次指令下发都会在 MQTT 通讯日志中留下一条下行记录。',
-  '「设备控制」入口常显（不设入口级权限点），其下 5 个指令各自独立授权：无某指令权限时该指令置灰并提示联系管理员；若 5 个指令权限均未授予，弹窗内给出统一提示且不展示指令清单。',
+  '「设备控制」按「读取类 / 开关类 / 通讯类 / 清零类」分组，共 7 个操作：校时、抄表、合闸、分闸、重连、电量清零、设备事件清零；全部操作下发前均需二次确认，其中合闸、分闸影响现场供电，两类清零影响计量数据或设备内记录，确认弹窗会突出风险提示。',
+  '设备控制的前置条件是设备在线：离线设备会禁用全部指令与清零操作并说明原因；每次下发都会在 MQTT 通讯日志中留下一条下行记录。',
+  '「设备控制」入口常显（不设入口级权限点），其下 7 个操作各自独立授权：无某操作权限时该项置灰并提示联系管理员；若全部权限均未授予，弹窗内给出统一提示且不展示操作清单。两类清零权限均未授予时，「清零类」分组整体不展示；网关设备不支持清零，对应操作置灰并说明设备能力不支持。',
+  '电量清零与设备事件清零各自独立确认：电量清零影响累计电量读数与后续统计，成功后设备「总有功电量」置零；设备事件清零只重置设备内事件记录，不删除云端告警、MQTT 日志与审计日志。清零过程区分「已提交 / 执行成功 / 执行失败 / 结果未知」，提交成功不代表设备执行成功。',
   '「设备参数」本期开放 PT（电压互感器变比）与 CT（电流互感器变比）两项计量参数，每项同时展示设备当前值与待下发值，可「从设备抄读」后修改并下发；其余参数（表计地址、接线方式、上报参数、通讯参数等）已登记为待规划，本期界面不呈现。',
   '参数配置按分组组织并只呈现本期开放项（当前为「计量参数」），新增或开放可配置项只需调整参数字典，抽屉会按分组自动适配，无需改动页面结构。',
   '「MQTT 通讯日志」由工具栏按钮打开抽屉查看：只读记录，仅保留最近 30 天，超期记录系统自动删除；支持按时间段（精确到时分秒）、通讯方向 / 结果与关键字筛选，可展开查看报文，失败记录会给出失败原因；有导出权限时可导出当前筛选结果。',

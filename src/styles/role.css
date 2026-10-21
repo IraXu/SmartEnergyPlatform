@@ -612,6 +612,12 @@
   margin-top: 10px;
 }
 
+/* 含下级菜单的分组卡：自身无按钮、只承载子菜单，占满整行，
+   避免被多列栅格压成半宽、导致内部子菜单过窄 */
+.perm-menu--with-children {
+  grid-column: 1 / -1;
+}
+
 .perm-menu {
   display: flex;
   flex-direction: column;
@@ -636,10 +642,12 @@
   border-left: 2px solid rgba(15, 123, 108, 0.2);
 }
 
-/* 下级菜单容器：与上级菜单的按钮区留出间距，形成「上级内容 → 下级菜单」的分层 */
+/* 下级菜单容器：同一菜单下的多个子菜单横向并排（等宽自适应、窄屏自动换行），
+   与上级菜单的按钮区留出间距，形成「上级内容 → 下级菜单」的分层；
+   子菜单为并列关系，横向排布可避免逐层纵向堆叠把卡片拉得又高又窄 */
 .perm-menu__children {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 10px;
   margin-top: 2px;
 }

@@ -72,6 +72,23 @@ export interface SessionState {
   contactPhone: string
   remember: boolean
   expiresAt: number
+  /**
+   * 【原型说明】控制台分流标记：
+   * - `enterprise`（或缺省）：企业端会话，按企业边界访问业务模块；
+   * - `platform`：平台管理端会话，账号不属任何企业，导航为「首页 / 客户&设备 / 平台管理」。
+   * 平台成员为独立体系，其会话不复用企业上下文字段。
+   */
+  scope?: 'enterprise' | 'platform'
+  /** 平台端会话：平台成员标识 */
+  platformMemberId?: string
+  /** 平台端会话：平台成员姓名 */
+  platformName?: string
+  /** 平台端会话：平台角色标识集合（用于权限计算） */
+  platformRoleIds?: string[]
+  /** 平台端会话：平台角色名称集合（用于顶栏展示） */
+  platformRoles?: string[]
+  /** 平台端会话：是否内置平台超级管理员 */
+  platformSuper?: boolean
 }
 
 /**

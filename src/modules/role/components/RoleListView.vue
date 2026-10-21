@@ -71,7 +71,7 @@
         <!-- 操作区常显（默认低对比度），预置角色不渲染重命名与删除（EX-ROL-12、EX-ROL-13） -->
         <a-dropdown
           :menu="{ items: menuItems(role) }"
-          trigger="click"
+          :trigger="['click']"
           placement="bottomRight"
           root-class="role-item-menu"
           @menu-click="handleMenuClick(role.id, $event)"

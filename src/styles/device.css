@@ -1560,6 +1560,143 @@
   margin-bottom: 12px;
 }
 
+/* 曲线卡：紧随专属数据，左右两栏，窄屏自动堆叠 */
+.device-detail__chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.device-detail__chart-grid > .device-detail__card {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+@media (max-width: 1400px) {
+  .device-detail__chart-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 曲线卡筛选区：无底色工具条，底部分隔线；控件自适应宽度，避免日期被截断 */
+.device-detail__filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #eef2f1;
+}
+
+.device-detail__filter-range {
+  flex: 1 1 230px;
+  width: auto;
+  min-width: 220px;
+  max-width: 240px;
+}
+
+.device-detail__filter-metric {
+  flex: 0 0 220px;
+}
+
+/* 查询 / 重置：小尺寸文字按钮，右对齐 */
+.device-detail__filter-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.device-detail__filter-actions .ant-btn {
+  font-size: 12px;
+}
+
+/* 历史指标未选择时的空态：虚线容器 + 图标 + 说明 */
+.device-detail__chart-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 292px;
+  padding: 24px;
+  text-align: center;
+  background: #fbfdfc;
+  border: 1px dashed #dfe9e6;
+  border-radius: 10px;
+}
+
+.device-detail__chart-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.08);
+  border-radius: 50%;
+}
+
+.device-detail__chart-empty-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.device-detail__chart-empty-desc {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.device-detail__chart-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.device-detail__chart-summary-list {
+  margin-bottom: 10px;
+}
+
+.device-detail__chart-summary-list .device-detail__chart-summary {
+  margin-bottom: 2px;
+}
+
+.device-detail__chart-summary-name {
+  flex: none;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.device-detail__chart-summary em {
+  margin: 0 2px;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 600;
+  color: #0f7b6c;
+  font-variant-numeric: tabular-nums;
+}
+
+.device-detail__chart-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
 /* 标题后缀说明：弱化展示「默认 5 条」等口径，不抢占标题层级 */
 .device-detail__card-note {
   margin-left: 8px;
@@ -2421,6 +2558,38 @@
 
 .devctl__confirm-target {
   margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 清零执行状态：已提交 / 执行成功 / 执行失败 / 结果未知 */
+.devctl__confirm-state {
+  display: inline-block;
+  margin: 12px 0 0;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.devctl__confirm-state.is-submitted {
+  color: #ad6800;
+  background: rgba(250, 173, 20, 0.12);
+}
+
+.devctl__confirm-state.is-success {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.devctl__confirm-state.is-failed {
+  color: #cf1322;
+  background: rgba(255, 77, 79, 0.1);
+}
+
+.devctl__confirm-hint {
+  margin: 6px 0 0;
   font-size: 12px;
   line-height: 1.7;
   color: rgba(0, 0, 0, 0.45);

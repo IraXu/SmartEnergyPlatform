@@ -1,0 +1,1208 @@
+/* 工作台页面样式：对齐《产品交互设计文档-工作台》v0.4 第 3 章视觉 token 与 4.1.2 页面布局。
+   仅用于原型交互验证，不作为生产代码。 */
+
+/* 工作台为看板页：取消业务页通用的 960px 居中限制，内容区占满 */
+.wb-page {
+  max-width: none;
+}
+
+/* ---------- 顶部信息区：账号信息卡 + 企业信息卡 ---------- */
+.wb-top {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* 顶部信息卡：账号卡与企业卡共用同一容器样式（统一色调 + 左上角标题 + 标题下分割线） */
+.wb-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 108px;
+  padding: 16px 22px 20px;
+  background: linear-gradient(135deg, #e8f6f3 0%, #f6fbfa 55%, #ffffff 100%);
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+/* 卡片左上角标题：小圆点 + 标题文字；标题下方以分割线区隔内容 */
+.wb-card__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #0f7b6c;
+  border-bottom: 1px solid rgba(15, 123, 108, 0.15);
+}
+
+.wb-card__label::before {
+  content: '';
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+/* AREA-WB-01 账号信息卡 */
+.wb-account__body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 账号头像：主色渐变圆角块 + 首字，作为本卡的主色点缀 */
+.wb-account__avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #0f7b6c 0%, #1aa192 100%);
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(15, 123, 108, 0.22);
+}
+
+.wb-account__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.wb-account__greeting {
+  margin: 0;
+  overflow: hidden;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-account__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.wb-account__id {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 角色标签：浅主色底 + 主色文字，统一卡片上的语义色 */
+.wb-account__role {
+  margin: 0;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border: none;
+  border-radius: 4px;
+}
+
+.wb-account__clock {
+  flex: none;
+  padding-left: 20px;
+  text-align: right;
+}
+
+.wb-account__time {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+
+.wb-account__date {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* AREA-WB-02 企业信息卡 */
+.wb-enterprise__body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wb-enterprise__text {
+  min-width: 0;
+}
+
+.wb-enterprise__name {
+  margin: 0;
+  overflow: hidden;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-enterprise__addr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.wb-enterprise__addr .anticon {
+  flex: none;
+  font-size: 13px;
+}
+
+.wb-enterprise__addr span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- AREA-WB-03 平台使用引导 ---------- */
+.wb-onboard {
+  position: relative;
+  padding: 20px 22px 22px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(15, 123, 108, 0.1) 0%, rgba(15, 123, 108, 0) 55%),
+    linear-gradient(135deg, #f3fbf9 0%, #ffffff 60%);
+  border: 1px solid #e2f0ec;
+  border-radius: 12px;
+}
+
+/* 顶部主色渐显装饰线 */
+.wb-onboard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0f7b6c 0%, #1aa192 45%, rgba(26, 161, 146, 0) 100%);
+}
+
+.wb-onboard__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.wb-onboard__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* 欢迎手势：轻微摇摆，营造「欢迎」的动感 */
+.wb-onboard__wave {
+  display: inline-block;
+  font-size: 20px;
+  line-height: 1;
+  transform-origin: 70% 70%;
+  animation: wbWave 2.4s ease-in-out infinite;
+}
+
+@keyframes wbWave {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(16deg);
+  }
+  30% {
+    transform: rotate(-10deg);
+  }
+  45% {
+    transform: rotate(8deg);
+  }
+}
+
+/* 进度：置于卡片底部，进度条在前、文字与百分比紧随其后 */
+.wb-onboard__progress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(15, 123, 108, 0.12);
+}
+
+.wb-onboard__progress-meta {
+  display: flex;
+  flex: none;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.wb-onboard__progress-text {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+}
+
+.wb-onboard__progress-text b {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f7b6c;
+}
+
+.wb-onboard__progress-percent {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f7b6c;
+}
+
+.wb-onboard__progress-bar {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  background: rgba(15, 123, 108, 0.12);
+  border-radius: 999px;
+}
+
+.wb-onboard__progress-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #0f7b6c 0%, #16a394 45%, #2bc9b3 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(15, 123, 108, 0.35);
+  transition: width 0.4s ease;
+}
+
+.wb-onboard__close {
+  flex: none;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.wb-onboard__close:hover {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.wb-onboard__steps {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.wb-onboard__arrow {
+  flex: none;
+  align-self: center;
+  font-size: 14px;
+  color: rgba(15, 123, 108, 0.35);
+}
+
+/* 引导步骤卡：未完成可点击（白底 + 主色描边 + 悬停上浮）、已完成置灰不可点击 */
+.wb-step {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #e2f0ec;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.wb-step:hover:not(:disabled) {
+  border-color: rgba(15, 123, 108, 0.45);
+  box-shadow: 0 8px 18px rgba(15, 123, 108, 0.14);
+  transform: translateY(-3px);
+}
+
+.wb-step:focus-visible {
+  outline: 2px solid rgba(15, 123, 108, 0.45);
+  outline-offset: 2px;
+}
+
+.wb-step--done,
+.wb-step:disabled {
+  cursor: default;
+  background: #f7f9f8;
+  border: 1px solid #eceff0;
+  box-shadow: none;
+}
+
+/* 步骤头部：序号 + 状态（同一行两端对齐） */
+.wb-step__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* 步骤序号：未完成为主色渐变实心圆，已完成为中性勾选圆 */
+.wb-step__index {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #0f7b6c 0%, #1aa192 100%);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(15, 123, 108, 0.25);
+}
+
+.wb-step--done .wb-step__index {
+  color: #fff;
+  background: #b7c4c1;
+  box-shadow: none;
+}
+
+.wb-step__text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.wb-step__title {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-step--done .wb-step__title {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.wb-step__desc {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.45);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 步骤状态：未完成以「去完成 + 箭头」提示可点击；已完成展示勾选 + 文字 */
+.wb-step__state {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.wb-step__state--todo {
+  font-weight: 500;
+  color: #0f7b6c;
+}
+
+.wb-step__go {
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+
+.wb-step:hover:not(:disabled) .wb-step__go {
+  transform: translateX(2px);
+}
+
+.wb-step__state--done {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- AREA-WB-04 核心指标统计面板 ---------- */
+.wb-stats {
+  padding: 18px 20px 20px;
+  margin-bottom: 16px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.wb-stats__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.wb-panel-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.wb-stats__tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wb-stats__time {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 指标项：卡片化 + 图标色块，六项等宽自适应换行 */
+.wb-stats__body {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.wb-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  background: #f8fbfa;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.wb-stat:hover {
+  border-color: rgba(15, 123, 108, 0.28);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.wb-stat--skeleton {
+  align-items: stretch;
+  padding: 16px;
+}
+
+/* 指标图标色块：按语义色区分，作为卡片主色点缀 */
+.wb-stat__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 19px;
+  border-radius: 10px;
+}
+
+.wb-stat--primary .wb-stat__icon {
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+}
+
+.wb-stat--success .wb-stat__icon {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.1);
+}
+
+.wb-stat--warning .wb-stat__icon {
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.12);
+}
+
+.wb-stat--info .wb-stat__icon {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.wb-stat--neutral .wb-stat__icon {
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.wb-stat__text {
+  min-width: 0;
+}
+
+.wb-stat__value {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: rgba(0, 0, 0, 0.88);
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-stat__name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0 0;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+}
+
+/* 口径说明问号图标：仅「今日策略执行次数」使用 */
+.wb-stat__tip {
+  flex: none;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+  cursor: help;
+  transition: color 0.2s;
+}
+
+.wb-stat__tip:hover {
+  color: #0f7b6c;
+}
+
+.wb-stat__hint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- AREA-WB-05 / WB-06 最新告警 与 快捷入口（左右并排，左宽右窄） ---------- */
+.wb-split {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 16px;
+}
+
+/* 并排时两侧面板等高拉伸，面板内部纵向排布以便空态居中填充 */
+.wb-split > .wb-panel {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+/* ---------- 通用面板（最新告警 / 快捷入口 / 未开工占位） ---------- */
+.wb-panel {
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 10px;
+}
+
+.wb-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.wb-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.wb-panel__note {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 区块错误态：图标 + 主文案 + 辅助说明 + 主色重试按钮，纵向居中 */
+.wb-error {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 180px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+/* 行内错误态（核心指标）：横向紧凑布局整体居中，高度与正常指标网格持平，不撑高卡片 */
+.wb-error--inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 0;
+  padding: 16px;
+  text-align: left;
+}
+
+.wb-error--inline .wb-error__icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0;
+  font-size: 19px;
+  border-radius: 10px;
+}
+
+.wb-error--inline .wb-error__text {
+  flex: 0 1 auto;
+}
+
+.wb-error--inline .wb-error__desc {
+  margin-bottom: 0;
+}
+
+.wb-error--inline .wb-error__title {
+  font-size: 13px;
+}
+
+.wb-error__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 6px;
+  font-size: 26px;
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
+  border-radius: 50%;
+}
+
+.wb-error__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.wb-error__desc {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- AREA-WB-05 最新告警 ---------- */
+/* 实时标识：主色文字 + 呼吸小圆点 */
+.wb-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 10px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 999px;
+}
+
+.wb-live__dot {
+  width: 6px;
+  height: 6px;
+  background: #0f7b6c;
+  border-radius: 50%;
+  animation: wbLivePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes wbLivePulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* 推送中断：中性灰提示，不用主色 */
+.wb-live--off {
+  color: rgba(0, 0, 0, 0.45);
+  background: #f2f4f3;
+}
+
+/* 空态：整块居中填充，与右侧快捷入口面板等高对齐 */
+.wb-alarm__empty {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 220px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.wb-alarm__empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 6px;
+  font-size: 26px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 50%;
+}
+
+.wb-alarm__empty-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.wb-alarm__empty-desc {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.wb-alarm {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+/* 列宽：按比例分配，随面板宽度整体缩放，避免宽屏下把余量全部堆给「告警内容」列导致右侧大片空白
+   时间 19% / 用能单元 16% / 设备 16% / 事件类型 16%（须容纳最长标签）/ 告警内容 33% */
+.wb-alarm__col-time {
+  width: 19%;
+}
+
+.wb-alarm__col-unit {
+  width: 16%;
+}
+
+.wb-alarm__col-device {
+  width: 16%;
+}
+
+.wb-alarm__col-type {
+  width: 16%;
+}
+
+.wb-alarm__col-content {
+  width: 33%;
+}
+
+.wb-alarm th {
+  padding: 10px 12px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: left;
+  background: #fafbfb;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.wb-alarm td {
+  padding: 12px;
+  color: rgba(0, 0, 0, 0.75);
+  border-bottom: 1px solid #f5f6f7;
+  vertical-align: middle;
+}
+
+.wb-alarm tr:last-child td {
+  border-bottom: none;
+}
+
+.wb-alarm__time {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 事件类型：以标签形式展示，主色浅底、不换行 */
+.wb-alarm__type {
+  display: inline-block;
+  padding: 1px 8px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #0f7b6c;
+  white-space: nowrap;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 4px;
+}
+
+/* 新推送行高亮：浅底 + 左侧主色条，插入时行整体渐入并短暂高亮，随后衰减 */
+.wb-alarm--new {
+  animation: wbAlarmIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes wbAlarmIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wb-alarm--new td {
+  background: #e7f4f1;
+  animation: wbAlarmFlash 3.2s ease-out both;
+}
+
+@keyframes wbAlarmFlash {
+  0% {
+    background: #d4ece6;
+  }
+  60% {
+    background: #e7f4f1;
+  }
+  100% {
+    background: #ffffff;
+  }
+}
+
+.wb-alarm--new td:first-child {
+  box-shadow: inset 3px 0 0 #0f7b6c;
+  animation: wbAlarmFlash 3.2s ease-out both;
+}
+
+.wb-alarm__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+  padding: 0 7px;
+  margin-right: 6px;
+  font-size: 12px;
+  color: #fff;
+  background: #0f7b6c;
+  border-radius: 999px;
+  box-shadow: 0 0 0 0 rgba(15, 123, 108, 0.5);
+  animation: wbAlarmBadgePulse 1.8s ease-out infinite;
+}
+
+@keyframes wbAlarmBadgePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(15, 123, 108, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(15, 123, 108, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(15, 123, 108, 0);
+  }
+}
+
+.wb-alarm__content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 单元格单行省略：用能单元 / 所属设备等长文本列 */
+.wb-alarm__ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-alarm__ellipsis,
+.wb-alarm__content {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* ---------- AREA-WB-06 快捷入口 ---------- */
+/* 入口网格：两个一行，随权限点动态增减；窄屏降为单列 */
+.wb-entry {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.wb-entry__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px 14px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: #f8fbfa;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.wb-entry__item:hover {
+  background: #ecf4f3;
+  border-color: rgba(15, 123, 108, 0.2);
+}
+
+.wb-entry__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  font-size: 16px;
+  color: #0f7b6c;
+  background: rgba(15, 123, 108, 0.1);
+  border-radius: 9px;
+}
+
+.wb-entry__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-entry__arrow {
+  flex: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- AREA-WB-07 未开工模块占位 ---------- */
+.wb-placeholder {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* 占位卡：只读、不可点击，与错误态 / 空态在视觉上区分 */
+.wb-placeholder__card {
+  position: relative;
+  padding: 16px 18px;
+  background: #f8fbfa;
+  border: 1px dashed #dfe6e4;
+  border-radius: 10px;
+}
+
+.wb-placeholder__name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.wb-placeholder__desc {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.wb-placeholder__tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 1px 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  background: #f2f4f3;
+  border-radius: 4px;
+}
+
+/* ---------- 右下角悬浮按钮（帮助入口：点击展开菜单，本期仅「使用手册」） ---------- */
+/* 组容器：固定右下角、距边 24px（行业惯例 16~24px；`ant-float-btn-group` 自身为 fixed） */
+.wb-fab {
+  inset-inline-end: 24px;
+  bottom: 24px;
+}
+
+/* 触发按钮：主色实心圆形 + 白色帮助图标 + 轻投影（行业惯例：圆形、品牌色、软投影、悬停微上浮） */
+.wb-fab .ant-float-btn-group-trigger {
+  width: 48px;
+  height: 48px;
+  background: #0f7b6c;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgba(15, 123, 108, 0.28);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s, background-color 0.25s;
+}
+
+.wb-fab .ant-float-btn-group-trigger:hover {
+  background: #12907f;
+  box-shadow: 0 10px 22px rgba(15, 123, 108, 0.36);
+  transform: translateY(-2px);
+}
+
+.wb-fab .ant-float-btn-group-trigger .ant-float-btn-icon {
+  font-size: 24px;
+  color: #fff;
+}
+
+/* 菜单面板：一张白色圆角卡片，底部带指向触发按钮的小箭头 */
+.wb-fab .ant-float-btn-group-list {
+  inset-inline-end: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* 面板宽度贴合内容（不再固定 160px 最小宽），避免只有「使用手册」一项时右侧出现过长留白 */
+  width: max-content;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #eef2f1;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+}
+
+.wb-fab .ant-float-btn-group-list::before {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  inset-inline-end: 17px;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-inline-end: 1px solid #eef2f1;
+  border-block-end: 1px solid #eef2f1;
+  transform: rotate(45deg);
+  border-end-end-radius: 2px;
+}
+
+/* 菜单项：面板内的扁平行，主色图标 + 深色文案，单行不换行 */
+.wb-fab .ant-float-btn:not(.ant-float-btn-group-trigger) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 12px;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  box-shadow: none;
+  transition: background-color 0.18s;
+}
+
+.wb-fab .ant-float-btn:not(.ant-float-btn-group-trigger):hover {
+  background: #f1f8f6;
+}
+
+.wb-fab .ant-float-btn:not(.ant-float-btn-group-trigger) .ant-float-btn-icon {
+  flex: none;
+  font-size: 17px;
+  color: #0f7b6c;
+}
+
+.wb-fab .ant-float-btn:not(.ant-float-btn-group-trigger) .ant-float-btn-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: visible;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* ---------- 动效与窄屏 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .wb-live__dot,
+  .wb-onboard__wave,
+  .wb-alarm--new,
+  .wb-alarm--new td,
+  .wb-alarm--new td:first-child,
+  .wb-alarm__badge {
+    animation: none;
+  }
+}
+
+@media (max-width: 1279px) {
+  .wb-onboard__steps {
+    flex-wrap: wrap;
+  }
+
+  .wb-step {
+    flex: 1 1 calc(50% - 24px);
+  }
+
+  .wb-stats__body {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991px) {
+  .wb-top,
+  .wb-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wb-entry {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wb-stats__body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .wb-entry,
+  .wb-placeholder {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wb-step {
+    flex: 1 1 100%;
+  }
+
+  .wb-stats__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wb-account__body {
+    flex-wrap: wrap;
+  }
+
+  .wb-account__clock {
+    padding-left: 0;
+    text-align: left;
+    border-left: none;
+  }
+}
