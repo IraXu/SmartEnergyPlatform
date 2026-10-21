@@ -159,6 +159,119 @@
       </div>
     </section>
 
+    <!-- AREA-WB-08 用能概览（EN-08：4 项用能指标 + 趋势简图） -->
+    <section v-if="canEnergyOverview" class="wb-panel wb-energy" aria-label="用能概览">
+      <header class="wb-panel__head">
+        <h2 class="wb-panel__title">用能概览</h2>
+        <div class="wb-energy__tools">
+          <span class="wb-panel__note">数据统计时间：{{ energyStatAtText }}</span>
+          <a-button
+            v-if="canEnergyAnalysis"
+            type="link"
+            size="small"
+            class="wb-energy__entry"
+            @click="goEnergy('analysis')"
+          >
+            用能分析
+          </a-button>
+          <a-button
+            v-if="canEnergyReport"
+            type="link"
+            size="small"
+            class="wb-energy__entry"
+            @click="goEnergy('report')"
+          >
+            报表统计
+          </a-button>
+        </div>
+      </header>
+
+      <div v-if="sectionError.energy" class="wb-error">
+        <span class="wb-error__icon" aria-hidden="true">
+          <ExclamationCircleOutlined />
+        </span>
+        <p class="wb-error__title">数据加载失败</p>
+        <p class="wb-error__desc">统计数据拉取异常，请稍后重试</p>
+        <a-button type="primary" ghost size="small" @click="retryEnergy">
+          <template #icon><ReloadOutlined /></template>
+          重新加载
+        </a-button>
+      </div>
+
+      <div v-else-if="energyState === 'no-stat'" class="wb-energy__state">
+        <span class="wb-energy__state-tag">统计范围未确认</span>
+        <p class="wb-energy__state-desc">用电统计尚未设置，当前不展示用能数值</p>
+        <a-button v-if="canEnergyAnalysis" type="link" size="small" @click="goEnergy('analysis')">
+          前往用能分析配置统计口径 ›
+        </a-button>
+      </div>
+
+      <div v-else-if="energyState === 'no-data'" class="wb-energy__state">
+        <span class="wb-energy__state-tag">暂无历史数据</span>
+        <p class="wb-energy__state-desc">授权范围内暂无可用于统计的历史数据</p>
+      </div>
+
+      <div v-else class="wb-energy__body">
+        <div class="wb-energy__metrics">
+          <div
+            v-for="item in energyMetrics"
+            :key="item.key"
+            class="wb-energy__metric"
+            :class="`wb-energy__metric--${item.tone}`"
+          >
+            <span class="wb-energy__metric-icon"><component :is="item.icon" /></span>
+            <div class="wb-energy__metric-text">
+              <p class="wb-energy__metric-value">{{ item.value }}</p>
+              <p class="wb-energy__metric-name">{{ item.label }}</p>
+              <p class="wb-energy__metric-hint">{{ item.hint }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="wb-energy__trend">
+          <div class="wb-energy__trend-head">
+            <span class="wb-energy__trend-title">近 {{ energy.trend.length }} 天用电趋势（kWh）</span>
+            <span v-if="energyIncomplete" class="wb-energy__trend-flag">数据不完整</span>
+            <span class="wb-energy__trend-time">统计时间：{{ energyStatAtText }}</span>
+          </div>
+          <svg
+            class="wb-energy__spark"
+            :viewBox="`0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`"
+            preserveAspectRatio="none"
+            role="img"
+            aria-label="近 14 天用电趋势简图"
+          >
+            <line
+              v-for="n in 3"
+              :key="`grid-${n}`"
+              x1="0"
+              :y1="(SPARK_HEIGHT / 4) * n"
+              :x2="SPARK_WIDTH"
+              :y2="(SPARK_HEIGHT / 4) * n"
+              stroke="#eef2f1"
+              stroke-width="1"
+              vector-effect="non-scaling-stroke"
+            />
+            <polyline
+              v-for="(segment, index) in sparkSegments"
+              :key="`seg-${index}`"
+              :points="segment"
+              fill="none"
+              stroke="#0f7b6c"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              vector-effect="non-scaling-stroke"
+            />
+          </svg>
+          <div class="wb-energy__spark-axis">
+            <span>{{ energy.trend[0]?.label }}</span>
+            <span>{{ energy.trend[energy.trend.length - 1]?.label }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- AREA-WB-05 / WB-06 最新告警 与 快捷入口（左右并排，各占一半） -->
     <div class="wb-split">
       <!-- AREA-WB-05 最新告警（左半，当日实时清单） -->
@@ -252,25 +365,13 @@
       </section>
     </div>
 
-    <!-- AREA-WB-07 未开工模块占位（三块） -->
-    <section v-if="placeholders.length" class="wb-panel" aria-label="未开工模块">
-      <header class="wb-panel__head">
-        <h2 class="wb-panel__title">未开工模块</h2>
-        <span class="wb-panel__note">模块规划中，暂不可进入</span>
-      </header>
-      <div class="wb-placeholder">
-        <article v-for="item in placeholders" :key="item.name" class="wb-placeholder__card">
-          <p class="wb-placeholder__name">{{ item.name }}</p>
-          <p class="wb-placeholder__desc">{{ item.desc }}</p>
-          <span class="wb-placeholder__tag">规划中</span>
-        </article>
-      </div>
-    </section>
-
     <ProtoTip :lines="tipLines" @reset="handleReset">
       <template #extra>
         <a-space size="small">
           <a-button size="small" @click="simulatePush">模拟收到新告警推送</a-button>
+          <a-button size="small" @click="simulateNoStat">
+            {{ energyNoStat ? '恢复统计范围' : '模拟统计范围未确认' }}
+          </a-button>
           <a-button size="small" @click="simulateFail">{{ anyError ? '恢复展示' : '模拟加载失败' }}</a-button>
         </a-space>
       </template>
@@ -302,14 +403,16 @@
 <script setup lang="ts">
 /**
  * WB-PAGE-01 工作台
- * 【原型说明】对齐《产品交互设计文档-工作台》v0.4：
+ * 【原型说明】对齐《产品交互设计文档-工作台》v0.6：
  * - 顶部账号信息卡展示问候语、脱敏账号、角色标签与实时时间；企业信息卡展示企业 Logo / 名称 / 注册地址；
  * - 平台使用引导为固定四步（新建组织架构 / 新建角色 / 新建成员 / 添加设备），按本企业实际数据判定完成态，
  *   四步全部完成自动隐藏，未完成时可手动关闭（当次会话）；
  * - 核心指标为单块统计面板（六项），面板头承载统计时间与刷新；
  *   「今日策略执行次数」名称旁带口径说明 Tooltip；
+ * - 用能概览（EN-08）展示授权范围内的今日用电 / 本月用电 / 本月可比环比 / 数据完整率与近 14 天趋势简图，
+ *   面板头提供「用能分析 / 报表统计」入口；未就绪时以状态表达，不以 0 替代；
  * - 最新告警为当日实时清单（最多 10 条、动态覆盖、推送实时插入并高亮）；
- * - 快捷入口按当前账号权限点渲染；未开工模块占位三块。
+ * - 快捷入口按当前账号权限点渲染（含能源数据三个子页面）；
  * 页面只读、不提供写操作与处置动作；不做自动轮询。
  */
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
@@ -317,6 +420,8 @@ import { useRouter } from 'vue-router'
 import {
   AlertOutlined,
   ApartmentOutlined,
+  AreaChartOutlined,
+  CalendarOutlined,
   CheckCircleOutlined,
   CloseOutlined,
   CloudUploadOutlined,
@@ -327,13 +432,18 @@ import {
   EnvironmentOutlined,
   ExclamationCircleOutlined,
   FieldTimeOutlined,
+  FileTextOutlined,
   HeatMapOutlined,
   HddOutlined,
+  LineChartOutlined,
   QuestionCircleOutlined,
   ReadOutlined,
   ReloadOutlined,
   RightOutlined,
+  RiseOutlined,
+  SafetyCertificateOutlined,
   SettingOutlined,
+  ThunderboltOutlined,
   WarningOutlined,
   WifiOutlined,
 } from '@antdv-next/icons'
@@ -345,12 +455,14 @@ import { session } from '@/modules/auth/store'
 import { resetAlarmData } from '@/modules/alarm/store'
 import { currentPermissions } from '@/modules/role/store'
 import { currentProfile } from '@/modules/enterprise/store'
+import { hasPermission as hasEnergyPermission } from '@/modules/energy/store'
+import { PERM as ENERGY_PERM } from '@/modules/energy/store/constants'
 import {
   LATEST_ALARM_LIMIT,
-  PLACEHOLDER_MODULES,
   buildPushedAlarm,
   latestAlarms,
   onboardingSteps,
+  workbenchEnergy,
   workbenchMetrics,
 } from '../store'
 import type { Alarm } from '@/modules/alarm/store'
@@ -367,6 +479,17 @@ const canAlarm = computed(() => has('alarm'))
 const canOnboarding = computed(() => has('system:org'))
 const canOta = computed(() => has('device:ota'))
 const canStrategy = computed(() => has('device:power:strategy'))
+
+/* ---------- 能源数据权限（目录级 + 菜单级，与 AdminLayout 口径一致） ---------- */
+const canEnergyMonitor = computed(() => hasEnergyPermission(ENERGY_PERM.monitor))
+const canEnergyAnalysis = computed(() => hasEnergyPermission(ENERGY_PERM.analysis))
+const canEnergyReport = computed(() => hasEnergyPermission(ENERGY_PERM.report))
+/** 用能概览可见性：目录级 `energy` + 至少一个子页面权限；无权限时区块整体不展示 */
+const canEnergyOverview = computed(
+  () =>
+    hasEnergyPermission(ENERGY_PERM.energy) &&
+    (canEnergyAnalysis.value || canEnergyMonitor.value || canEnergyReport.value),
+)
 
 /* ---------- 顶部信息区 ---------- */
 const current = computed(() => session.current)
@@ -435,7 +558,7 @@ function closeOnboarding() {
 const loading = ref(true)
 const updatedAt = ref(Date.now())
 const statsError = ref(false)
-const sectionError = reactive({ alarm: false })
+const sectionError = reactive({ alarm: false, energy: false })
 const realtimeBroken = ref(false)
 
 const updatedAtText = computed(() => formatTime(updatedAt.value))
@@ -534,6 +657,88 @@ const statItems = computed(() => {
   return list
 })
 
+/* ---------- 用能概览（EN-08：4 项用能指标 + 趋势简图） ---------- */
+const energy = ref(workbenchEnergy())
+/** 演示态：模拟「无有效用电统计设置」，用于复现 STATE-WB-13 */
+const energyNoStat = ref(false)
+const energyState = computed(() => (energyNoStat.value ? 'no-stat' : energy.value.state))
+const energyStatAtText = computed(() => formatTime(energy.value.statAt))
+const energyIncomplete = computed(() => energyState.value === 'ready' && energy.value.incomplete)
+
+function formatKwh(value: number | null) {
+  return value === null ? '—' : `${formatNumber(value)} kWh`
+}
+
+const energyMetrics = computed(() => {
+  const data = energy.value
+  return [
+    {
+      key: 'todayKwh',
+      label: '今日用电',
+      value: formatKwh(data.todayKwh),
+      hint: '当日 00:00 起',
+      icon: ThunderboltOutlined,
+      tone: 'primary',
+    },
+    {
+      key: 'monthKwh',
+      label: '本月用电',
+      value: formatKwh(data.monthKwh),
+      hint: `本月已过 ${data.monthDays} 天`,
+      icon: CalendarOutlined,
+      tone: 'info',
+    },
+    {
+      key: 'delta',
+      label: '本月可比环比',
+      value:
+        data.deltaRate === null
+          ? '—'
+          : `${data.deltaRate > 0 ? '+' : ''}${data.deltaRate}%`,
+      hint:
+        data.deltaKwh === null
+          ? '基期缺数，暂不可比'
+          : `${data.deltaKwh > 0 ? '+' : ''}${formatNumber(data.deltaKwh)} kWh`,
+      icon: RiseOutlined,
+      tone: data.deltaRate !== null && data.deltaRate < 0 ? 'success' : 'warning',
+    },
+    {
+      key: 'completeness',
+      label: '数据完整率',
+      value: data.completeness === null ? '—' : `${data.completeness}%`,
+      hint: data.incomplete ? '含缺失 / 补齐点' : '有效采集点占比',
+      icon: SafetyCertificateOutlined,
+      tone: data.incomplete ? 'warning' : 'success',
+    },
+  ]
+})
+
+/** 趋势简图（近 14 天；缺失点断开，不补 0） */
+const SPARK_WIDTH = 720
+const SPARK_HEIGHT = 120
+const sparkSegments = computed(() => {
+  const points = energy.value.trend
+  const values = points
+    .map((point) => point.value)
+    .filter((value): value is number => value !== null)
+  const max = Math.max(...values, 1)
+  const stepX = SPARK_WIDTH / Math.max(points.length - 1, 1)
+  const segments: string[] = []
+  let current: string[] = []
+  points.forEach((point, index) => {
+    if (point.value === null) {
+      if (current.length > 1) segments.push(current.join(' '))
+      current = []
+      return
+    }
+    const x = Math.round(index * stepX)
+    const y = Math.round(SPARK_HEIGHT - 10 - (point.value / max) * (SPARK_HEIGHT - 24))
+    current.push(`${x},${y}`)
+  })
+  if (current.length > 1) segments.push(current.join(' '))
+  return segments
+})
+
 /* ---------- 最新告警（当日实时清单 + 推送插入） ---------- */
 interface AlarmRow extends Alarm {
   isNew: boolean
@@ -587,10 +792,28 @@ const ALL_ENTRIES = [
   { perm: 'system:enterprise', label: '企业中心', route: '/system/enterprise', icon: ApartmentOutlined },
 ]
 
-const entries = computed(() => ALL_ENTRIES.filter((entry) => has(entry.perm)))
+/** 能源数据入口：目录级 `energy` 下按菜单级权限分别渲染 */
+const ENERGY_ENTRIES = [
+  { label: '用能分析', route: '/energy/analysis', icon: LineChartOutlined, visible: canEnergyAnalysis },
+  { label: '设备数据分析', route: '/energy/monitor', icon: AreaChartOutlined, visible: canEnergyMonitor },
+  { label: '报表统计', route: '/energy/report', icon: FileTextOutlined, visible: canEnergyReport },
+]
 
-/* ---------- 未开工模块占位 ---------- */
-const placeholders = computed(() => PLACEHOLDER_MODULES)
+const entries = computed(() => {
+  const base = ALL_ENTRIES.filter((entry) => has(entry.perm)).map(({ route, label, icon }) => ({
+    route,
+    label,
+    icon,
+  }))
+  const energyEntries = ENERGY_ENTRIES.filter((entry) => entry.visible.value).map(
+    ({ route, label, icon }) => ({ route, label, icon }),
+  )
+  if (!energyEntries.length) return base
+  // 能源数据入口紧随「告警中心」，与一级导航顺序一致
+  const alarmIndex = base.findIndex((entry) => entry.route === '/alarm/center')
+  const at = alarmIndex === -1 ? base.length : alarmIndex + 1
+  return [...base.slice(0, at), ...energyEntries, ...base.slice(at)]
+})
 
 /* ---------- 右下角悬浮按钮（帮助入口：点击展开菜单，本期仅「使用手册」，后续可扩展其他入口） ---------- */
 /** 打开《用户使用手册》：原型仅给出入口提示，不实现具体内容 */
@@ -603,6 +826,7 @@ async function reload() {
   loading.value = true
   statsError.value = false
   sectionError.alarm = false
+  sectionError.energy = false
   realtimeBroken.value = false
   await new Promise((resolve) => window.setTimeout(resolve, 500))
   refreshData()
@@ -612,6 +836,7 @@ async function reload() {
 
 function refreshData() {
   metrics.value = workbenchMetrics()
+  energy.value = workbenchEnergy()
   steps.value = onboardingSteps()
   loadAlarms()
 }
@@ -626,26 +851,44 @@ function retryAlarm() {
   loadAlarms()
 }
 
+function retryEnergy() {
+  sectionError.energy = false
+  energy.value = workbenchEnergy()
+}
+
 /* ---------- 演示控制 ---------- */
-const anyError = computed(() => statsError.value || sectionError.alarm)
+const anyError = computed(() => statsError.value || sectionError.alarm || sectionError.energy)
 
 function simulateFail() {
   if (anyError.value) {
     statsError.value = false
     sectionError.alarm = false
+    sectionError.energy = false
     realtimeBroken.value = false
     return
   }
   statsError.value = true
   sectionError.alarm = true
+  sectionError.energy = true
+}
+
+/** 模拟「无有效用电统计设置」：用于复现用能概览四态，不影响其他区块 */
+function simulateNoStat() {
+  energyNoStat.value = !energyNoStat.value
+  message.info(energyNoStat.value ? '已模拟：统计范围未确认' : '已恢复：统计范围已设置')
 }
 
 function goAlarmCenter() {
   router.push('/alarm/center')
 }
 
+function goEnergy(target: 'monitor' | 'analysis' | 'report') {
+  router.push(`/energy/${target}`)
+}
+
 function handleReset() {
   resetAlarmData()
+  energyNoStat.value = false
   refreshData()
   setTimeout(() => {
     onboardingClosed.value = false
@@ -658,9 +901,11 @@ const tipLines = [
   '顶部账号信息卡展示问候语、脱敏账号、角色标签与实时时间；企业信息卡展示企业 Logo / 名称 / 注册地址。',
   '平台使用引导为固定四步（新建组织架构 / 新建角色 / 新建成员 / 添加设备），按本企业实际数据判定完成态；未完成步骤可点击跳转，四步全部完成后自动隐藏，也可手动关闭。',
   '核心指标为单块统计面板（设备总数 / 在线设备数 / 离线设备数 / 今日告警数 / 可升级设备数 / 今日策略执行次数）；后两项按权限渲染，「今日策略执行次数」名称旁问号可悬浮查看口径。',
+  '用能概览按当前成员授权范围展示今日用电 / 本月用电 / 本月可比环比 / 数据完整率与近 14 天趋势简图；未就绪时展示状态标签，不以 0 替代。',
   '「最新告警」只展示当日告警，最多 10 条；点击「模拟收到新告警推送」可验证实时插入顶部并动态覆盖最旧一条。',
+  '同时点击「模拟统计范围未确认」可复现用能概览未设置统计口径的状态；「模拟加载失败」用于验证各区块错误态。',
   '右下角为常驻悬浮按钮，点击展开帮助菜单（本期仅「使用手册」，后续可扩展其他入口；原型仅演示入口，不做真实跳转）。',
-  '页面整体手动刷新、不做自动轮询；「模拟加载失败」用于验证统计面板与区块的错误态。',
+  '页面整体手动刷新、不做自动轮询。',
 ]
 
 onMounted(() => {

@@ -3,13 +3,15 @@
  *
  * 工作台为**只读看板**：全部指标与清单均由已定稿模块的演示数据派生，
  * 本模块**不维护独立数据容器**，也不写入任何业务数据。
- * 业务规则对齐《产品需求文档-工作台》v0.3 与《产品交互设计文档-工作台》v0.4。
+ * 业务规则对齐《产品需求文档-工作台》v0.5 与《产品交互设计文档-工作台》v0.6。
  */
 
 import { alarms } from '@/modules/alarm/store'
 import type { Alarm } from '@/modules/alarm/store'
 import { session } from '@/modules/auth/store'
 import { devices } from '@/modules/device/store'
+import { createDailySeries } from '@/modules/energy/mock/seed'
+import { meterStats } from '@/modules/energy/store'
 import { memberList } from '@/modules/member/store'
 import { nodes } from '@/modules/org/store'
 import { allRows as otaRows } from '@/modules/ota/store'
@@ -57,6 +59,105 @@ export function workbenchMetrics(): WorkbenchMetrics {
     todayAlarms: alarms.filter((alarm) => alarm.reportAt >= start).length,
     upgradableDevices: upgradable,
     todayExecutions: executions,
+  }
+}
+
+/* ---------- 用能概览（EN-08：4 项用能指标 + 趋势简图） ---------- */
+
+/** 趋势简图天数 */
+const ENERGY_TREND_POINTS = 14
+/** 生成两月日用电序列，保证「本月 / 上月同期」可比 */
+const ENERGY_SERIES_DAYS = 70
+
+/** 未就绪状态：无有效用电统计设置 / 无历史数据；正常时为 ready（含数据不完整标记） */
+export type WorkbenchEnergyState = 'ready' | 'no-stat' | 'no-data'
+
+export interface WorkbenchEnergyOverview {
+  state: WorkbenchEnergyState
+  /** 今日用电（kWh）；当日无有效点为 null */
+  todayKwh: number | null
+  /** 本月用电（kWh） */
+  monthKwh: number | null
+  /** 本月可比环比变化量（kWh） */
+  deltaKwh: number | null
+  /** 本月可比环比变化率（%）；基期为 0 或缺数时为 null */
+  deltaRate: number | null
+  /** 数据完整率（%）：有效真实采集点 ÷ 应采集点 */
+  completeness: number | null
+  /** 本月已过天数 */
+  monthDays: number
+  /** 趋势简图（缺数点不补 0） */
+  trend: Array<{ label: string; value: number | null }>
+  /** 存在缺失 / 补齐 / 异常点 */
+  incomplete: boolean
+  /** 统计时间 */
+  statAt: number
+}
+
+/**
+ * 工作台用能概览（PRD F-WB-10）：
+ * - 按当前成员授权范围汇总（原型为单企业全量授权，不做跨部门越权模拟）；
+ * - 4 项指标均由**时段用电量**派生，不使用累计表底；
+ * - 无有效用电统计设置 / 无历史数据分别表达，不以 0 替代。
+ */
+export function workbenchEnergy(): WorkbenchEnergyOverview {
+  const statAt = Date.now()
+  const hasStat = Object.values(meterStats).some((config) => config.confirmed)
+  const series = createDailySeries(ENERGY_SERIES_DAYS)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  // 演示序列按「今天」回溯落日期，确保今日 / 本月 / 上月同期口径可计算
+  const dated = series.points.map((point, index) => {
+    const date = new Date(today)
+    date.setDate(today.getDate() - (series.points.length - 1 - index))
+    return { date, value: point.value, quality: point.quality }
+  })
+
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+  const prevMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+  const monthDays = today.getDate()
+  const prevMonthDays = new Date(today.getFullYear(), today.getMonth(), 0).getDate()
+  const prevComparableDays = Math.min(monthDays, prevMonthDays)
+
+  const sum = (rows: typeof dated) =>
+    rows.reduce((total, row) => total + (row.value ?? 0), 0)
+  const todayPoint = dated[dated.length - 1]
+  const todayKwh = todayPoint?.value ?? null
+  const monthRows = dated.filter((row) => row.date >= monthStart && row.value !== null)
+  const prevRows = dated.filter(
+    (row) =>
+      row.date >= prevMonthStart &&
+      row.date < monthStart &&
+      row.date.getDate() <= prevComparableDays &&
+      row.value !== null,
+  )
+  const monthKwh = monthRows.length ? sum(monthRows) : null
+  const prevKwh = prevRows.length ? sum(prevRows) : null
+  const deltaKwh = monthKwh !== null && prevKwh !== null ? monthKwh - prevKwh : null
+  const deltaRate =
+    deltaKwh !== null && prevKwh ? Math.round((deltaKwh / prevKwh) * 1000) / 10 : null
+
+  const validCount = dated.filter((row) => row.quality === 'valid').length
+  const completeness = dated.length ? Math.round((validCount / dated.length) * 1000) / 10 : null
+  const incomplete = dated.some((row) => row.quality !== 'valid')
+
+  const trend = dated.slice(-ENERGY_TREND_POINTS).map((row) => ({
+    label: `${row.date.getMonth() + 1}/${row.date.getDate()}`,
+    value: row.value,
+  }))
+
+  return {
+    state: !hasStat ? 'no-stat' : validCount ? 'ready' : 'no-data',
+    todayKwh,
+    monthKwh,
+    deltaKwh,
+    deltaRate,
+    completeness,
+    monthDays,
+    trend,
+    incomplete,
+    statAt,
   }
 }
 
@@ -157,15 +258,4 @@ export function onboardingSteps(): OnboardingStep[] {
   ]
 }
 
-/* ---------- 未开工模块占位（Q-WB-04：逐块替换；碳排管理已取消） ---------- */
-
-export interface PlaceholderModule {
-  name: string
-  desc: string
-}
-
-export const PLACEHOLDER_MODULES: PlaceholderModule[] = [
-  { name: '能耗数据采集与监测', desc: '采集并监测各用能单元的实时能耗数据' },
-  { name: '能源分析与报表', desc: '对历史用能数据做分析并生成报表' },
-  { name: '运维工单', desc: '告警转工单、派单与处理闭环' },
-]
+/* ---------- 右下角悬浮帮助入口等页面级交互由页面组件维护 ---------- */
