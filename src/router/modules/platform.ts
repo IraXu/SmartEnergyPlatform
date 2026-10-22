@@ -1,6 +1,6 @@
 /**
  * 【原型说明】平台管理端路由。
- * 平台成员登录后进入平台端，独立于企业端；一级「首页 / 客户&设备 / 平台管理（权限管理 › 平台成员管理 / 平台角色管理）」。
+ * 平台成员登录后进入平台端，独立于企业端；一级「首页 / 客户&设备 / 平台管理（平台权限管理 › 平台成员管理 / 平台角色管理；企业权限管理 › 企业角色管理）」。
  * 所有页面均带 meta.platform = true，由路由守卫限制仅平台端会话可进入。
  */
 
@@ -42,6 +42,12 @@ export const platformRoutes: RouteRecordRaw[] = [
         name: 'platform-roles',
         component: () => import('@/modules/platform/pages/PlatformRoleView.vue'),
         meta: { title: '平台角色管理', requiresAuth: true, platform: true },
+      },
+      {
+        path: 'enterprise-roles',
+        name: 'platform-enterprise-roles',
+        component: () => import('@/modules/platform/pages/PlatformEnterpriseRoleView.vue'),
+        meta: { title: '企业角色管理', requiresAuth: true, platform: true },
       },
     ],
   },

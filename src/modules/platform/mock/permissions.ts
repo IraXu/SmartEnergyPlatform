@@ -1,5 +1,5 @@
 /**
- * 【原型说明】平台权限点字典，对齐《产品需求文档-平台管理端总览》v1.0 第 4.6 节（共 15 项）。
+ * 【原型说明】平台权限点字典，对齐《产品需求文档-平台管理端总览》v1.1 第 4.6 节（共 21 项）。
  *
  * 采用与企业端「角色管理」一致的**三层模型**（目录 / 菜单 / 按钮），但为**独立字典**，
  * 标识统一以 `platform` 为目录前缀，与企业端权限点互不影响。
@@ -37,8 +37,8 @@ export const PLATFORM_PERMISSION_TREE: PlatformPermissionNode[] = [
     name: '平台管理',
     level: 'dir',
     children: [
-      // 二级分组「权限管理」：自身无页面，仅承载平台成员与平台角色两个菜单
-      menu('platform:permission:manage', '权限管理', [
+      // 二级分组「平台权限管理」：自身无页面，仅承载平台成员与平台角色两个菜单
+      menu('platform:permission:manage', '平台权限管理', [
         menu('platform:member', '平台成员管理', [
           action('platform:member:create', '新增平台成员'),
           action('platform:member:edit', '编辑平台成员'),
@@ -51,6 +51,15 @@ export const PLATFORM_PERMISSION_TREE: PlatformPermissionNode[] = [
           action('platform:role:edit', '编辑平台角色'),
           action('platform:role:delete', '删除平台角色'),
           action('platform:role:permission', '配置角色权限'),
+        ]),
+      ]),
+      // 二级分组「企业权限管理」：自身无页面，仅承载企业角色管理
+      menu('platform:enterprise:permission', '企业权限管理', [
+        menu('platform:enterprise:role', '企业角色管理', [
+          action('platform:enterprise:role:create', '新增企业默认角色'),
+          action('platform:enterprise:role:edit', '编辑企业默认角色'),
+          action('platform:enterprise:role:delete', '删除企业默认角色'),
+          action('platform:enterprise:role:permission', '配置企业角色权限'),
         ]),
       ]),
     ],

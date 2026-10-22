@@ -104,7 +104,7 @@
             <!-- 无 energy:export 时不渲染导出入口（按钮级权限） -->
             <a-button v-if="canExport" :disabled="!appliedDeviceIds.length" @click="openExport">
               <template #icon><DownloadOutlined /></template>
-              能源数据导出
+              数据导出
             </a-button>
           </div>
         </section>

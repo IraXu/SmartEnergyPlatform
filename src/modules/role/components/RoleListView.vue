@@ -61,8 +61,12 @@
       >
         <span class="role-item__name" :title="role.name">{{ role.name }}</span>
         <a-tag v-if="isPresetRole(role)" class="role-item__tag role-item__tag--preset">
-          <LockOutlined />
+          <template #icon><LockOutlined /></template>
           预置
+        </a-tag>
+        <a-tag v-else-if="isDefaultRole(role)" class="role-item__tag role-item__tag--default">
+          <template #icon><LockOutlined /></template>
+          默认
         </a-tag>
         <span class="role-item__count" :title="`${roleMemberCount(role.id)} 名成员`">
           {{ roleMemberCount(role.id) }}
@@ -123,7 +127,7 @@ import {
   SearchOutlined,
 } from '@antdv-next/icons'
 import type { MenuItemType } from 'antdv-next'
-import { isPresetRole, roleMemberCount, ROLE_LIMIT, SEARCH_MAX } from '../store'
+import { isDefaultRole, isPresetRole, roleMemberCount, ROLE_LIMIT, SEARCH_MAX } from '../store'
 import type { Role } from '../store'
 
 const props = defineProps<{
@@ -146,9 +150,11 @@ const emit = defineEmits<{
   menu: [roleId: string, action: string]
 }>()
 
-/** 仅有预置角色且无搜索条件时给出引导（STATE-ROL-03 / CMP-ROL-28） */
+/** 仅有预置 / 默认角色且无搜索条件时给出引导（STATE-ROL-03 / CMP-ROL-28） */
 const onlyPreset = computed(
-  () => !props.keyword.trim() && props.roles.every((role) => isPresetRole(role)),
+  () =>
+    !props.keyword.trim() &&
+    !props.roles.some((role) => role.source === 'custom'),
 )
 
 /** 菜单点击统一由页面按角色与动作分发 */
@@ -156,19 +162,19 @@ function handleMenuClick(roleId: string, info: { key?: string | number }) {
   emit('menu', roleId, String(info.key ?? ''))
 }
 
-/** 菜单项按角色类型与权限点裁剪：预置角色不渲染「重命名」与「删除」 */
+/** 菜单项按角色类型与权限点裁剪：预置角色与平台默认角色不渲染「重命名」与「删除」 */
 function menuItems(role: Role): MenuItemType[] {
-  const preset = isPresetRole(role)
+  const locked = isPresetRole(role) || isDefaultRole(role)
   const memberCount = roleMemberCount(role.id)
   const items: MenuItemType[] = []
 
-  if (!preset && props.canEdit) items.push({ key: 'rename', label: '重命名' })
+  if (!locked && props.canEdit) items.push({ key: 'rename', label: '重命名' })
   items.push({
     key: 'members',
     label: '查看成员',
     disabled: memberCount === 0,
   })
-  if (!preset && props.canRemove) {
+  if (!locked && props.canRemove) {
     items.push({ type: 'divider' })
     // 删除入口常显可用：是否可删除在点击后由页面判定并给出具体原因（PRD F-ROL-07）
     items.push({ key: 'remove', label: '删除', danger: true })

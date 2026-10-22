@@ -48,7 +48,7 @@
           >
             <span class="role-item__name" :title="item.name">{{ item.name }}</span>
             <a-tag v-if="isPresetPlatformRole(item)" class="role-item__tag role-item__tag--preset">
-              <LockOutlined />
+              <template #icon><LockOutlined /></template>
               预置
             </a-tag>
             <span class="role-item__count" :title="`${roleMemberCount(item.id)} 名成员`">
@@ -77,7 +77,7 @@
               </span>
               <span class="role-perm__name" :title="selectedRole.name">{{ selectedRole.name }}</span>
               <a-tag v-if="preset" class="role-perm__tag role-perm__tag--preset">
-                <LockOutlined />
+                <template #icon><LockOutlined /></template>
                 预置
               </a-tag>
               <a v-if="memberCount > 0" class="role-perm__members" @click="openMembers">{{ memberCount }} 名成员</a>

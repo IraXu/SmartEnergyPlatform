@@ -137,8 +137,8 @@
 /**
  * 平台管理端通用布局
  * 【原型说明】承载平台端顶栏（平台标识 + 账号区，**不含企业切换**）、一级导航栏与二级导航列。
- * 一级项为「首页 / 客户&设备 / 平台管理」，其中「平台管理」下含二级分组「权限管理」，
- * 「权限管理」再展开「平台成员管理 / 平台角色管理」两个三级菜单。
+ * 一级项为「首页 / 客户&设备 / 平台管理」，其中「平台管理」下含两个并列二级分组：
+ * 「平台权限管理」（展开「平台成员管理 / 平台角色管理」）与「企业权限管理」（展开「企业角色管理」）。
  * 导航项按平台权限点渲染：无对应权限的项不出现（与企业端「对全部账号可见」的口径不同）。
  */
 import { computed, h, onBeforeUnmount, onMounted, ref, watch, type Component } from 'vue'
@@ -164,7 +164,7 @@ type NavChild = {
   /** 二级项对应路由；缺失时表示含三级菜单的分组，自身不可跳转 */
   route?: string
   permission: string
-  /** 三级菜单项；仅「权限管理」这类分组存在，在二级列内缩进展开 */
+  /** 三级菜单项；仅「平台权限管理 / 企业权限管理」这类分组存在，在二级列内缩进展开 */
   children?: NavChild[]
 }
 type NavItem = {
@@ -188,14 +188,28 @@ const platformNavAll: NavItem[] = [
     expandable: true,
     permission: 'platform:permission',
     children: [
-      // 二级分组「权限管理」：自身不跳转，点击在二级列内展开三级菜单
+      // 二级分组「平台权限管理」：自身不跳转，点击在二级列内展开三级菜单
       {
         key: 'permission-manage',
-        label: '权限管理',
+        label: '平台权限管理',
         permission: 'platform:permission:manage',
         children: [
           { key: 'members', label: '平台成员管理', route: '/platform/members', permission: 'platform:member' },
           { key: 'roles', label: '平台角色管理', route: '/platform/roles', permission: 'platform:role' },
+        ],
+      },
+      // 二级分组「企业权限管理」：维护全平台企业统一可见的企业默认角色
+      {
+        key: 'enterprise-permission',
+        label: '企业权限管理',
+        permission: 'platform:enterprise:permission',
+        children: [
+          {
+            key: 'enterprise-roles',
+            label: '企业角色管理',
+            route: '/platform/enterprise-roles',
+            permission: 'platform:enterprise:role',
+          },
         ],
       },
     ],

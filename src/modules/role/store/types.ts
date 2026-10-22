@@ -4,8 +4,8 @@
  * 不涉及数据库表、字段类型或接口设计。
  */
 
-/** 角色来源：系统预置 / 企业自定义 */
-export type RoleSource = 'preset' | 'custom'
+/** 角色来源：系统预置 / 平台默认 / 企业自定义 */
+export type RoleSource = 'preset' | 'default' | 'custom'
 
 /**
  * 角色：一组权限点的集合。

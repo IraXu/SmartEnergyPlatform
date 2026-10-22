@@ -197,6 +197,12 @@
   border-color: rgba(15, 123, 108, 0.2);
 }
 
+.role-item__tag--default {
+  color: #0f7b6c;
+  background: #f4faf8;
+  border-color: rgba(15, 123, 108, 0.3);
+}
+
 /* 成员数：以「人」为单位的小徽标，避免与角色名称混淆 */
 .role-item__count {
   flex: none;
@@ -322,6 +328,12 @@
   color: #0f7b6c;
   background: #ecf4f3;
   border-color: rgba(15, 123, 108, 0.2);
+}
+
+.role-perm__tag--default {
+  color: #0f7b6c;
+  background: #f4faf8;
+  border-color: rgba(15, 123, 108, 0.3);
 }
 
 .role-perm__members {

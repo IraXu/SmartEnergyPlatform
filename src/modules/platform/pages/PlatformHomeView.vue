@@ -131,6 +131,7 @@ import {
   HomeOutlined,
   RightOutlined,
   ReloadOutlined,
+  SafetyCertificateOutlined,
   ThunderboltOutlined,
   UserOutlined,
 } from '@antdv-next/icons'
@@ -248,6 +249,14 @@ const entries = computed(() => {
   }
   if (permissions.value.includes('platform:role')) {
     list.push({ label: '平台角色管理', desc: '配置平台角色与权限', route: '/platform/roles', icon: ApartmentOutlined })
+  }
+  if (permissions.value.includes('platform:enterprise:role')) {
+    list.push({
+      label: '企业角色管理',
+      desc: '维护全平台企业默认角色',
+      route: '/platform/enterprise-roles',
+      icon: SafetyCertificateOutlined,
+    })
   }
   return list
 })

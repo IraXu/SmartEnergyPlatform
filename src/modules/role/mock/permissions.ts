@@ -1,5 +1,5 @@
 /**
- * 【原型说明】权限点字典，对齐《产品需求文档-角色管理》v1.8 的 7.4 权限点字典（共 50 项）。
+ * 【原型说明】权限点字典，对齐《产品需求文档-角色管理》v1.14 的 7.4 权限点字典（共 68 项）。
  *
  * 【层级模型】权限树的层级与导航一一对应，且深度不受限制：
  * - 目录级（`dir`）：一级导航栏内的项（如「系统管理」）——仅作分组容器；
@@ -73,6 +73,30 @@ export const PERMISSION_TREE: PermissionNode[] = [
     ],
   },
   {
+    /**
+     * 一级导航栏内的项，含下级菜单 → 纯分组容器。
+     * 勾选目录级 `energy` 即整块授权其下三个页面及全部按钮。
+     */
+    key: 'energy',
+    name: '能源数据',
+    level: 'dir',
+    children: [
+      // 菜单顺序与一级导航下的二级项一致：用能分析 → 设备数据分析 → 报表统计
+      menu('energy:analysis', '用能分析', []),
+      menu('energy:monitor', '设备数据分析', [
+        /**
+         * 数据导出为**跨「用能分析 / 设备数据分析」两页共用**的导出权限点，
+         * 故挂在设备数据分析下并标注共用；拥有页面访问权不代表可导出。
+         */
+        action('energy:export', '数据导出'),
+      ]),
+      menu('energy:report', '报表统计', [
+        action('energy:report:generate', '生成报表'),
+        action('energy:report:export', '报表导出'),
+      ]),
+    ],
+  },
+  {
     // 一级导航栏内的项，含下级菜单 → 纯分组容器
     key: 'device',
     name: '设备管理',
@@ -135,6 +159,8 @@ export const PERMISSION_TREE: PermissionNode[] = [
         action('system:org:node:sort', '同级排序'),
         action('system:org:node:delete', '删除节点'),
         action('system:org:node:attr:edit', '编辑节点属性'),
+        // 用电统计设置不单设菜单，编辑权限保留在组织架构下，实际用于用能分析抽屉
+        action('system:org:unit:meterstat:edit', '用电统计设置编辑'),
       ]),
       menu('system:member', '企业成员', [
         action('system:member:create', '新增成员'),

@@ -54,18 +54,27 @@ export function normalizeText(value: string) {
 /* ---------- 查询 ---------- */
 
 export const isPresetRole = (role: Pick<Role, 'source'>) => role.source === 'preset'
+/** 【原型说明】平台默认角色：由平台「企业角色管理」统一维护，企业侧只读、可分配给成员 */
+export const isDefaultRole = (role: Pick<Role, 'source'>) => role.source === 'default'
+/** 企业侧不可编辑的角色（预置 / 平台默认） */
+export const isReadonlyRole = (role: Pick<Role, 'source'>) =>
+  isPresetRole(role) || isDefaultRole(role)
 
 export const getRole = (id: string) => roleList.find((role) => role.id === id) ?? null
 
-/** 列表顺序：预置角色置顶 → 自定义角色按创建时间倒序（PRD F-ROL-01） */
+/** 列表顺序：预置角色置顶 → 平台默认角色 → 自定义角色按创建时间倒序（PRD F-ROL-01） */
 export function sortedRoles(): Role[] {
+  const rank = (role: Role) => (isPresetRole(role) ? 0 : isDefaultRole(role) ? 1 : 2)
   return [...roleList].sort((a, b) => {
-    if (isPresetRole(a) !== isPresetRole(b)) return isPresetRole(a) ? -1 : 1
+    if (rank(a) !== rank(b)) return rank(a) - rank(b)
+    if (isDefaultRole(a) && isDefaultRole(b)) return b.createdAt - a.createdAt
     return b.createdAt - a.createdAt
   })
 }
 
-export const customRoleCount = () => roleList.filter((role) => !isPresetRole(role)).length
+/** 自定义角色数量：平台默认角色不计入单企业上限 */
+export const customRoleCount = () =>
+  roleList.filter((role) => !isPresetRole(role) && !isDefaultRole(role)).length
 
 export const isRoleLimitReached = () => customRoleCount() >= ROLE_LIMIT
 
@@ -189,13 +198,14 @@ export function rolePermissions(role: Role | null): string[] {
 
 /* ---------- 校验 ---------- */
 
-/** 角色名称校验：必填、2-20 字符、企业内唯一（不区分大小写） */
+/** 角色名称校验：必填、2-20 字符、企业内唯一（不区分大小写），且不得与平台默认角色 / 内置超管重名 */
 export function validateRoleName(name: string, excludeId?: string): string | null {
   const value = normalizeText(name)
   if (!value) return '请输入角色名称'
   if (value.length < ROLE_NAME_MIN || value.length > ROLE_NAME_MAX) {
     return `角色名称需 ${ROLE_NAME_MIN}-${ROLE_NAME_MAX} 个字符`
   }
+  if (value === '企业超级管理员') return '该角色名称已存在，请修改名称'
   const duplicated = roleList.some(
     (role) => role.id !== excludeId && role.name.toLowerCase() === value.toLowerCase(),
   )
@@ -251,11 +261,12 @@ export async function createRole(input: RoleInput): Promise<Role> {
   return role
 }
 
-/** 重命名角色与编辑描述；预置角色不可编辑（PRD Q-ROL-03） */
+/** 重命名角色与编辑描述；预置角色与平台默认角色不可编辑 */
 export async function updateRole(id: string, input: RoleInput): Promise<void> {
   await delay()
   const role = getRole(id)
   if (!role) throw new Error('角色不存在')
+  if (isDefaultRole(role)) throw new Error('平台默认角色由平台统一维护，不可修改')
   if (isPresetRole(role)) throw new Error('预置角色不可修改')
   const name = normalizeText(input.name)
   const before = role.name
@@ -269,11 +280,12 @@ export async function updateRole(id: string, input: RoleInput): Promise<void> {
   if (changes.length) writeRoleLog('重命名', role.name, changes.join('；'))
 }
 
-/** 删除角色：成员数为 0 才可删除，预置角色不可删除（PRD Q-ROL-02、Q-ROL-03） */
+/** 删除角色：成员数为 0 才可删除，预置角色与平台默认角色不可删除 */
 export async function removeRole(id: string): Promise<void> {
   await delay()
   const role = getRole(id)
   if (!role) throw new Error('角色不存在')
+  if (isDefaultRole(role)) throw new Error('平台默认角色由平台统一维护，企业侧不可删除')
   if (isPresetRole(role)) throw new Error('预置角色不可删除')
   const memberCount = roleMemberCount(id)
   if (memberCount > 0) throw new Error(`该角色下有 ${memberCount} 名成员，请先解除绑定`)
@@ -297,6 +309,7 @@ export async function saveRolePermissions(id: string, grantKeys: string[]): Prom
   await delay()
   const role = getRole(id)
   if (!role) throw new Error('角色不存在')
+  if (isDefaultRole(role)) throw new Error('平台默认角色由平台统一维护，权限不可修改')
   if (isPresetRole(role)) throw new Error('预置角色权限不可修改')
 
   const before = rolePermissions(role)
@@ -312,6 +325,86 @@ export async function saveRolePermissions(id: string, grantKeys: string[]): Prom
   if (added.length) parts.push(`新增 ${added.length} 项：${added.map(permissionPathText).join('、')}`)
   if (removed.length) parts.push(`移除 ${removed.length} 项：${removed.map(permissionPathText).join('、')}`)
   writeRoleLog('权限配置', role.name, parts.join('；'))
+}
+
+/* ---------- 企业默认角色（平台端「企业角色管理」维护） ---------- */
+
+/** 平台端企业角色管理列表：内置企业超级管理员（只读）+ 平台默认角色 */
+export function builtinEnterpriseRoles(): Role[] {
+  return sortedRoles().filter((role) => isPresetRole(role) || isDefaultRole(role))
+}
+
+export const getDefaultRole = (id: string) => {
+  const role = getRole(id)
+  return role && isDefaultRole(role) ? role : null
+}
+
+export function searchDefaultRoles(keyword: string): Role[] {
+  const value = keyword.trim().toLowerCase()
+  return builtinEnterpriseRoles().filter((role) => {
+    if (!value) return true
+    return role.name.toLowerCase().includes(value) || role.desc.toLowerCase().includes(value)
+  })
+}
+
+/** 默认角色名称校验：全平台唯一，不得与内置角色或其他企业自定义角色重名 */
+export function validateDefaultRoleName(name: string, excludeId?: string): string | null {
+  return validateRoleName(name, excludeId)
+}
+
+/** 新增默认角色：只创建名称与描述，权限为空，创建后由右侧面板配置 */
+export async function createDefaultRole(input: RoleInput): Promise<Role> {
+  await delay()
+  const name = normalizeText(input.name)
+  const nameError = validateDefaultRoleName(name)
+  if (nameError) throw new Error(nameError)
+  const role: Role = {
+    id: `ROLE-DEFAULT-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    name,
+    desc: normalizeText(input.desc),
+    source: 'default',
+    permissions: [],
+    createdAt: Date.now(),
+  }
+  roleList.push(role)
+  persistRoles()
+  return role
+}
+
+/** 编辑默认角色：仅允许平台侧修改 */
+export async function updateDefaultRole(id: string, input: RoleInput): Promise<void> {
+  await delay()
+  const role = getDefaultRole(id)
+  if (!role) throw new Error('默认角色不存在')
+  const name = normalizeText(input.name)
+  const nameError = validateDefaultRoleName(name, id)
+  if (nameError) throw new Error(nameError)
+  role.name = name
+  role.desc = normalizeText(input.desc)
+  persistRoles()
+}
+
+/** 删除默认角色：全平台无成员绑定时才可删除 */
+export async function removeDefaultRole(id: string): Promise<void> {
+  await delay()
+  const role = getDefaultRole(id)
+  if (!role) throw new Error('默认角色不存在')
+  const memberCount = roleMemberCount(id)
+  if (memberCount > 0) {
+    throw new Error(`该默认角色仍被 ${memberCount} 名成员使用，请先在企业成员中解除绑定后再删除`)
+  }
+  const index = roleList.findIndex((item) => item.id === id)
+  if (index >= 0) roleList.splice(index, 1)
+  persistRoles()
+}
+
+/** 保存默认角色权限：仅允许平台侧修改，保存后对所有企业立即生效 */
+export async function saveDefaultRolePermissions(id: string, grantKeys: string[]): Promise<void> {
+  await delay()
+  const role = getDefaultRole(id)
+  if (!role) throw new Error('默认角色不存在')
+  role.permissions = collapsePermissionKeys(grantKeys)
+  persistRoles()
 }
 
 /* ---------- 搜索与筛选 ---------- */

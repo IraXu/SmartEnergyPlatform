@@ -14,8 +14,12 @@
           </span>
           <span class="role-perm__name" :title="role.name">{{ role.name }}</span>
           <a-tag v-if="preset" class="role-perm__tag role-perm__tag--preset">
-            <LockOutlined />
+            <template #icon><LockOutlined /></template>
             预置
+          </a-tag>
+          <a-tag v-else-if="defaultRole" class="role-perm__tag role-perm__tag--default">
+            <template #icon><LockOutlined /></template>
+            默认
           </a-tag>
           <a v-if="memberCount > 0" class="role-perm__members" @click="emit('viewMembers')">
             {{ memberCount }} 名成员
@@ -23,7 +27,7 @@
           <span v-else class="role-perm__members role-perm__members--empty">0 名成员</span>
         </div>
         <div class="role-perm__head-actions">
-          <a-button v-if="canEdit" type="link" size="small" @click="emit('rename')">编辑</a-button>
+          <a-button v-if="editable" type="link" size="small" @click="emit('rename')">编辑</a-button>
         </div>
       </header>
 
@@ -39,6 +43,14 @@
         <div class="role-perm__lock-main">
           <p class="role-perm__lock-title">该角色为系统预置，权限不可修改</p>
           <p class="role-perm__lock-desc">企业超级管理员恒定拥有本企业全部功能与全部数据权限</p>
+        </div>
+      </div>
+
+      <div v-else-if="defaultRole" class="role-perm__lock">
+        <span class="role-perm__lock-icon"><LockOutlined /></span>
+        <div class="role-perm__lock-main">
+          <p class="role-perm__lock-title">该角色由平台统一维护，可在企业成员中分配给成员使用</p>
+          <p class="role-perm__lock-desc">权限不可修改；如需差异化权限，请通过「新增角色」建立后逐项配置</p>
         </div>
       </div>
 
@@ -64,7 +76,7 @@
               : `已选 ${checkedCount} / ${ALL_CAPABILITY_KEYS.length} 项权限`
           }}
         </span>
-        <a-space v-if="canConfig" size="small">
+        <a-space v-if="configurable" size="small">
           <a-button type="link" size="small" @click="emit('selectAll')">全选</a-button>
           <a-button type="link" size="small" danger @click="emit('clearAll')">清空</a-button>
         </a-space>
@@ -125,7 +137,7 @@
               class="perm-level__box"
               :checked="stateOf(dir.key) === 'all'"
               :indeterminate="stateOf(dir.key) === 'partial'"
-              :disabled="!canConfig"
+              :disabled="!configurable"
               @change="toggle(dir.key, $event.target.checked)"
             />
             <span class="perm-module__icon"><AppstoreOutlined /></span>
@@ -146,7 +158,7 @@
                 :checked="granted.has(action.key)"
                 :dim="isActionDim(action.key)"
                 :keyword="keyword"
-                :disabled="!canConfig"
+                :disabled="!configurable"
                 @toggle="toggle"
               />
             </div>
@@ -165,7 +177,7 @@
               :hit-keys="hitKeys"
               :searching="searching"
               :keyword="keyword"
-              :disabled="!canConfig"
+              :disabled="!configurable"
               @toggle="toggle"
             />
           </div>
@@ -175,7 +187,7 @@
       </div>
 
       <!-- 底部操作区：未保存摘要 + 取消 / 保存（CMP-ROL-22、CMP-ROL-23） -->
-      <footer v-if="canConfig" class="role-perm__footer">
+      <footer v-if="configurable" class="role-perm__footer">
         <span v-if="dirty" class="role-perm__summary">
           已选 {{ checkedCount }} / {{ ALL_CAPABILITY_KEYS.length }} 项权限 · 新增
           {{ diff.added.length }} 项 · 移除 {{ diff.removed.length }} 项
@@ -263,6 +275,10 @@ const emit = defineEmits<{
 const keyword = computed(() => props.keyword)
 
 const preset = computed(() => props.role?.source === 'preset')
+const defaultRole = computed(() => props.role?.source === 'default')
+/** 仅自定义角色可编辑名称与权限 */
+const editable = computed(() => props.canEdit && !preset.value && !defaultRole.value)
+const configurable = computed(() => props.canConfig && !preset.value && !defaultRole.value)
 
 /** 展开后的生效能力集合：勾选态与计数都以它为准（父级授权自动覆盖其下全部能力） */
 const granted = computed(() => new Set(expandPermissionKeys(props.draft)))

@@ -17,7 +17,7 @@ export const PERM = {
   reportGenerate: 'energy:report:generate',
   /** 报表 PDF 导出 */
   reportExport: 'energy:report:export',
-  /** 能源数据导出（监测/分析） */
+  /** 数据导出（用能分析 / 设备数据分析共用） */
   export: 'energy:export',
   /** 用电统计设置（用能单元详情页签内编辑） */
   meterStatEdit: 'system:org:unit:meterstat:edit',

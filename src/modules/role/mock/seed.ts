@@ -9,10 +9,15 @@ import type { Role } from '../store/types'
 /** 【原型说明】预置角色标识：企业超级管理员，拥有本企业全部权限，不可改权限、不可删除 */
 export const PRESET_ROLE_ID = 'ROLE-PRESET'
 
+/** 【原型说明】平台默认角色标识：由平台「企业角色管理」统一维护，企业侧只读 */
+export const DEFAULT_ROLE_IDS = ['ROLE-DEFAULT-01', 'ROLE-DEFAULT-02'] as const
+
 /**
- * 【原型说明】预置角色 + 5 个企业自建角色示例。
+ * 【原型说明】预置角色 + 2 个平台默认角色 + 5 个企业自建角色示例。
  * 预置角色仅「企业超级管理员」一个（PRD Q-ROL-03）：权限恒等于字典全集，
  * 因此这里不写死权限清单，由 store 在读取时按字典实时计算（超管自动获得新增权限点）。
+ * 默认角色（source = 'default'）由平台统一维护，企业侧只读、可分配给成员；
+ * 平台侧「企业角色管理」页对同一批数据做增删改。
  *
  * 自定义角色的 permissions 存「已授权节点」的收敛态，标识可位于任意层级：
  * - `'system'`：目录级授权（整块授予「系统管理」下全部功能）
@@ -29,6 +34,50 @@ export const PRESET_ROLES: Role[] = [
     source: 'preset',
     permissions: [],
     createdAt: Date.now() - 30 * 24 * 60 * 60 * 1000,
+  },
+  {
+    id: DEFAULT_ROLE_IDS[0],
+    name: '企业运维管理员',
+    desc: '平台默认角色：负责企业设备、告警与成员日常运维',
+    source: 'default',
+    permissions: [
+      'dashboard',
+      'location',
+      'alarm',
+      'alarm:export',
+      'device:ledger',
+      'device:ledger:control:timesync',
+      'device:ledger:control:meterread',
+      'device:ledger:control:switchon',
+      'device:ledger:control:switchoff',
+      'device:ledger:control:reconnect',
+      'device:ledger:param',
+      'system:org',
+      'system:member',
+    ],
+    createdAt: Date.now() - 20 * 24 * 60 * 60 * 1000,
+  },
+  {
+    id: DEFAULT_ROLE_IDS[1],
+    name: '企业只读成员',
+    desc: '平台默认角色：可查看企业设备、告警与能源数据，不具备操作权限',
+    source: 'default',
+    permissions: [
+      'dashboard',
+      'location',
+      'alarm',
+      'device:ledger',
+      'device:ota',
+      'device:ota:content',
+      'device:ota:record',
+      // 能源数据仅可进入三个页面查看，不含导出 / 生成报表等按钮级权限
+      'energy:monitor',
+      'energy:analysis',
+      'energy:report',
+      'system:org',
+      'system:member',
+    ],
+    createdAt: Date.now() - 18 * 24 * 60 * 60 * 1000,
   },
   {
     id: 'ROLE-02',

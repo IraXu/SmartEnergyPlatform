@@ -315,6 +315,7 @@ import {
   currentPermissions,
   expandPermissionKeys,
   getRole,
+  isDefaultRole,
   isPresetRole,
   isRoleLimitReached,
   normalizeText,
@@ -555,6 +556,10 @@ const renameDescError = computed(() => validateRoleDesc(renameForm.desc))
 function openRename() {
   const role = selectedRole.value
   if (!role) return
+  if (isDefaultRole(role)) {
+    message.warning('平台默认角色由平台统一维护，不可修改')
+    return
+  }
   if (isPresetRole(role)) {
     message.warning('预置角色不可修改')
     return
@@ -600,6 +605,10 @@ const removePermissionCount = computed(() => (removeTarget.value ? rolePermissio
 function openRemove() {
   const role = selectedRole.value
   if (!role) return
+  if (isDefaultRole(role)) {
+    message.warning('平台默认角色由平台统一维护，企业侧不可删除')
+    return
+  }
   if (isPresetRole(role)) {
     message.warning('预置角色不可删除')
     return
