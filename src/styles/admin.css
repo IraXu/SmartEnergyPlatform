@@ -367,6 +367,7 @@
    指针位于导航栏上时滚轮不产生任何滚动效果（不出现内部滚动条）。 */
 .admin-nav {
   --nav-fillet: 14px;
+  position: relative;
   flex: none;
   display: flex;
   flex-direction: column;
@@ -374,6 +375,35 @@
   width: 100px;
   padding: 8px 6px;
   background: #fff;
+}
+
+/* 一级导航选中滑块：位置与尺寸由脚本按当前项量取，
+   切换模块时以位移过渡滑到目标项，形成「色块跟着手走」的连续感。
+   首帧定位完成前不启用过渡，避免从左上角滑入。 */
+.admin-nav__indicator {
+  position: absolute;
+  z-index: 0;
+  border-radius: 8px;
+  background: #ecf4f3;
+  pointer-events: none;
+}
+
+/* 定位完成后再开启过渡与淡入 */
+.admin-nav__indicator--ready {
+  opacity: 1;
+  box-shadow: 0 1px 3px rgba(15, 42, 70, 0.08);
+  transition: top 0.32s cubic-bezier(0.22, 0.61, 0.36, 1),
+    left 0.32s cubic-bezier(0.22, 0.61, 0.36, 1),
+    width 0.32s cubic-bezier(0.22, 0.61, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-radius 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 未定位到选中项时隐藏 */
+.admin-nav__indicator:not(.admin-nav__indicator--ready) {
+  opacity: 0;
 }
 
 /* 业务域组与系统组之间的弹性留白，把系统组推到栏底；不画分割线 */
@@ -385,6 +415,7 @@
 
 .admin-nav__item {
   position: relative;
+  z-index: 1;
   display: flex;
   flex: none;
   flex-direction: column;
@@ -416,29 +447,29 @@
   transform: scale(0.97);
 }
 
-/* 当前模块与展开项：与二级栏共用同一浅底（不透明色，避免半透明叠加导致色差），
-   悬停时保持该底色不变，保证与二级栏的一体性 */
+/* 当前模块与展开项：底色由选中滑块承担，项本身只改文字色，
+   滑块位移时不会出现「新项先变色、旧项后消失」的断层 */
 .admin-nav__item--current,
 .admin-nav__item--expanded {
   color: #0f7b6c;
-  background: #ecf4f3;
+  background: transparent;
 }
 
 .admin-nav__item--current:hover,
 .admin-nav__item--expanded:hover {
-  background: #ecf4f3;
+  background: transparent;
 }
 
-/* 未展开时（二级列未打开）保留轻微投影，浮起为独立卡片 */
-.admin-nav__item--current:not(.admin-nav__item--expanded) {
-  box-shadow: 0 1px 3px rgba(15, 42, 70, 0.08);
-}
-
-/* 浮层展开时，选中项向右补齐到导航栏边缘、右侧收平，与白色二级列连成一块；
-   再用两个内凹圆角把直角接缝抹圆，使一级与二级的白色自然过渡 */
+/* 浮层展开时，选中项向右补齐到导航栏边缘（滑块按该宽度量取，右侧收平），
+   使一级与二级连成一块；命中区域同时延伸到接缝，点击手感更顺 */
 .admin-nav__item--expanded {
   width: calc(100% + 6px);
   margin-right: -6px;
+}
+
+/* 浮层展开时，选中滑块向右补齐到导航栏边缘、右侧收平，与白色二级列连成一块；
+   再用两个内凹圆角把直角接缝抹圆，使一级与二级的白色自然过渡 */
+.admin-nav__indicator--expanded {
   border-radius: 8px 0 0 8px;
   box-shadow: none;
 }
@@ -446,8 +477,8 @@
 /* 内凹圆角：在方块内以「远离接点的一角」为圆心画弧，
    弧内透明露出白底、弧外为选中浅底，形成从选中项边缘弯向二级列的内凹弧。
    半径由 --nav-fillet 统一控制，方块的尺寸、偏移与渐变半径均随其联动。 */
-.admin-nav__item--expanded::before,
-.admin-nav__item--expanded::after {
+.admin-nav__indicator--expanded::before,
+.admin-nav__indicator--expanded::after {
   content: '';
   position: absolute;
   right: 0;
@@ -456,13 +487,13 @@
 }
 
 /* 上接缝：圆心在方块左上角，浅底补在右下侧 */
-.admin-nav__item--expanded::before {
+.admin-nav__indicator--expanded::before {
   top: calc(var(--nav-fillet) * -1);
   background: radial-gradient(circle at 0 0, transparent var(--nav-fillet), #ecf4f3 var(--nav-fillet));
 }
 
 /* 下接缝：圆心在方块左下角，浅底补在右上侧 */
-.admin-nav__item--expanded::after {
+.admin-nav__indicator--expanded::after {
   bottom: calc(var(--nav-fillet) * -1);
   background: radial-gradient(circle at 0 100%, transparent var(--nav-fillet), #ecf4f3 var(--nav-fillet));
 }
@@ -496,9 +527,37 @@
   border-right: 1px solid #e6ecea;
 }
 
+/* 二级列内容容器：作为选中滑块的定位参照 */
+.admin-nav-panel__list {
+  position: relative;
+}
+
+/* 二级导航选中滑块：在浅底面板上以白色块浮起，
+   切换功能时纵向滑动到目标项，形成连续的位置感，而非两处各自明灭 */
+.admin-nav-panel__indicator {
+  position: absolute;
+  z-index: 0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 42, 70, 0.06);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.admin-nav-panel__indicator--ready {
+  opacity: 1;
+  transition: top 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+    left 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+    width 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+    height 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* 一级项之间切换时，二级列表逐项错开滑入：
    每项按自身索引延迟 --nav-item-index × 18ms，形成自上而下的瀑布式出现 */
 .admin-nav-panel__item {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 44px;
@@ -546,11 +605,10 @@
   transform: scale(0.985);
 }
 
-/* 当前功能：在浅底面板上以白色块浮起，配主色文字与加重字重，形成最强层级 */
+/* 当前功能：白色块由选中滑块承担，项本身只保留主色文字与加重字重 */
 .admin-nav-panel__item--current {
   font-weight: 500;
   color: #0f7b6c;
-  background: #fff;
 }
 
 .admin-nav-panel__item:focus-visible {
@@ -634,6 +692,8 @@
 @media (prefers-reduced-motion: reduce) {
   .admin-nav__item,
   .admin-nav-panel__item,
+  .admin-nav__indicator--ready,
+  .admin-nav-panel__indicator--ready,
   .nav-panel-enter-active,
   .nav-panel-leave-active {
     transition: none;

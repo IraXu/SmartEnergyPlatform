@@ -39,6 +39,16 @@
 
     <div class="admin-body">
       <nav ref="navRef" class="admin-nav" aria-label="平台端主导航" @keydown="handleNavKeydown">
+        <!-- 选中滑块：切换一级项时由脚本量取目标位置后平滑滑过去 -->
+        <span
+          class="admin-nav__indicator"
+          :class="{
+            'admin-nav__indicator--expanded': Boolean(openItem),
+            'admin-nav__indicator--ready': navIndicatorReady,
+          }"
+          :style="indicatorStyle(navIndicator)"
+          aria-hidden="true"
+        />
         <template v-for="item in platformNav" :key="item.key">
           <button
             type="button"
@@ -62,6 +72,13 @@
         <aside v-if="openItem" ref="panelRef" class="admin-nav-panel" :aria-label="`${openItem.label}二级导航`">
           <!-- 以模块 key 作为容器身份：切换一级项时容器重建，二级项重新挂载并逐项播放滑入 -->
           <div :key="openItem.key" class="admin-nav-panel__list">
+            <!-- 二级选中滑块：在二级项之间滑动，跟随当前功能的位置 -->
+            <span
+              class="admin-nav-panel__indicator"
+              :class="{ 'admin-nav-panel__indicator--ready': panelIndicatorReady }"
+              :style="indicatorStyle(panelIndicator)"
+              aria-hidden="true"
+            />
             <template v-for="(child, index) in visibleChildren(openItem)" :key="child.key">
               <!-- 含三级菜单的二级分组：点击在二级列内展开三级项，分组自身不跳转 -->
               <div
@@ -141,7 +158,7 @@
  * 「平台权限管理」（展开「平台成员管理 / 平台角色管理」）与「企业权限管理」（展开「企业角色管理」）。
  * 导航项按平台权限点渲染：无对应权限的项不出现（与企业端「对全部账号可见」的口径不同）。
  */
-import { computed, h, onBeforeUnmount, onMounted, ref, watch, type Component } from 'vue'
+import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message, type MenuItemType, type MenuProps } from 'antdv-next'
 import {
@@ -253,6 +270,62 @@ let triggerEl: HTMLElement | null = null
 
 const openItem = computed(() => (openKey.value ? platformNav.value.find((item) => item.key === openKey.value) ?? null : null))
 
+/* ---------- 选中滑块：一级与二级共用一套量取逻辑 ---------- */
+type IndicatorBox = { top: number; left: number; width: number; height: number }
+
+/** 一级导航选中滑块的位置与尺寸；null 表示暂无可定位的选中项 */
+const navIndicator = ref<IndicatorBox | null>(null)
+/** 二级导航选中滑块的位置与尺寸 */
+const panelIndicator = ref<IndicatorBox | null>(null)
+/** 首帧定位完成后才开启过渡，避免滑块从左上角滑入 */
+const navIndicatorReady = ref(false)
+const panelIndicatorReady = ref(false)
+
+/** 量取元素相对其定位容器（导航栏 / 二级列内容容器）的位置与尺寸 */
+function measureBox(el: HTMLElement): IndicatorBox {
+  return { top: el.offsetTop, left: el.offsetLeft, width: el.offsetWidth, height: el.offsetHeight }
+}
+
+function indicatorStyle(box: IndicatorBox | null) {
+  return box
+    ? { top: `${box.top}px`, left: `${box.left}px`, width: `${box.width}px`, height: `${box.height}px` }
+    : { opacity: 0 }
+}
+
+function refreshNavIndicator() {
+  const active = navRef.value?.querySelector<HTMLElement>('.admin-nav__item--expanded, .admin-nav__item--current')
+  navIndicator.value = active ? measureBox(active) : null
+}
+
+function refreshPanelIndicator() {
+  // 含三级菜单的分组只用主色提示所在位置，不占白色块，故排除分组行
+  const active = panelRef.value?.querySelector<HTMLElement>(
+    '.admin-nav-panel__item--current:not(.admin-nav-panel__item--group)',
+  )
+  panelIndicator.value = active ? measureBox(active) : null
+}
+
+/** 等 DOM 更新后重新定位滑块，再开启过渡与淡入 */
+async function refreshIndicators() {
+  await nextTick()
+  refreshNavIndicator()
+  refreshPanelIndicator()
+  if (!navIndicatorReady.value) requestAnimationFrame(() => (navIndicatorReady.value = true))
+  if (!panelIndicatorReady.value) requestAnimationFrame(() => (panelIndicatorReady.value = true))
+}
+
+// 切换一级项时二级列内容容器会按模块重建，滑块需重新从无到有地定位
+watch(
+  () => openItem.value?.key ?? null,
+  () => {
+    panelIndicator.value = null
+    panelIndicatorReady.value = false
+  },
+)
+
+// 路由、一级展开态、三级分组展开态变化都会改变选中项位置
+watch(() => [route.path, openKey.value, openChildKey.value, platformNav.value.length], refreshIndicators)
+
 function isCurrent(item: NavItem) {
   if (item.route) return route.path === item.route
   return Boolean(visibleChildren(item).some((child) => isChildCurrent(child) || isGroupCurrent(child)))
@@ -361,6 +434,7 @@ watch(() => route.path, syncPanelWithRoute)
 
 onMounted(() => {
   syncPanelWithRoute()
+  refreshIndicators()
   document.addEventListener('click', handleDocumentClick)
   document.addEventListener('keydown', handleDocumentKeydown)
 })
