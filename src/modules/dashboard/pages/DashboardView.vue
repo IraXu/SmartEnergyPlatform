@@ -181,7 +181,7 @@
             class="wb-energy__entry"
             @click="goEnergy('report')"
           >
-            报表统计
+            统计报表
           </a-button>
         </div>
       </header>
@@ -410,7 +410,7 @@
  * - 核心指标为单块统计面板（六项），面板头承载统计时间与刷新；
  *   「今日策略执行次数」名称旁带口径说明 Tooltip；
  * - 用能概览（EN-08）展示授权范围内的今日用电 / 本月用电 / 本月可比环比 / 数据完整率与近 14 天趋势简图，
- *   面板头提供「用能分析 / 报表统计」入口；未就绪时以状态表达，不以 0 替代；
+ *   面板头提供「用能分析 / 统计报表」入口；未就绪时以状态表达，不以 0 替代；
  * - 最新告警为当日实时清单（最多 10 条、动态覆盖、推送实时插入并高亮）；
  * - 快捷入口按当前账号权限点渲染（含能源数据三个子页面）；
  * 页面只读、不提供写操作与处置动作；不做自动轮询。
@@ -796,7 +796,7 @@ const ALL_ENTRIES = [
 const ENERGY_ENTRIES = [
   { label: '用能分析', route: '/energy/analysis', icon: LineChartOutlined, visible: canEnergyAnalysis },
   { label: '设备数据分析', route: '/energy/monitor', icon: AreaChartOutlined, visible: canEnergyMonitor },
-  { label: '报表统计', route: '/energy/report', icon: FileTextOutlined, visible: canEnergyReport },
+  { label: '统计报表', route: '/energy/report', icon: FileTextOutlined, visible: canEnergyReport },
 ]
 
 const entries = computed(() => {

@@ -81,7 +81,7 @@ export const PERMISSION_TREE: PermissionNode[] = [
     name: '能源数据',
     level: 'dir',
     children: [
-      // 菜单顺序与一级导航下的二级项一致：用能分析 → 设备数据分析 → 报表统计
+      // 菜单顺序与一级导航下的二级项一致：用能分析 → 设备数据分析 → 统计报表
       menu('energy:analysis', '用能分析', []),
       menu('energy:monitor', '设备数据分析', [
         /**
@@ -90,7 +90,7 @@ export const PERMISSION_TREE: PermissionNode[] = [
          */
         action('energy:export', '数据导出'),
       ]),
-      menu('energy:report', '报表统计', [
+      menu('energy:report', '统计报表', [
         action('energy:report:generate', '生成报表'),
         action('energy:report:export', '报表导出'),
       ]),

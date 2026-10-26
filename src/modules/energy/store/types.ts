@@ -14,6 +14,9 @@ export type MeterStatMode = 'total' | 'sum'
 /** 计量角色 */
 export type MeterRole = '总表' | '分项表' | '独立电表'
 
+/** 报告类型：安全报告 / 用能报告 / 系统运行报告 */
+export type ReportType = 'safety' | 'energy' | 'runtime'
+
 /** 报告周期 */
 export type ReportPeriod = 'monthly' | 'annual'
 
@@ -65,10 +68,14 @@ export interface RankRow {
 export interface ReportVersion {
   id: string
   name: string
+  /** 报告类型：决定报告章节与可生成条件 */
+  type: ReportType
   period: ReportPeriod
   periodText: string
-  /** 报告范围（生成时的用能单元层级路径；历史版本保留生成时快照） */
+  /** 报告范围（生成时的节点层级路径；历史版本保留生成时快照） */
   scope?: string
+  /** 报告范围节点 ID；用于预览时还原报告快照的统计范围 */
+  scopeId?: string
   version: number
   status: ReportStatus
   generatedAt: string

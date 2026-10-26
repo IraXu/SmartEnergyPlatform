@@ -11,7 +11,7 @@ export const PERM = {
   monitor: 'energy:monitor',
   /** 用能分析 */
   analysis: 'energy:analysis',
-  /** 报表统计：查看/预览 */
+  /** 统计报表：查看/预览 */
   report: 'energy:report',
   /** 报表生成/重新生成 */
   reportGenerate: 'energy:report:generate',
@@ -25,7 +25,7 @@ export const PERM = {
 
 export const ENERGY_VERSION_KEY = 'proto_energy_version'
 /** 【原型说明】演示数据结构版本，调整演示数据时提升版本以清理旧数据 */
-export const ENERGY_DATA_VERSION = '2'
+export const ENERGY_DATA_VERSION = '4'
 
 export const ENERGY_METERSTAT_KEY = 'proto_energy_meterstat'
 export const ENERGY_REPORTS_KEY = 'proto_energy_reports'
@@ -64,6 +64,13 @@ export const DEVICE_COMPARE_COLORS = [
 
 /** 年报开放阈值：具备不少于 13 个月的日/月汇总 */
 export const ANNUAL_MIN_MONTHS = 13
+
+/** 报告类型标签（顺序与页面页签一致） */
+export const REPORT_TYPE_LABELS = {
+  safety: '安全报告',
+  energy: '用能报告',
+  runtime: '系统运行报告',
+} as const
 
 /** 时区与时间格式（沿用平台约定） */
 export const TIME_FORMAT = 'YYYY-MM-DD HH:mm'

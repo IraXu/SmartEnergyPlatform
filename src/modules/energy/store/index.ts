@@ -24,7 +24,7 @@ import {
   ENERGY_REPORTS_KEY,
   ENERGY_VERSION_KEY,
 } from './constants'
-import type { MeterStatConfig, ReportVersion } from './types'
+import type { MeterStatConfig, ReportPeriod, ReportType, ReportVersion } from './types'
 
 /** 演示数据结构升级时清理旧数据 */
 function migrateEnergyData() {
@@ -80,16 +80,19 @@ window.setTimeout(() => {
 }, 2500)
 
 /** 【原型说明】模拟生成一份新版本报告：新增一行（旧版本不变） */
-export function generateReport(period: 'monthly' | 'annual', periodText: string, scope = '') {
-  const samePeriod = reports.filter((item) => item.period === period && item.periodText === periodText)
+export function generateReport(type: ReportType, period: ReportPeriod, periodText: string, scope = '', scopeId = '') {
+  const samePeriod = reports.filter(
+    (item) => item.type === type && item.period === period && item.periodText === periodText && item.scope === scope,
+  )
   const nextVersion = samePeriod.reduce((max, item) => Math.max(max, item.version), 0) + 1
-  const name = period === 'monthly' ? `${periodText}用能月报` : `${periodText}用能年报`
   const report: ReportVersion = {
-    id: `RPT-${Date.now()}`,
-    name,
+    id: `RPT-${type}-${Date.now()}`,
+    name: buildReportName(type, period, periodText),
+    type,
     period,
     periodText,
     scope,
+    scopeId,
     version: nextVersion,
     status: 'generating',
     generatedAt: formatNow(),
@@ -97,14 +100,23 @@ export function generateReport(period: 'monthly' | 'annual', periodText: string,
     operator: '徐志诚',
   }
   reports.unshift(report)
+  // 取数组中的响应式代理，避免直接修改原始对象导致状态不刷新
+  const stored = reports[0]
   persistReports()
   // 模拟异步生成完成
   window.setTimeout(() => {
-    report.status = 'generated'
-    report.sizeText = '1.9 MB'
+    stored.status = 'generated'
+    stored.sizeText = type === 'safety' ? '2.1 MB' : type === 'runtime' ? '1.4 MB' : '1.9 MB'
     persistReports()
   }, 1800)
-  return report
+  return stored
+}
+
+/** 报告名称：类型 + 期间；月份不补零 */
+export function buildReportName(type: ReportType, _period: ReportPeriod, periodText: string) {
+  if (type === 'safety') return `${periodText}安全报告`
+  if (type === 'runtime') return `${periodText}系统运行报告`
+  return `${periodText}用能报告`
 }
 
 /** 【原型说明】保存用电统计设置（单点保存 + 系统日志留痕由页面提示） */

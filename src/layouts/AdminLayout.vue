@@ -256,7 +256,7 @@ const baseNav: NavItem[] = [
       },
     ],
   },
-  // 能源数据为 v1.0.1 新增业务域：其下含用能分析 / 设备数据分析 / 报表统计
+  // 能源数据为 v1.0.1 新增业务域：其下含用能分析 / 设备数据分析 / 统计报表
 ]
 
 /**
@@ -272,7 +272,7 @@ const energyNav = computed<NavItem[]>(() => {
     children.push({ key: 'energy-monitor', label: '设备数据分析', route: '/energy/monitor' })
   }
   if (hasEnergyPermission(ENERGY_PERM.report)) {
-    children.push({ key: 'energy-report', label: '报表统计', route: '/energy/report' })
+    children.push({ key: 'energy-report', label: '统计报表', route: '/energy/report' })
   }
   if (!hasEnergyPermission(ENERGY_PERM.energy) || !children.length) return []
   return [{ key: 'energy', label: '能源数据', icon: ThunderboltOutlined, expandable: true, children }]

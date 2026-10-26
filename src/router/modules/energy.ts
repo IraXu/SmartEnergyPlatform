@@ -1,6 +1,6 @@
 /**
  * 【原型说明】能源数据模块路由（v1.0.1 迭代）。
- * 三个菜单页：用能分析 / 设备数据分析 / 报表统计；
+ * 三个菜单页：用能分析 / 设备数据分析 / 统计报表；
  * 用电统计设置已取消，meter-stat 仅作历史原型留存，不再提供入口。
  */
 
@@ -29,7 +29,7 @@ export const energyRoutes: RouteRecordRaw[] = [
         path: 'report',
         name: 'energy-report',
         component: () => import('@/modules/energy/pages/EnergyReportView.vue'),
-        meta: { title: '报表统计', requiresAuth: true },
+        meta: { title: '统计报表', requiresAuth: true },
       },
       {
         path: 'meter-stat/:unitId?',
