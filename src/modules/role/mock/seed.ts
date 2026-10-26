@@ -52,6 +52,10 @@ export const PRESET_ROLES: Role[] = [
       'device:ledger:control:switchoff',
       'device:ledger:control:reconnect',
       'device:ledger:param',
+      // 能源数据：可进入三个页面查看，不含导出 / 生成报告等操作权限
+      'energy:monitor',
+      'energy:analysis',
+      'energy:report',
       'system:org',
       'system:member',
     ],
@@ -116,6 +120,9 @@ export const PRESET_ROLES: Role[] = [
       'device:power:strategy:toggle',
       'device:power:strategy:delete',
       'device:power:strategy:record',
+      // 能源数据：设备数据分析 + 统计报表（安全/系统运行报告用于运维定位），只读进入
+      'energy:monitor',
+      'energy:report',
       'system:org',
       'system:member',
       // 系统日志：可进入并查看两类日志 + 导出操作行为日志（查看为菜单级共用，导出按类型拆分）
@@ -135,6 +142,12 @@ export const PRESET_ROLES: Role[] = [
       'alarm',
       'alarm:export',
       'device',
+      // 能源数据：面向客户报表解读，可查看三类报告并生成、导出
+      'energy:analysis',
+      'energy:monitor',
+      'energy:report',
+      'energy:report:generate',
+      'energy:report:export',
       'system:org',
       'system:member',
       'system:role',
@@ -159,6 +172,8 @@ export const PRESET_ROLES: Role[] = [
       'alarm:export',
       'alarm:delete',
       'device',
+      // 能源数据：园区主管查看本范围统计报表
+      'energy:report',
       'system:org',
       'system:member',
       'system:member:role:assign',
@@ -183,6 +198,10 @@ export const PRESET_ROLES: Role[] = [
       'device:ota:record',
       'device:power:strategy',
       'device:power:strategy:record',
+      // 能源数据：只读查看三个页面，不含任何按钮级操作
+      'energy:analysis',
+      'energy:monitor',
+      'energy:report',
       'system:org',
       'system:member',
       'system:role',

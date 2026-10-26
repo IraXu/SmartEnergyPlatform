@@ -260,8 +260,9 @@ const baseNav: NavItem[] = [
 ]
 
 /**
- * 能源数据一级项：目录级 `energy` + 菜单级权限分别渲染；
- * 无目录权限或无任何可见子页面时整项隐藏（UI-ENOV-04/05）。
+ * 能源数据一级项：按各菜单级权限分别渲染；
+ * 至少一个子页面可见时展示；无任何可见子页面时整项隐藏（UI-ENOV-05）。
+ * 目录级 `energy` 表示整块授权，不额外作为一级项展示的前置条件。
  */
 const energyNav = computed<NavItem[]>(() => {
   const children: NavChild[] = []
@@ -274,7 +275,7 @@ const energyNav = computed<NavItem[]>(() => {
   if (hasEnergyPermission(ENERGY_PERM.report)) {
     children.push({ key: 'energy-report', label: '统计报表', route: '/energy/report' })
   }
-  if (!hasEnergyPermission(ENERGY_PERM.energy) || !children.length) return []
+  if (!children.length) return []
   return [{ key: 'energy', label: '能源数据', icon: ThunderboltOutlined, expandable: true, children }]
 })
 

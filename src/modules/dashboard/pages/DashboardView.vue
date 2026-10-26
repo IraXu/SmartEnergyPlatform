@@ -480,15 +480,13 @@ const canOnboarding = computed(() => has('system:org'))
 const canOta = computed(() => has('device:ota'))
 const canStrategy = computed(() => has('device:power:strategy'))
 
-/* ---------- 能源数据权限（目录级 + 菜单级，与 AdminLayout 口径一致） ---------- */
+/* ---------- 能源数据权限（按菜单级权限渲染，与 AdminLayout 口径一致） ---------- */
 const canEnergyMonitor = computed(() => hasEnergyPermission(ENERGY_PERM.monitor))
 const canEnergyAnalysis = computed(() => hasEnergyPermission(ENERGY_PERM.analysis))
 const canEnergyReport = computed(() => hasEnergyPermission(ENERGY_PERM.report))
-/** 用能概览可见性：目录级 `energy` + 至少一个子页面权限；无权限时区块整体不展示 */
+/** 用能概览可见性：至少一个能源数据子页面权限；无权限时区块整体不展示 */
 const canEnergyOverview = computed(
-  () =>
-    hasEnergyPermission(ENERGY_PERM.energy) &&
-    (canEnergyAnalysis.value || canEnergyMonitor.value || canEnergyReport.value),
+  () => canEnergyAnalysis.value || canEnergyMonitor.value || canEnergyReport.value,
 )
 
 /* ---------- 顶部信息区 ---------- */
