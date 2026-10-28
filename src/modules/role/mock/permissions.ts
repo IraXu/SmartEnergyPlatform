@@ -1,5 +1,5 @@
 /**
- * 【原型说明】权限点字典，对齐《产品需求文档-角色管理》v1.14 的 7.4 权限点字典（共 68 项）。
+ * 【原型说明】权限点字典，对齐《产品需求文档-角色管理》7.4 权限点字典（回填品牌设置后共 72 项）。
  *
  * 【层级模型】权限树的层级与导航一一对应，且深度不受限制：
  * - 目录级（`dir`）：一级导航栏内的项（如「系统管理」）——仅作分组容器；
@@ -181,6 +181,12 @@ export const PERMISSION_TREE: PermissionNode[] = [
         action('system:enterprise:profile:edit', '编辑企业档案与企业 Logo'),
         action('system:enterprise:contact:edit', '维护企业联系人'),
         action('system:enterprise:qualification:edit', '维护企业资质信息'),
+      ]),
+      // 品牌设置：查看与三组配置编辑分别授权（PRD F-BRD-07）
+      menu('system:branding', '品牌设置', [
+        action('system:branding:tab:edit', '编辑浏览器标签'),
+        action('system:branding:login:edit', '编辑登录页品牌'),
+        action('system:branding:frame:edit', '编辑主界面框架'),
       ]),
       /**
        * 系统日志为**只读视图**：两类日志的**查看共用菜单级标识 `system:log`**

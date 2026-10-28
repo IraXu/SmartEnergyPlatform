@@ -439,6 +439,7 @@ export function currentPermissions(): string[] {
       'system:member',
       'system:role',
       'system:enterprise',
+      'system:branding',
       'system:log',
     ]
   }

@@ -30,6 +30,14 @@
   height: 28px;
 }
 
+/* 顶栏主标题：由品牌设置维护，单行展示，超长省略并保留原生悬停提示 */
+.admin-header__title {
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* 顶栏右侧：企业切换与账号区依次排列 */
 .admin-header__right {
   display: flex;

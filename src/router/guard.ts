@@ -8,6 +8,7 @@
 
 import type { Router } from 'vue-router'
 import { hasEnteredOrg, isPlatformSession, isSessionValid, refreshSession } from '@/modules/auth/store'
+import { applyDocumentBranding } from '@/modules/branding/store'
 import { applyEnterpriseScope } from '@/shared/enterpriseScope'
 
 export function setupRouterGuard(router: Router) {
@@ -53,7 +54,7 @@ export function setupRouterGuard(router: Router) {
   })
 
   router.afterEach((to) => {
-    const title = to.meta.title || ''
-    document.title = title ? `${title} — 智能数字化能源系统` : '智能数字化能源系统'
+    // 浏览器标签标题与图标由品牌设置维护：`{页面名称} — {标签标题}`（PRD F-BRD-01）
+    applyDocumentBranding(String(to.meta.title ?? ''))
   })
 }

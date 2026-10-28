@@ -157,6 +157,7 @@ import {
 } from '@/modules/auth/store'
 import { findPlatformMember, getPlatformRole } from '@/modules/platform/store'
 import { recordSessionLog } from '@/modules/log/store'
+import { applyDocumentBranding, clearLoginBrandOrg } from '@/modules/branding/store'
 
 const router = useRouter()
 const route = useRoute()
@@ -560,6 +561,9 @@ function handleDataReset() {
 }
 
 onMounted(() => {
+  // 登录页默认展示平台默认品牌；企业品牌在「选择登录企业」选中后才生效（Q-BRD-02）
+  clearLoginBrandOrg()
+  applyDocumentBranding(String(route.meta.title ?? ''))
   if (isSessionValid()) refreshSession()
   if (route.query.reason === 'expired') {
     formAlert.value = { type: 'info', text: '登录状态已失效，请重新登录', closable: true }

@@ -127,7 +127,7 @@ export const adminRoutes: RouteRecordRaw[] = [
           {
             path: 'branding',
             name: 'system-branding',
-            component: ModulePlaceholder,
+            component: () => import('@/modules/branding/pages/BrandingView.vue'),
             meta: { title: '品牌设置', requiresAuth: true },
           },
         ],

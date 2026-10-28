@@ -2,8 +2,8 @@
   <div class="admin-layout">
     <header class="admin-header">
       <div class="admin-header__left">
-        <img class="admin-header__mark" :src="`${baseUrl}logo.png`" alt="智能数字化能源系统" />
-        <span>智能数字化能源系统</span>
+        <img class="admin-header__mark" :src="headerLogoSrc" alt="" @error="headerLogoFailed = true" />
+        <span class="admin-header__title" :title="headerTitle">{{ headerTitle }}</span>
       </div>
 
       <div class="admin-header__right">
@@ -198,15 +198,19 @@ import {
 } from '@antdv-next/icons'
 import EnterpriseBadge from '@/shared/components/EnterpriseBadge.vue'
 import { clearSession, enterOrg, findAccount, membershipsOf, session } from '@/modules/auth/store'
+import {
+  applyDocumentBranding,
+  brandImageSrc,
+  brandingVersion,
+  clearLoginBrandOrg,
+  currentBranding,
+} from '@/modules/branding/store'
 import { logoOf } from '@/modules/enterprise/store'
 import { recordSessionLog } from '@/modules/log/store'
 import { maskIdentifier } from '@/shared/utils/mask'
 import { applyEnterpriseScope } from '@/shared/enterpriseScope'
 import { hasPermission as hasEnergyPermission } from '@/modules/energy/store'
 import { PERM as ENERGY_PERM } from '@/modules/energy/store/constants'
-
-/** 站点部署基路径：兼容 GitHub Pages 子路径与本地根路径 */
-const baseUrl = import.meta.env.BASE_URL
 
 type NavChild = {
   key: string
@@ -511,6 +515,29 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleDocumentKeydown)
 })
 
+/* ---------- 顶栏品牌（系统管理 › 品牌设置） ---------- */
+/** 顶栏 Logo 与标题取当前企业的生效品牌；保存品牌设置后随版本号即时刷新 */
+const branding = computed(() => {
+  void brandingVersion.value
+  return currentBranding()
+})
+const headerTitle = computed(() => branding.value.headerTitle)
+const headerLogoFailed = ref(false)
+const headerLogoSrc = computed(() =>
+  headerLogoFailed.value ? `${import.meta.env.BASE_URL}logo.png` : brandImageSrc(branding.value.headerLogo),
+)
+watch(
+  () => branding.value.headerLogo,
+  () => {
+    headerLogoFailed.value = false
+  },
+)
+// 切换企业或保存品牌设置后，同步刷新浏览器标签标题与图标
+watch(
+  () => `${branding.value.tabTitle}__${branding.value.tabIcon}`,
+  () => applyDocumentBranding(String(route.meta.title ?? '')),
+)
+
 /* ---------- 顶栏账号区 ---------- */
 const accountSession = computed(() => session.current)
 const orgName = computed(() => accountSession.value?.orgName ?? '')
@@ -602,6 +629,7 @@ function handleLogout() {
     recordSessionLog({ identifier: session.current.identifier, action: '退出登录', result: '成功' })
   }
   clearSession()
+  clearLoginBrandOrg()
   message.success('已退出登录')
   router.replace({ name: 'login' })
 }

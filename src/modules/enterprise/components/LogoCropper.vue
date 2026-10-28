@@ -2,7 +2,7 @@
   <!-- OVERLAY-05 企业 Logo 裁剪（COMP-ENT-03）：固定 1:1 裁剪框，可拖动与缩放，不留白、不提供旋转与比例切换 -->
   <a-modal
     :open="open"
-    title="裁剪企业 Logo"
+    :title="title"
     :width="560"
     :footer="null"
     :mask-closable="true"
@@ -61,9 +61,12 @@
  */
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { cropToSquare, loadImageFile } from '../store'
-import { LOGO_CROP_MAX_SCALE, LOGO_CROP_SIZE, LOGO_SUGGEST_SIZE } from '../store'
+import { LOGO_CROP_MAX_SCALE, LOGO_CROP_SIZE } from '../store'
 
-const props = defineProps<{ open: boolean; file: File | null }>()
+const props = withDefaults(
+  defineProps<{ open: boolean; file: File | null; title?: string; suggestSize?: number }>(),
+  { title: '裁剪企业 Logo', suggestSize: 200 },
+)
 const emit = defineEmits<{ cancel: []; confirm: [string] }>()
 
 const imageEl = ref<HTMLImageElement | null>(null)
@@ -131,7 +134,7 @@ async function prepare() {
     const image = await loadImageFile(file)
     imageEl.value = image
     imageSrc.value = image.src
-    if (Math.min(image.naturalWidth, image.naturalHeight) < LOGO_SUGGEST_SIZE) {
+    if (Math.min(image.naturalWidth, image.naturalHeight) < props.suggestSize) {
       sizeWarning.value = '图片尺寸较小，可能在徽标中显示模糊'
     }
   } catch {

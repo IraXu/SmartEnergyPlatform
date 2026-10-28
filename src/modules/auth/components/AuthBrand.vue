@@ -1,43 +1,77 @@
 <template>
-  <div class="auth-brand">
+  <div class="auth-brand" :class="{ 'auth-brand--image': Boolean(brand.loginBackground), 'auth-brand--preview': preview }" :style="brandStyle">
     <div class="auth-brand__logo">
-      <img class="auth-brand__mark" :src="`${baseUrl}logo.png`" alt="智能数字化能源系统" />
-      <span class="auth-brand__name">智能数字化能源系统</span>
+      <img class="auth-brand__mark" :src="logoSrc" alt="" @error="logoFailed = true" />
+      <span class="auth-brand__name">{{ brand.loginBrandName }}</span>
     </div>
 
     <div class="auth-brand__hero">
-      <h1 class="auth-brand__title">连接每一台设备 · 看清每一度能源</h1>
-      <p class="auth-brand__desc">
-        以电能为重点的能源数字化管理平台，统一接入并管理园区、企业与各类用能场景的电能数据，
-        覆盖设备管控、用电策略、点位分布与告警闭环，支撑用能成本下降与碳排管理目标达成。
-      </p>
+      <h1 class="auth-brand__title">{{ brand.loginTitle }}</h1>
+      <p v-if="brand.loginSubtitle" class="auth-brand__desc">{{ brand.loginSubtitle }}</p>
 
-      <div class="auth-brand__points">
-        <div class="auth-brand__point">
+      <div v-if="points.length" class="auth-brand__points">
+        <div v-for="point in points" :key="point" class="auth-brand__point">
           <span class="auth-brand__point-icon"><CheckCircleOutlined /></span>
-          <span class="auth-brand__point-text">设备台账与固件 OTA，档案与运行状态集中管控</span>
-        </div>
-        <div class="auth-brand__point">
-          <span class="auth-brand__point-icon"><CheckCircleOutlined /></span>
-          <span class="auth-brand__point-text">时控与负控策略，用电管控按规则自动执行</span>
-        </div>
-        <div class="auth-brand__point">
-          <span class="auth-brand__point-icon"><CheckCircleOutlined /></span>
-          <span class="auth-brand__point-text">点位地图与告警中心，设备分布可视、异常闭环</span>
+          <span class="auth-brand__point-text">{{ point }}</span>
         </div>
       </div>
     </div>
 
-    <div class="auth-brand__footer">© 2026 智能数字化能源系统· 伊米特合作平台项目 · 南京鹤梦产品部原型</div>
+    <!-- 页脚为平台统一文案，不开放品牌自定义 -->
+    <div class="auth-brand__footer">{{ PLATFORM_LOGIN_FOOTER }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * 【原型说明】左侧品牌区为认证类页面的公共视觉模块。
+ * 【原型说明】认证类页面的公共品牌区。
+ * 品牌取自「平台默认 + 企业覆盖」：已登录时用当前企业品牌，未登录时用最近进入企业的品牌；
+ * 品牌设置页的登录页预览通过 config 传入草稿值，实现所见即所得。
  */
+import { computed, ref, watch } from 'vue'
 import { CheckCircleOutlined } from '@antdv-next/icons'
+import {
+  brandImageSrc,
+  brandingVersion,
+  loginBranding,
+  PLATFORM_LOGIN_FOOTER,
+  type BrandingConfig,
+} from '@/modules/branding/store'
 
-/** 站点部署基路径：兼容 GitHub Pages 子路径与本地根路径 */
-const baseUrl = import.meta.env.BASE_URL
+const props = withDefaults(defineProps<{ config?: BrandingConfig | null; preview?: boolean }>(), {
+  config: null,
+  preview: false,
+})
+
+/** 使用外部草稿配置时不再读取已保存品牌；否则随品牌版本号刷新 */
+const brand = computed<BrandingConfig>(() => {
+  if (props.config) return props.config
+  void brandingVersion.value
+  return loginBranding()
+})
+
+/** 品牌区三条价值点：按配置顺序展示，空值不占位 */
+const points = computed(() =>
+  [brand.value.loginPoint1, brand.value.loginPoint2, brand.value.loginPoint3].map((item) => item.trim()).filter(Boolean),
+)
+
+const logoFailed = ref(false)
+const logoSrc = computed(() => (logoFailed.value ? `${import.meta.env.BASE_URL}logo.png` : brandImageSrc(brand.value.loginLogo)))
+watch(
+  () => brand.value.loginLogo,
+  () => {
+    logoFailed.value = false
+  },
+)
+
+/** 有背景图时叠加固定深色遮罩，保证白色标题与副标题可读（交互文档 4.9.2） */
+const brandStyle = computed(() => {
+  const image = brand.value.loginBackground
+  if (!image) return undefined
+  return {
+    backgroundImage: `linear-gradient(rgba(7, 63, 56, 0.5), rgba(7, 63, 56, 0.5)), url("${image}")`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }
+})
 </script>

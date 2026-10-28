@@ -16,7 +16,7 @@
             class="org-option"
             :class="{ 'org-option--active': selectedOrgId === item.orgId }"
             :aria-checked="selectedOrgId === item.orgId"
-            @click="selectedOrgId = item.orgId"
+            @click="handleSelect(item.orgId)"
           >
             <EnterpriseBadge :logo="item.logo" :name="item.orgName" :size="44" :radius="6" />
             <span class="org-option__body">
@@ -71,7 +71,7 @@
  * 单企业账号不经过本页，登录后直接进入其唯一企业。
  */
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { message } from 'antdv-next'
 import AuthBrand from '@/modules/auth/components/AuthBrand.vue'
 import ProtoTip from '@/shared/components/ProtoTip.vue'
@@ -86,7 +86,9 @@ import {
   session,
 } from '@/modules/auth/store'
 import { recordSessionLog } from '@/modules/log/store'
+import { applyDocumentBranding, clearLoginBrandOrg, setLoginBrandOrg } from '@/modules/branding/store'
 
+const route = useRoute()
 const router = useRouter()
 
 const submitting = ref(false)
@@ -113,18 +115,26 @@ const orgOptions = computed(() => {
 
 const tipLines = [
   '使用多企业账号登录（+8613800138000 归属 3 家企业）即可进入本页。',
+  '选中企业后，左侧品牌区自动识别并切换为该企业设置的品牌（未配置的分组继承平台默认）。',
   '「最近登录」= 该账号最近一次成功选择并进入某企业的时间，仅用于打标签与默认选中。',
   '勾选「记住选择」后再次登录将直接进入所选企业，不再展示本页；未勾选则下次登录仍展示本页。',
   '单企业账号（如 +6591234567、admin@example.com）登录后直接进入，不经过本页。',
 ]
 
+/** 选中企业：同步切换该企业在登录页／选择企业页的品牌（Q-BRD-02） */
+function handleSelect(orgId: string) {
+  selectedOrgId.value = orgId
+  setLoginBrandOrg(orgId)
+  applyDocumentBranding(String(route.meta.title ?? ''))
+}
+
 function initializeSelection() {
   const options = orgOptions.value
   if (!options.length) return
   const recentOrgId = recentOrg.value?.orgId ?? ''
-  selectedOrgId.value = options.some((item) => item.orgId === recentOrgId)
-    ? recentOrgId
-    : (options[0]?.orgId ?? '')
+  handleSelect(
+    options.some((item) => item.orgId === recentOrgId) ? recentOrgId : (options[0]?.orgId ?? ''),
+  )
   // 默认不勾选「记住选择」：是否记住由用户本次主动决定
   rememberChoice.value = false
 }
@@ -160,6 +170,7 @@ async function handleEnter() {
 /** 返回登录：结束「待选企业」态并回到登录页，重新走凭证校验 */
 function handleBackToLogin() {
   clearSession()
+  clearLoginBrandOrg()
   message.info('已返回登录')
   router.replace({ name: 'login' })
 }

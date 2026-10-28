@@ -207,6 +207,8 @@ export const PRESET_ROLES: Role[] = [
       'system:role',
       // 企业中心：仅可进入查看（无任一按钮级权限点），用于验证卡片整体只读、不渲染「编辑」入口
       'system:enterprise',
+      // 品牌设置：仅可进入查看与预览，不渲染编辑 / 保存 / 恢复默认入口
+      'system:branding',
       // 系统日志：仅可进入查看两类日志（无任一导出权限点），用于验证「导出」入口不渲染
       'system:log',
     ],

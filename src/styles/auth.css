@@ -318,6 +318,20 @@
   overflow: hidden;
 }
 
+/* 自定义背景图：固定叠加深色遮罩（内联），此时隐藏装饰光斑，避免与照片叠加显脏 */
+.auth-brand--image::before,
+.auth-brand--image::after {
+  display: none;
+}
+
+/* 预览态：关闭入场动画与文字流光，避免缩放画布中反复播放 */
+.auth-brand--preview,
+.auth-brand--preview .auth-brand__logo,
+.auth-brand--preview .auth-brand__hero,
+.auth-brand--preview .auth-brand__name {
+  animation: none;
+}
+
 /* 装饰光斑：与原有右下角圆形叠加，营造纵深与呼吸感 */
 .auth-brand::before {
   content: '';
@@ -398,9 +412,12 @@
 
 /* 平台名称：渐变文字 + 流动高光 + 冷光晕，品牌区视觉焦点，字号需大于下方所有正文 */
 .auth-brand__name {
+  max-width: calc(100% - 72px);
+  overflow: hidden;
   font-size: 30px;
   font-weight: 700;
   letter-spacing: 2px;
+  text-overflow: ellipsis;
   white-space: nowrap;
   background: linear-gradient(
     100deg,
@@ -436,13 +453,20 @@
   }
 }
 
+/* 主标语允许两行：品牌设置支持 1-40 字符，超长时换行并最多展示两行，避免右侧硬裁切 */
 .auth-brand__title {
+  display: -webkit-box;
+  max-width: 680px;
   margin: 0 0 20px;
+  overflow: hidden;
   font-size: 34px;
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: 1px;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 /* 主标语左侧加一条品牌青强调线，替代居中堆叠的常规排版 */
